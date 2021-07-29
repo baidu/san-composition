@@ -1,0 +1,14 @@
+{
+  "name": "san-reactive",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/jinzhan/san-reactive.git",
+  "author": "jinzhan <jinzhan@baidu.com>",
+  "license": "MIT",
+  "peerDependencies": {
+    "san": "^3.10.6"
+  },
+  "devDependencies": {
+    "san": "^3.10.6"
+  }
+}
