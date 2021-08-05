@@ -1,16 +1,14 @@
 import san from 'san';
 
-let currentInstance = null;
-
-// TODO: 需要考虑嵌套组件的情况
-let currentRenderingInstance = null;
-
-const getCurrentInstance = () => {
-    return currentInstance || currentRenderingInstance;
-};
-
-const setCurrentInstance = instance => {
-    currentInstance = instance;
+const globalInstance = {
+    instance: null,
+    renderingInstance: null,
+    get() {
+        return this.instance || this.renderingInstance;
+    },
+    set(instance) {
+        this.instance = instance;
+    }
 };
 
 const dataKey = Symbol('dataKey');
@@ -25,29 +23,29 @@ const dataKey = Symbol('dataKey');
 export class Component extends san.Component {
     constructor(options = {}) {
         super(options);
-
-        // 添加setup的逻辑
         if (typeof this.setup === 'function') {
             this._setupHooks = {};
-            setCurrentInstance(this);
+            globalInstance.set(this);
+            // ① 获取setup返回的方法和数据
             const composition = this.setup();
             const keys = Object.keys(composition);
-            // const data = {};
+
+            // TODO: setup(context) {} setup提供的API
             keys.forEach(key => {
                 if (typeof composition[key] === 'function') {
-                    // ① 实现setup中的定义方法
+                    // 实现setup中的定义方法
                     if (this[key]) {
                         console.log(`Error: method [${key}] is duplicated.`);
                     } else {
                         this[key] = composition[key];
                     }
                 } else {
-                    // ② 实现通过setup来设置data数据
+                    // 实现通过setup来设置data数据
                     composition[key][dataKey] = key;
                 }
             });
 
-            // ③ 实现生命周期钩子
+            // ② 实现生命周期钩子
             const _toPhase = this._toPhase;
             this._toPhase = name => {
                 const hooks = this._setupHooks[name] || [];
@@ -59,10 +57,7 @@ export class Component extends san.Component {
         }
     }
 
-    // TODO: setup提供的API
-    // setup(context) {
-
-    // }
+    // ③ 
 
     // attach(...args) {
     //     super.attach.call(this, ...args);
@@ -70,7 +65,7 @@ export class Component extends san.Component {
 };
 
 /**
- * 添加生命周期回调方法
+ * 添加生命周期回调的高阶函数
  * 
  * @param {string} lifecycle 
  * @param {Object} scope 
@@ -82,13 +77,13 @@ const injectHook = (lifecycle, hook, target) => {
 };
 
 /**
- * 添加生命周期回调的高阶函数
+ * 添加生命周期回调方法
  * 
  * @param {string} lifecycle 
  * @param {Object} scope 
  * @returns 
  */
-const createHook = lifecycle => (hook, target = getCurrentInstance()) => {
+const createHook = lifecycle => (hook, target = globalInstance.get()) => {
     injectHook(lifecycle, hook, target);
 };
 
@@ -99,8 +94,7 @@ const createHook = lifecycle => (hook, target = getCurrentInstance()) => {
  * @param Object data data对象
 */
 export const reactive = data => {
-    const currentInstance = getCurrentInstance();
-    // 需要知道data的参数名称，否则无法和组件的data结合
+    const currentInstance = globalInstance.get();
     let name;
     return new Proxy(data, {
         get(obj, prop) {
@@ -108,7 +102,7 @@ export const reactive = data => {
             if (!prop in data) {
                 return;
             }
-            return name ? currentInstance.data.get(`info.${prop}`) : obj[prop];
+            return name ? currentInstance.data.get(`${name}.${prop}`) : obj[prop];
         },
         set(obj, prop, value) {
             if (prop === dataKey) {
@@ -133,6 +127,42 @@ export const reactive = data => {
             return true;
         }
     });
+};
+
+/**
+ * 目标：函数的方式，设置data中的响应式数据
+ *  function setup() {
+        const person = setData({
+            name: 'Jinz',
+            count: 20
+        });
+
+        const increase = () => {
+            person.set('name', person.get('name') + 1);
+        };
+        
+        return {
+            person,
+            increase
+        };
+    };
+ * 
+ * @param {string} key 
+ * @param {string|number|Object} value 
+ */
+export const setData = () => {
+    const person = setData({
+        name: 'Jinz',
+        count: 20
+    });
+
+    const increase = () => {
+        person.set('name', person.get('name') + 1);
+    };
+
+    return {
+        person
+    };
 };
 
 /**
@@ -169,4 +199,3 @@ export const onCreated = createHook('created');
 export const onAttached = createHook('attached');
 export const onDetached = createHook('detached');
 export const onDisposed = createHook('disposed');
-
