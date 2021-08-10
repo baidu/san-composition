@@ -1,4 +1,5 @@
 # Referenced from https://github.com/github/gitignore/blob/master/Node.gitignore
+#
 
 # Logs
 logs
@@ -84,3 +85,6 @@ yarn.lock
 /output
 /dist
 /dll
+
+*.bak.js
+*.bak?.js

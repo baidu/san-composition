@@ -1,3 +1,7 @@
+/**
+ * @file 方案二：类React, react-hooks
+*/
+
 import san from 'san';
 
 const globalInstance = {
