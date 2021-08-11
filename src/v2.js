@@ -90,7 +90,7 @@ export class Component extends san.Component {
         });
     }
 
-    _calcComputed = function (computedExpr) {
+    _calcComputed(computedExpr) {
         // TODO:
     }
 };
