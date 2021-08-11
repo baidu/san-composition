@@ -1,11 +1,8 @@
 /**
- * @file 容器组件
- * @author jinzhan <jinzhan@baidu.com>
+* @file 组合式API，demo1
  */
 
 import {Component, reactive, computed, onAttached} from '@/san-reactive';
-import './app.less';
-
 export default class App extends Component {
     static template = /*html*/`
         <div>
