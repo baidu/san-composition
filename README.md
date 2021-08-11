@@ -15,9 +15,7 @@ Composition API的思路受了React Hooks的影响，由Vue框架提出，它使
    1.  在逻辑组织和逻辑复用方面，Composition API是优于Options API；
    2. 因为Composition API几乎是函数，会有更好的类型推断；
    3. Composition API对 tree-shaking 友好，代码也更容易压缩；
-   4. （Composition API中见不到this的使用，减少了this指向不明的情况）。
-
-![c7dad90771f7458ebb5c4e38d97be3e3](/Users/jinzhan/rfcs/images/c7dad90771f7458ebb5c4e38d97be3e3.png)
+   4. Composition API中见不到this的使用，减少了this指向不明的情况；（注：这是Vue里面的问题，San应该不存在）。
 
 先看一个Vue的例子：
 
@@ -93,12 +91,6 @@ export default {
 }
 </script>
 ```
-
-
-
-完整的组合式API
-
-![img](/Users/jinzhan/rfcs/images/image-20210416111905005.png)
 
 
 
