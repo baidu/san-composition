@@ -2,7 +2,7 @@
  * @file 组合式API，demo3
  */
 
- import {Component} from '@/san-reactive';
+ import {Component} from '@san-reactive/v3';
  
  export default class App extends Component {
     static template = /*html*/`

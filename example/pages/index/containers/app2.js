@@ -1,8 +1,8 @@
 /**
-* @file 组合式API，demo1
+ * @file 组合式API，demo2
  */
+import {Component, initData, computed, onAttached} from '@san-reactive/v2';
 
-import {Component, reactive, computed, onAttached} from '@/san-reactive';
 export default class App extends Component {
     static template = /*html*/`
         <div>
@@ -70,8 +70,8 @@ export default class App extends Component {
         }
     }
 
-    setup() {
-        const info = reactive({
+    setup(data) {
+        const info = initData({
             name: 'Jinz',
             count: 1,
             ext: {
@@ -103,7 +103,7 @@ export default class App extends Component {
         });
 
         const increment = () => {
-            info.count = info.count + 1;
+            info.set('count', info.get('count') ? info.get('count') + 1 : 1);
         };
 
         onAttached(() => {
@@ -111,34 +111,32 @@ export default class App extends Component {
         });
 
         const testExt = () => {
-            info.deep.deeper.deepest.title += ' ' + info.deep.deeper.deepest.title;
+        info.set('deep.deeper.deepest.title', info.get('deep.deeper.deepest.title') + 'haha');
         };
 
         const testArr1 = () => {
-            info.list1[0].title = 'woca1~' + Date.now();
+        info.set('list1[0].title', 'woca1~' + Date.now());
         };
 
         const testArr2 = () => {
-            info.list2 = [{
-                title: 'woca2~' + Date.now()
-            }];
+        info.set('list2[0]', {
+            title: 'woca2~' + Date.now()
+        });
         };
 
         const testArr3 = () => {
-            info.list3.splice(0, 0, {
+        info.splice('list3', [0, 0, {
                 title: 'woca3~' + Date.now()
-            })
+            }]);
         };
 
         const setExt = () => {
-            // info.ext?.deeper?.deepest.title = 'deeper set';
-            info.ext.deeper = {};
-            info.ext.deeper.deepest = {};
-            info.ext.deeper.deepest.title = 'deep set';
+        info.set('ext.deeper.deepest.title', 'deep set');
         };
 
         const showMsg = computed(() => {
-            return 'info.deep.deeper.deepest.title => ' + info.deep.deeper.deepest.title;
+            // return 'info.deep.deeper.deepest.title => ' + this.data.get('info.deep.deeper.deepest.title');
+            return 'info.deep.deeper.deepest.title => ' + info.get('deep.deeper.deepest.title');
         });
 
         return {

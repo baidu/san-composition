@@ -3,7 +3,7 @@
 */
 
 import san from 'san';
-import {isObject} from '../utils/utils';
+import {isObject} from './utils/utils';
 
 const globalInstance = {
     instance: null,
