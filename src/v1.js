@@ -77,11 +77,14 @@ export class Component extends san.Component {
      *  获取setup方法，调用san.component内部方法，重新初始化
     */
     _doCalcComputed(computedDeps) {
-        // TODO: 这里要做依赖分析，computedDeps
+        // TODO: 这里要做依赖分析，computedDeps，
+        // TODO: 考虑扩展san._calcComputed，增加额外的参数？
         this.__setupComputed && Object.keys(this.__setupComputed).forEach(expr => {
             this.computed[expr] = this.__setupComputed[expr];
             this._calcComputed(expr);
         });
+
+        // TODO: 重置_calcComputed，收集依赖
     }
 };
 

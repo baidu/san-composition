@@ -1,5 +1,5 @@
 /**
- * @file 方案二：类React, react-hooks
+ * @file 方案二
 */
 
 import san from 'san';
@@ -14,6 +14,9 @@ const globalInstance = {
         this.instance = instance;
     }
 };
+
+const REACTIVE_KEY_NAME = '__s_isReactive';
+const COMPUTED_KEY_NAME = '__s_isComputed';
 
 const dataKey = Symbol('dataKey');
 
@@ -33,8 +36,6 @@ export class Component extends san.Component {
             // ① 获取setup返回的方法和数据
             const composition = this.setup();
             const keys = Object.keys(composition);
-
-            // TODO: setup(context) {} setup提供的API
             keys.forEach(key => {
                 if (typeof composition[key] === 'function') {
                     // 实现setup中的定义方法
@@ -43,11 +44,26 @@ export class Component extends san.Component {
                     } else {
                         this[key] = composition[key];
                     }
-                } else {
-                    // 实现通过setup来设置data数据
-                    composition[key][dataKey] = key;
+                }
+                
+                else if(composition[key][REACTIVE_KEY_NAME]) {
+                    const keyName = composition[key].keyName;
+                    this.data.set(key, this.data.raw[keyName]);
+                    this.data.set(keyName, undefined);
+                    // 更新keyName
+                    composition[key].keyName = key;
+                }
+                
+                else if(composition[key][COMPUTED_KEY_NAME]) {
+                    this.__setupComputed = this.__setupComputed || {};
+                    Object.assign(this.__setupComputed, {
+                        [key]: composition[key].computed
+                    });
                 }
             });
+
+            // 初始化setup中的依赖
+            this._doCalcComputed();
 
             // ② 实现生命周期钩子
             const _toPhase = this._toPhase;
@@ -61,11 +77,22 @@ export class Component extends san.Component {
         }
     }
 
-    // ③ 
+    /**
+     *  获取setup方法，调用san.component内部方法，重新初始化
+     * TODO: 需要扩展_calcComputed，增加额外的参数？
+    */
+     _doCalcComputed() {
+        this.__setupComputed && Object.keys(this.__setupComputed).forEach(expr => {
+            if (!this.computedDeps[expr]) {
+                this.computed[expr] = this.__setupComputed[expr];
+                this._calcComputed(expr);
+            }
+        });
+    }
 
-    // attach(...args) {
-    //     super.attach.call(this, ...args);
-    // }
+    _calcComputed = function (computedExpr) {
+        // TODO:
+    }
 };
 
 /**
@@ -92,46 +119,24 @@ const createHook = lifecycle => (hook, target = globalInstance.get()) => {
 };
 
 /**
- * 2. 增加reactive方法，实现data的reactive，
- *    这里不能简单返回this.data，要解决名称的冲突问题
+ * 生命周期钩子方法，直接在san的组件生命周期中注入setup
  * 
- * @param Object data data对象
+ * 注：选择san的生命周期最早的钩子：compiled
+ * compiled - 组件视图模板编译完成
+ * inited - 组件实例初始化完成
+ * created - 组件元素创建完成
+ * attached - 组件已被附加到页面中
+ * detached - 组件从页面中移除
+ * disposed - 组件卸载完成
 */
-export const reactive = data => {
-    const currentInstance = globalInstance.get();
-    let name;
-    return new Proxy(data, {
-        get(obj, prop) {
-            // 不能获取不在reactive下的东西
-            if (!prop in data) {
-                return;
-            }
-            return name ? currentInstance.data.get(`${name}.${prop}`) : obj[prop];
-        },
-        set(obj, prop, value) {
-            if (prop === dataKey) {
-                name = value;
-                // 初始化
-                currentInstance.data.set(name, obj);
-                return true;
-            }
+export const onCompiled = createHook('compiled');
+export const onInited = createHook('inited');
+export const onCreated = createHook('created');
+export const onAttached = createHook('attached');
+export const onDetached = createHook('detached');
+export const onDisposed = createHook('disposed');
 
-            // 不能设置不在reactive下的东西
-            if (!prop in data) {
-                console.error(`[${prop}] is not existed in the Object.`);
-                return;
-            }
 
-            if (name) {
-                currentInstance.data.set(`${name}.${prop}`, value);
-            } else {
-                obj[prop] = value;
-            }
-
-            return true;
-        }
-    });
-};
 
 /**
  * 目标：函数的方式，设置data中的响应式数据
@@ -154,19 +159,45 @@ export const reactive = data => {
  * @param {string} key 
  * @param {string|number|Object} value 
  */
-export const setData = () => {
-    const person = setData({
-        name: 'Jinz',
-        count: 20
+let id = 0;
+export const initData = data => {
+    const currentInstance = globalInstance.get();
+    const dataMethod = currentInstance.data;
+    // 常用方法
+    const methods = [
+        'get',
+        'set',
+        'apply',
+        'assign',
+        'merge',
+        'remove',
+        'pop',
+        'shift',
+        'push',
+        'unshift',
+        'splice'
+    ];
+    const ret = {
+        keyName: '_t' + id++,
+        [REACTIVE_KEY_NAME]: true,
+    };
+    dataMethod.set(ret.keyName, data);
+    methods.forEach(method => {
+        ret[method] = function(expr, ...args) {
+            return dataMethod[method](`${this.keyName}.${expr}`, ...args);
+        };
     });
+    return ret;
+};
 
-    const increase = () => {
-        person.set('name', person.get('name') + 1);
-    };
-
+/**
+ * 扩展计算属性
+*/
+export const computed = computed => {
     return {
-        person
-    };
+        [COMPUTED_KEY_NAME]: 1,
+        computed
+    }
 };
 
 /**
@@ -184,22 +215,3 @@ export const ref = data => {
 export const watchEffect = callback => {
     // do something
 };
-
-
-/**
- * 生命周期钩子方法，直接在san的组件生命周期中注入setup
- * 
- * 注：选择san的生命周期最早的钩子：compiled
- * compiled - 组件视图模板编译完成
- * inited - 组件实例初始化完成
- * created - 组件元素创建完成
- * attached - 组件已被附加到页面中
- * detached - 组件从页面中移除
- * disposed - 组件卸载完成
-*/
-export const onCompiled = createHook('compiled');
-export const onInited = createHook('inited');
-export const onCreated = createHook('created');
-export const onAttached = createHook('attached');
-export const onDetached = createHook('detached');
-export const onDisposed = createHook('disposed');
