@@ -4,9 +4,6 @@
 
 import san from 'san';
 
-const REACTIVE_KEY_NAME = '__s_isReactive';
-const COMPUTED_KEY_NAME = '__s_isComputed';
-
 /**
  * 添加生命周期回调的高阶函数
  * 
