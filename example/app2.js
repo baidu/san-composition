@@ -2,7 +2,6 @@
  * @file 组合式API，demo2
  */
 import {Component, initData, computed, onAttached} from '@san-reactive/v2';
-
 export default class App extends Component {
     static template = /*html*/`
         <div>

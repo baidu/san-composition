@@ -17,8 +17,8 @@
         `;
 
         setup(context) {
-            const {reactive, watch, computed, onAttached, onCreated} = context;
-            const data = reactive({
+            const {setData, watch, computed, onAttached, onCreated} = context;
+            const data = setData({
                 count: 1,
                 triple: 3
             });

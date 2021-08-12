@@ -47,10 +47,14 @@ export class Component extends san.Component {
                     } else {
                         this[key] = composition[key];
                     }
-                } else if(composition[key][REACTIVE_KEY_NAME]) {
-                    // 实现通过setup来设置data数据，设置绑定的data的变量名称
+                }
+
+                // 设置setup中提供的数据对应的data的变量名称
+                else if(composition[key][REACTIVE_KEY_NAME]) {
                     composition[key][DATA_KEY_NAME] = key;
-                } else if(composition[key][COMPUTED_KEY_NAME]) {
+                }
+                
+                else if(composition[key][COMPUTED_KEY_NAME]) {
                     this.__setupComputed = this.__setupComputed || {};
                     Object.assign(this.__setupComputed, {
                         [key]: composition[key].computed
@@ -79,12 +83,12 @@ export class Component extends san.Component {
     _doCalcComputed(computedDeps) {
         // TODO: 这里要做依赖分析，computedDeps，
         // TODO: 考虑扩展san._calcComputed，增加额外的参数？
+        // TODO: 初步的思路是：
+        // TODO: 执行一下__setupComputed，然后在proxy对象的getter增加一些依赖的标识
         this.__setupComputed && Object.keys(this.__setupComputed).forEach(expr => {
             this.computed[expr] = this.__setupComputed[expr];
             this._calcComputed(expr);
         });
-
-        // TODO: 重置_calcComputed，收集依赖
     }
 };
 

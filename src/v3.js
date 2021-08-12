@@ -1,5 +1,5 @@
 /**
- * @file 方案二
+ * @file San组合式API（方案三）
 */
 
 import san from 'san';
@@ -50,11 +50,11 @@ const getHooksApi = target => {
 };
 
 /**
- * reactive
+ * setData 包装组件基础的data对象
 */
-const reactive = function (target, data) {
-    Object.assign(target.data.raw, data);
-    return target.data;
+const setData = function (extData, val) {
+    Object.assign(extData.raw(), val);
+    return extData;
 };
 
 const watch = function (target, dataName, listener) {
@@ -62,17 +62,59 @@ const watch = function (target, dataName, listener) {
 };
 
 /**
- * TODO: 这里执行时机有问题，待解决
+ * 处理计算属性
 */
-const computed = function (target, computed) {
-    return Object.assign(target.computed, computed);
+const computed = function (target, extData, computed) {
+    Object.keys(computed).forEach(key => {
+        // 监听数值的变化
+        extData._computingName = key;
+        extData._computingFn = function() {
+            target.data.set(key, computed[key].call(target));
+        };
+        // 计算出computed的值，挂在data上
+        target.data.set(key, computed[key].call(target));
+        extData._computingFn = null;
+        extData._computing = null;
+    });
 };
 
 const getSetupApi = target => {
+    const methods = [
+        // 'get', 
+        'set', 
+        'merge', 'assign', 'apply',
+        'splice', 'push', 'pop', 'unshift', 'shift', 'remove', 'removeAt',
+        'listen', 'fire', 'unlisten'
+    ];
+    // 包装data方法，解决计算属性依赖收集问题
+    const extData = {
+        computedDeps: {},
+        raw() {
+            return target.data.raw;
+        },
+        get(name) {
+            if (this._computingFn) {
+                const deps = this._computingName + '_' + name;
+                if (!this.computedDeps[deps]) {
+                    this.computedDeps[deps] = 1;
+                    const _computingFn = this._computingFn;
+                    target.watch(name, () => {
+                        _computingFn();
+                    });
+                }
+            }
+            return target.data.get(name);
+        }
+    };
+    methods.forEach(key => {
+        extData[key] = function() {
+            return target.data[key].apply(target.data, arguments);
+        };
+    });
     return {
-        reactive: reactive.bind(target, target),
+        setData: setData.bind(target, extData),
         watch: watch.bind(target, target),
-        computed: computed.bind(target, target)
+        computed: computed.bind(target, target, extData)
     };
 };
 
