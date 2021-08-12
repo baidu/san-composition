@@ -1,5 +1,59 @@
 /**
  * @file San组合式API（方案三）
+ * 
+ * DEMO：
+ *  
+ * export default class App extends Component {
+ *    static template = '
+ *         <div>
+ *              <span>count: {{ count }} </span>
+ *               <input type="text" value="{= count =}"/>
+ *               <div>double: {{ double }} </div>
+ *               <div>triple: {{ triple }} </div>
+ *               <button on-click="increment"> +1 </button>
+ *               <button on-click="decrement"> -1 </button>
+ *           </div>
+ *       `;
+ *
+ *      setup(context) {
+ *           const {setData, watch, computed, onAttached} = context;
+ *           const data = setData({
+ *               count: 1,
+ *               triple: 3
+ *           });
+ *
+ *           const increment = () => {
+ *               let count = data.get('count');
+ *               data.set('count', ++count);
+ *               data.set('triple', count * 3);
+ *           };
+ *
+ *           const decrement = () => {
+ *               let count = data.get('count');
+ *               data.set('count', --count);
+ *               data.set('triple', count * 3);
+ *           };
+ *
+ *           watch('count', newVal => {
+ *               console.log('count:', newVal);
+ *           });
+ *
+ *           computed({
+ *               double() {
+ *                   return data.get('count') * 2;
+ *               }
+ *           });
+ *
+ *           onAttached(() => {
+ *               console.log('onAttached');
+ *           });
+ *
+ *           return {
+ *               increment,
+ *               decrement
+ *           }
+ *       }
+ *   }
 */
 
 import san from 'san';
@@ -7,8 +61,9 @@ import san from 'san';
 /**
  * 添加生命周期回调的高阶函数
  * 
- * @param {string} lifecycle 
- * @param {Object} scope 
+ * @param {string} lifecycle
+ * @param  {Function} hook callback function
+ * @param {Object} target Component instance
  * @returns 
  */
 const injectHook = (lifecycle, hook, target) => {
@@ -20,7 +75,6 @@ const injectHook = (lifecycle, hook, target) => {
  * 添加生命周期回调方法
  * 
  * @param {string} lifecycle 
- * @param {Object} scope 
  * @returns 
  */
 const createHook = lifecycle => function(target, hook) {
@@ -28,9 +82,9 @@ const createHook = lifecycle => function(target, hook) {
 };
 
 /**
- * 生命周期钩子方法，直接在san的组件生命周期中注入setup
+ * 生命周期钩子方法
+ * @returns {Object} 返回生命周期钩子方法
  * 
- * 注：选择san的生命周期最早的钩子：compiled
  * compiled - 组件视图模板编译完成
  * inited - 组件实例初始化完成
  * created - 组件元素创建完成
@@ -78,6 +132,15 @@ const computed = function (target, extData, computed) {
     });
 };
 
+/**
+ * 获取setup相关的API
+ * @returns {Object} 
+ *  {
+ *      setData
+ *      watch
+ *      computed
+ *  }
+*/
 const getSetupApi = target => {
     const methods = [
         // 'get', 
@@ -119,11 +182,7 @@ const getSetupApi = target => {
 };
 
 /**
- * 新增setup扩展方法
- * 
- * @return 返回响应式的数据
- *  - properties => initData: 属性挂到data下面
- *  - methods => this： 方法挂到this下面
+ * 扩展san.Component，新增setup()方法
  **/
  export class Component extends san.Component {
     constructor(options = {}) {

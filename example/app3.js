@@ -57,6 +57,7 @@
                 console.log('onCreated');
             });
 
+            // 只返回方法，数据通过setData或computed来返回
             return {
                 increment,
                 decrement
