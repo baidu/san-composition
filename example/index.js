@@ -4,7 +4,7 @@
  */
 
 import App from '@app';
-import AppComponent from './v4';
+import AppComponent from './compt';
 
 console.log({AppComponent});
 

@@ -1,1 +1,1 @@
-export * from './src/v3';
+export * from './src';

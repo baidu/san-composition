@@ -20,7 +20,7 @@ import {
     onDetached,
     onDisposed,
     onUpdated
-} from '../src/v4';
+} from '../src';
 
 export default setupComponent(() => {
     template(/*html*/`
