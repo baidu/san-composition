@@ -5,10 +5,7 @@
   "private": true,
   "description": "A San project",
   "scripts": {
-    "start": "cross-env NODE_ENV=development san serve --config san.config.js",
-    "build": "cross-env NODE_ENV=production san build --config san.config.js",
-    "analyzer": "cross-env NODE_ENV=production san build --config san.config.js --analyze",
-    "build:modern": "cross-env NODE_ENV=production san build --config san.config.js --modern"
+    "start": "cross-env NODE_ENV=development san serve --config ./example/san.config.js"
   },
   "keywords": [
     "San",

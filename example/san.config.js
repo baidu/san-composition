@@ -9,13 +9,12 @@ module.exports = {
     outputDir,
     pages: {
         index: {
-            entry: './example/index.js',
+            entry: './index.js',
             template: './pages.template.ejs',
             filename: 'index.html'
         }
     },
     alias: {
-        '@app': resolve('example/lib/App.js'),
-        '@san-reactive': resolve('src')
+        '@app': resolve('./lib/App.js'),
     }
 };
