@@ -35,17 +35,63 @@ export default setupComponent(() => {
         </div>
     `);
 
+    // return;
+
     // 处理数据
     const count = data('count', 1);
+
+
+
+
+    const info = data({
+        name: 'jinz',
+        company: 'baidu'
+    });
+ 
+    info.get('name'); // jinz
+
+    // 批量设置
+    info.set({
+        name: 'liub',
+        company: 'tencent'
+    });
+
+
+    info.get('name');     // liub
+
+
+    const info2 = data('info', {name: 'jinz'});
+    info2.set({
+        name: 'liub',
+        company: 'tencent'
+    });
+
+    info2.get();          // {name: 'jinz'}
+    info2.get('name');    // liubin
+
+
+
+
+    const info3 = data({
+        name: 'jinz',
+        company: 'baidu'
+    });
+
+    info3.set('tencent'); // error
+
+
+
+
+    count.set(100);
 
     // 处理上下文
     method({
         increment: () => {
             console.log('incrementing');
-            // data('count', ++data('count'));
+            count.set(count.get() + 1);
         },
         decrement: () => {
-            // data('count', --data('count'));
+            count.set(count.get() - 1);
         }
     });
 
@@ -55,7 +101,7 @@ export default setupComponent(() => {
 
     computed({
         double() {
-            return data('count') * 2;
+            return count.get() * 2;
         }
     });
 

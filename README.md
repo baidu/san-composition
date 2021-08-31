@@ -9,13 +9,12 @@ Composition API的思路受了React Hooks的影响，由Vue框架提出，它使
 
 ## **1.1 Options API**  vs **Composition API**
 
-1. Options API通过在Vue文件中data、methods、computed、watch中定义属性和方法，共同处理页面逻辑；
+1. Options API通过使用San单文件中data、method、computed、watch来定义属性和方法，共同处理页面逻辑；
 2. Composition API根据逻辑相关性组织代码的，提高可读性和可维护性，基于函数组合的 API 更好的重用逻辑代码（替代容易发生命名冲突和数据来源不清的mixin）；
 3. **Brief Summary**：
-   1.  在逻辑组织和逻辑复用方面，Composition API是优于Options API；
+   1. 在逻辑组织和逻辑复用方面，Composition API是优于Options API；
    2. 因为Composition API几乎是函数，会有更好的类型推断；
    3. Composition API对 tree-shaking 友好，代码也更容易压缩；
-   4. Composition API中见不到this的使用，减少了this指向不明的情况；（注：这是Vue里面的问题，San应该不存在）。
 
 先看一个Vue的例子：
 
