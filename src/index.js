@@ -75,13 +75,10 @@ export const setupComponent = (creator, options = {}) => {
                     handler: computed[expr],
                     component: this
                 };
-                // 兼容，this.data.get
-                computed[expr].call({
-                    data: {
-                        get() {},
-                        set() {}
-                    }
-                });
+
+                // 执行一次computed方法，保证能收益到computed相关的依赖
+                // call(this)，保证原始的this.data.get等相关API兼容
+                computed[expr].call(this);
             });
             delete renderingContext.computing;
         });

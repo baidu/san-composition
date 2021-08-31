@@ -93,7 +93,8 @@ export default setupComponent(() => {
 
     computed({
         double() {
-            return count.get() * 2;
+            const name = this.data.get('name');
+            return name + ' got ' +  count.get() * 2;
         }
     });
 
