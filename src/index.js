@@ -51,21 +51,22 @@ export const setupComponent = (creator, options = {}) => {
     // 初始化context上下文
     const context = initContext();
     
-    // 定义数据
+    // 初始化数据
     dataCache = new san.Data({});
 
     // 执行san组合api
     creator();
 
     // 使用compiled，尽早把context.dataHandlers中的this的绑定
-    if (context.dataCenter) {
-        const dataCenter = context.dataCenter;
+    if (context.dataManager) {
+        const dataManager = context.dataManager;
+        const rawData = dataCache.raw;
         const computed = context.computed;
         context.attached = context.attached || [];
         context.attached.push(function() {
             // 初始化数据
-            this.data.assign(dataCache.raw);
-            dataCenter.forEach(instance => instance.setData(this.data));
+            this.data.assign(rawData);
+            dataManager.forEach(instance => instance.setData(this.data));
             
             // 处理computed属性
             Object.keys(computed).forEach(expr => {
@@ -85,7 +86,7 @@ export const setupComponent = (creator, options = {}) => {
             delete renderingContext.computing;
         });
     
-        delete context.dataCenter;
+        delete context.dataManager;
     }
 
     // 处理watch，尽量在生命周期靠后的阶段执行，注意调用的顺序
@@ -256,8 +257,11 @@ DataHandler.prototype.assign = function(...args) {
 
 
 
-// TODO:参数有冲突怎么办？
-// remove({string|Object}expr, {*}item, {Object?}option)
+/**
+ * TODO:考虑到参数有冲突的问题，一下方法不支持嵌套对象的key设置
+ * 例如：this.data.remove({string|Object}expr, {*}item, {Object?}option)
+ *      => data.remove({*}item, {Object?}option)
+ **/ 
 [
     'remove',
     'removeAt',
@@ -278,9 +282,9 @@ exports.data = (key, val) => {
     const obj = typeof key === 'string' ? {[key]: val} : key;
     dataCache.assign(obj);
     const dataKey = typeof key === 'string' ? key : Object.keys(key);
-    context.dataCenter = context.dataCenter || [];
+    context.dataManager = context.dataManager || [];
     const dh = new DataHandler(dataKey, dataCache);
-    context.dataCenter.push(dh);
+    context.dataManager.push(dh);
     return dh;
 };
 
