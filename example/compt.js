@@ -37,8 +37,10 @@ export default setupComponent(() => {
 
             <div>{{name}}</div>
             <div>{{company}}</div>
+            <div>{{extra}}</div>
             <button on-click="baidu"> baidu </button>
             <button on-click="tencent"> tencent </button>
+            <button on-click="assign"> assign </button>
         </div>
     `);
 
@@ -51,15 +53,24 @@ export default setupComponent(() => {
     });
 
     method({
+        baidu() {
+            info.set('name', 'jinz');
+            info.set('company', 'baidu');
+        },
+
         tencent() {
             info.set({
                 name: 'liub',
                 company: 'tencent'
             });
         },
-        baidu() {
-            info.set('name', 'jinz');
-            info.set('company', 'baidu');
+
+        assign() {
+            info.assign({
+                name: 'yuxin',
+                company: 'tencent',
+                extra: 'boy'
+            });
         }
     });
 
