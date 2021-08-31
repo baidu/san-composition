@@ -216,7 +216,6 @@ DataHandler.prototype.set = function(...args) {
         if (typeof this.key === 'string') {
             return this.dataCenter.set(this.key, data);
         }
-
         // this.key为数组的情况
         if (typeof data === 'object' && !Array.isArray(data)) {
             Object.keys(data).forEach(key => {
@@ -230,6 +229,7 @@ DataHandler.prototype.set = function(...args) {
         if (typeof this.key === 'string') {
             return this.dataCenter.set(this.key + '.' + args[0], args[1]);
         }
+        return this.dataCenter.set(args[0], args[1]);
     }
 };
 
