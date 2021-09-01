@@ -54,8 +54,8 @@ export const setupComponent = (creator, options = {}) => {
         context.initData = () => rawData;
 
         const computed = context.computed;
-        context.attached = context.attached || [];
-        context.attached.push(function () {
+        context.inited = context.inited || [];
+        context.inited.unshift(function () {
             // 将data API的方法挂载到组件上
             dataManager.forEach(dataHandler => dataHandler.setData(this.data));
 
@@ -82,7 +82,7 @@ export const setupComponent = (creator, options = {}) => {
         const watch = context.watch;
         Object.keys(watch).forEach(item => {
             context.attached = context.attached || [];
-            context.attached.push(function () {
+            context.attached.unshift(function () {
                 this.watch(item, watch[item])
             });
         });
@@ -112,6 +112,8 @@ export const setupComponent = (creator, options = {}) => {
 
 /**
  * 处理template方法
+ * 
+ * @param {string} tpl 组件的模板
 */
 export const template = tpl => {
     context.template = tpl;
@@ -131,6 +133,8 @@ class DataHandler {
     }
     /**
      * 用于把临时存储的数据，挂到组件上面
+     *
+     * @param {Object} dataCenter Data实例
      * */
     setData(dataCenter) {
         this.dataCenter = dataCenter;
@@ -150,33 +154,32 @@ class DataHandler {
      * const info = data('info', {name: 'jinz', company: 'baidu'})
      * info.get() // {name: 'jinz', company: 'baidu'}
      * info.get('name') // 'jinz'，等价于: this.data.get('info.name')
-     * 
+     *
+     * @param {string?} key 获取data()设置数据的key
      * **/
     get(key) {
         // 为computed计算属性添加对应的watcher
         if (renderingContext.computing) {
-            if (typeof this.key !== 'string' && typeof key !== 'string') {
-                // 使用data.get()的情况，不进行watch了
-                return;
-            }
-            const realKey = typeof this.key === 'string'
-                ? typeof key === 'string' ? this.key + '.' + key
-                    : this.key
-                : key;
-
-            if (renderingContext.computing[realKey]) {
-                return;
-            }
-
-            renderingContext.computing[realKey] = 1;
-
             const {
                 expr,
                 handler,
                 component
             } = renderingContext.computing;
 
-            component && component.watch(realKey, () => component.data.set(expr, handler.call(component)));
+            if (typeof this.key !== 'string' && typeof key !== 'string') {
+                // 使用data.get()的情况
+                this.key.forEach(key => {
+                    component && component.watch(key, () => component.data.set(expr, handler.call(component)));
+                });
+            }
+            else {
+                const realKey = typeof this.key === 'string'
+                ? typeof key === 'string' ? this.key + '.' + key
+                    : this.key
+                : key;
+        
+                component && component.watch(realKey, () => component.data.set(expr, handler.call(component)));
+            }
         }
 
         if (typeof this.key === 'string') {
@@ -224,6 +227,7 @@ class DataHandler {
      * 
      * info.set('sex', 'male'); // set失败
      * info.get();  // {name: 'jinz', company: 'tencent'}
+     * 
      * **/
     set(...args) {
         if (args.length === 1) {
@@ -309,8 +313,6 @@ class DataHandler {
         return this.dataCenter.assign(...args);
     }
 
-    
-
     /**
      * 快速设置
      * 
@@ -370,6 +372,24 @@ class DataHandler {
     }
 };
 
+/**
+ * 操作数据的API
+ * const info = data('info', 'san composition api');
+ * info.get();  // 'san composition api'
+ * 
+ * 2. 支持对象形式的设置数据的get
+ * const info = data({name: 'jinz', company: 'baidu'})
+ * info.get('name') // 'jinz'，等价于 this.data.get('name')
+ * 
+ * 3. 获取value为对象形式的数据
+ * const info = data('info', {name: 'jinz', company: 'baidu'})
+ * info.get() // {name: 'jinz', company: 'baidu'}
+ * info.get('name') // 'jinz'，等价于: this.data.get('info.name')
+ *
+ * @param {string|Object} key 数据的key，或者键值对
+ * @param {*} val 设置的数据
+ * @returns {Object} 返回一个带有包装有 this.data 相关数据操作API的对象
+ **/
 export const data = (key, val) => {
     const obj = typeof key === 'string' ? { [key]: val } : key;
     dataCache.assign(obj);
@@ -383,6 +403,9 @@ export const data = (key, val) => {
 
 /**
  * 处理生命周期钩子
+ *
+ * @param {string} action 生命周期阶段，inited, attached...等
+ * @param {Function} callback 生命周期钩子，回调方法
 */
 const setLifecycleHooks = (action, callback) => {
     context[action] = context[action] || [];
@@ -419,6 +442,10 @@ export const onUpdated = callback => {
 
 /**
  * 处理static option对应的API
+ *
+ * @param {string} method api名称
+ * @param {string|Object} key 数据的key，或者键值对 
+ * @param {Function|Object} val 静态属性对应的回调方法或者组件
 */
 const setStaticOption = (method, key, val) => {
     // 参数可以是key、val两个参数，也可以是对象的形式

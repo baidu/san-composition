@@ -8,7 +8,7 @@ Composition API的目标是让代码的共享和重用变得更为简单和便�
 2. Composition API根据逻辑相关性组织代码的，提高可读性和可维护性，基于函数组合的 API 更好的重用逻辑代码。
 
 
-# 2. Basic example
+## 2. Basic example
 
 ```js
 import {defineComponent} from 'san';
@@ -100,12 +100,12 @@ export default setupComponent(() => {
 
 ## 3. Motivation
 
-### 3.1 更好的代码组织和逻辑复用
+### 1. 更好的代码组织和逻辑复用
 
 1. 随着功能的增加，复杂组件的代码变得更难推理。尤其是当开发者在阅读不是他们自己写的代码时，这种情况会发生。根本原因是现有的API强迫按选项组织代码，但在某些情况下，按逻辑关注点组织代码更有意义；
 2. 目前缺少一种简洁且低成本的机制来提取和重用多个组件之间的逻辑。
 
-### 3.2 关于 setupComponent 的 return
+### 2. 关于 setupComponent 的 return
 
 1. 我们将 option API全部转换为了函数方法（composition API），如果再增加额外的return，会导致返回语句变得冗长；
 2. 返回语句对可维护性有一定的帮助，但经过权衡，我们选择不 return。

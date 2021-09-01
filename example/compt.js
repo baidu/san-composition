@@ -24,25 +24,26 @@ import {
 
 export default setupComponent(() => {
     template(/*html*/`
-        <div>
-            <span>count: {{ count }} </span>
-            <input type="text" value="{= count =}"/>
-            <div>double: {{ double }} </div>
-            <div>triple: {{ count|triple }} </div>
-            <button on-click="increment"> +1 </button>
-            <button on-click="decrement"> -1 </button>
-            <my-child></my-child>
-            
-            <br/>
-
-            <div>{{name}}</div>
-            <div>{{company}}</div>
-            <div>{{extra}}</div>
-            <button on-click="baidu"> baidu </button>
-            <button on-click="tencent"> tencent </button>
-            <button on-click="assign"> assign </button>
-        </div>
-    `);
+         <div>
+             <span>count: {{ count }} </span>
+             <input type="text" value="{= count =}"/>
+             <div>double: {{ double }} </div>
+             <div>triple: {{ count|triple }} </div>
+             <button on-click="increment"> +1 </button>
+             <button on-click="decrement"> -1 </button>
+             <my-child></my-child>
+             
+             <br/>
+ 
+             <div>{{name}}</div>
+             <div>{{company}}</div>
+             <div>{{extra}}</div>
+             <div>{{usrInfo}}</div>
+             <button on-click="baidu"> baidu </button>
+             <button on-click="tencent"> tencent </button>
+             <button on-click="assign"> assign </button>
+         </div>
+     `);
 
     // 处理数据
     const count = data('count', 1);
@@ -91,10 +92,15 @@ export default setupComponent(() => {
         console.log('count updated~', newVal);
     });
 
+
     computed({
         double() {
             const name = this.data.get('name');
-            return name + ' got ' +  count.get() * 2;
+            return name + ' got ' + count.get() * 2;
+        },
+        usrInfo() {
+            const {name, company} = info.get();
+            return `name: ${name}   /   company: ${company}`;
         }
     });
 
@@ -109,7 +115,15 @@ export default setupComponent(() => {
     });
 
     onAttached(() => {
-        console.log('onAttached1');
+        console.log('another onAttached...');
+    });
+
+    onCompiled(() => {
+        console.log('onCompiled');
+    });
+
+    onInited(() => {
+        console.log('onInited');
     });
 
     components({
