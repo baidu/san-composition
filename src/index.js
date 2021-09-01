@@ -247,17 +247,41 @@ class DataHandler {
         }
     }
 
-    // 省略第一个参数的情况
+    /**
+     * 当this.data下的原始方法的第一个参数不为string的情况，可以省略第一个参数
+     * 
+     * 两种情况：
+     * const someData = data('someData', [...]);
+     * 
+     * 1. someData.splice([1, 1]);
+     *  等价于： this.data.splice('someData', [1, 1]);
+     * 
+     * 2. someData.splice('list', [1, 1]);
+     * 等价于： this.data.splice('someData.list', [1, 1]);
+     * 
+     * 3. 批量设置的key，是需要传参数的
+     * const someData = data({
+     *     name: 'dataList',
+     *     list: []
+     * });
+     * someData.splice('list', [1, 1]);
+     * 
+     * @param {string} method 要设置的方法
+     * @param {Array} args 参数透传
+    */
     shorten(method, ...args) {
-        if (this.key !== 'string') {
-            return;
-        }
         let key = this.key;
+
+        if (typeof key !== 'string') {
+            key = '';
+        }
+        
         if (typeof args[0] === 'string') {
-            key = this.key + '.' + args[0];
+            key = key ? (key + '.') + args[0] : args[0];
             args.shift();
         }
-        return this.dataCenter[method](key, ...args);
+
+        return key && this.dataCenter[method](key, ...args);
     }
 
     splice(...args) {
