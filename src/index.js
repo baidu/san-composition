@@ -51,12 +51,13 @@ export const setupComponent = (creator, options = {}) => {
     if (context.dataManager) {
         const dataManager = context.dataManager;
         const rawData = dataCache.raw;
+        context.initData = () => rawData;
+
         const computed = context.computed;
         context.attached = context.attached || [];
         context.attached.push(function () {
-            // 初始化数据
-            this.data.assign(rawData);
-            dataManager.forEach(instance => instance.setData(this.data));
+            // 将data API的方法挂载到组件上
+            dataManager.forEach(dataHandler => dataHandler.setData(this.data));
 
             // 处理computed属性
             Object.keys(computed).forEach(expr => {
