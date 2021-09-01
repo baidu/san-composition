@@ -1,9 +1,9 @@
 {
   "name": "san-composition",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "./dist/index.js",
   "private": true,
-  "description": "A San project",
+  "description": "San Composition API",
   "scripts": {
     "dev": "cross-env NODE_ENV=development san serve --config ./example/san.config.js",
     "build": "yarn run clear && yarn run rollup",
@@ -14,7 +14,7 @@
   },
   "keywords": [
     "San",
-    "San CLI"
+    "San Composition API"
   ],
   "author": "jinzhan <jinzhan@baidu.com>",
   "license": "MIT",
@@ -32,10 +32,11 @@
     "@rollup/plugin-node-resolve": "^10.0.0",
     "jest": "^27.0.6",
     "rimraf": "^3.0.2",
-    "rollup": "^2.33.1"
-  },
-  "dependencies": {
+    "rollup": "^2.33.1",
     "axios": "^0.21.1",
+    "san": "^3.10.0"
+  },
+  "peerDependencies": {
     "san": "^3.10.0"
   }
 }
