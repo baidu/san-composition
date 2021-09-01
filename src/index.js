@@ -136,21 +136,21 @@ class DataHandler {
     }
 
     /**
- * 重写get方法:
- * 1. 支持不传参数：不传参数获取默认key设置的数据
- * const info = data('info', 'san composition api');
- * info.get();  // 'san composition api'
- * 
- * 2. 支持对象形式的设置数据的get
- * const info = data({name: 'jinz', company: 'baidu'})
- * info.get('name') // 'jinz'，等价于 this.data.get('name')
- * 
- * 3. 获取value为对象形式的数据
- * const info = data('info', {name: 'jinz', company: 'baidu'})
- * info.get() // {name: 'jinz', company: 'baidu'}
- * info.get('name') // 'jinz'，等价于: this.data.get('info.name')
- * 
- * **/
+     * 重写get方法:
+     * 1. 支持不传参数：不传参数获取默认key设置的数据
+     * const info = data('info', 'san composition api');
+     * info.get();  // 'san composition api'
+     * 
+     * 2. 支持对象形式的设置数据的get
+     * const info = data({name: 'jinz', company: 'baidu'})
+     * info.get('name') // 'jinz'，等价于 this.data.get('name')
+     * 
+     * 3. 获取value为对象形式的数据
+     * const info = data('info', {name: 'jinz', company: 'baidu'})
+     * info.get() // {name: 'jinz', company: 'baidu'}
+     * info.get('name') // 'jinz'，等价于: this.data.get('info.name')
+     * 
+     * **/
     get(key) {
         // 为computed计算属性添加对应的watcher
         if (renderingContext.computing) {
