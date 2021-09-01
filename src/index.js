@@ -76,7 +76,7 @@ export const setupComponent = (creator, options = {}) => {
                     component: this
                 };
 
-                // 执行一次computed方法，保证能收益到computed相关的依赖
+                // 执行一次computed方法，保证能收集到computed相关的依赖
                 // call(this)，保证原始的this.data.get等相关API兼容
                 computed[expr].call(this);
             });
@@ -146,7 +146,20 @@ DataHandler.prototype.setData = function(dataCenter) {
 };
 
 /**
- * 重写get方法
+ * 重写get方法:
+ * 1. 支持不传参数：不传参数获取默认key设置的数据
+ * const info = data('info', 'san composition api');
+ * info.get();  // 'san composition api'
+ * 
+ * 2. 支持对象形式的设置数据的get
+ * const info = data({name: 'jinz', company: 'baidu'})
+ * info.get('name') // 'jinz'，等价于 this.data.get('name')
+ * 
+ * 3. 获取value为对象形式的数据
+ * const info = data('info', {name: 'jinz', company: 'baidu'})
+ * info.get() // {name: 'jinz', company: 'baidu'}
+ * info.get('name') // 'jinz'，等价于: this.data.get('info.name')
+ * 
  * **/ 
 DataHandler.prototype.get = function(key) {
     // 为computed计算属性添加对应的watcher
@@ -197,16 +210,29 @@ DataHandler.prototype.get = function(key) {
 /**
  * 重写set方法
  * 
- * info.set('jinz');
+ * 1. 支持直接设置value：
+ * const info = data('info', 'sca');
+ * info.set({*}item)
  * 
+ * 2. 支持批量设置value
+ * const info = data('info', {name:'', company: ''});
  * info.set({
  *    name: 'jinz',
  *    company: 'tencent'
  * });
  * 
+ * 3. 支持通过2个参数设置：
+ * const info = data('info', {name:'', company: ''});
  * info.set('name', 'jinz');
  * 
- * TODO: 补充一些错误log
+ * 4. 一些限制？只设置data中存在的项目
+ * const info = data({
+ *    name: 'jinz',
+ *    company: 'tencent'
+ * });
+ * 
+ * info.set('sex', 'male'); // set失败
+ * info.get();  // {name: 'jinz', company: 'tencent'}
  * **/
 DataHandler.prototype.set = function(...args) {
     if (args.length === 1) {
@@ -217,7 +243,7 @@ DataHandler.prototype.set = function(...args) {
         // this.key为数组的情况
         if (typeof data === 'object' && !Array.isArray(data)) {
             Object.keys(data).forEach(key => {
-                // 过滤一遍，只设置data中存在的项目
+                // TODO: 过滤一遍，只设置data中存在的项目？
                 if (this.key.indexOf(key) > -1) {
                     return this.dataCenter.set(key, data[key]);
                 }
@@ -255,9 +281,13 @@ DataHandler.prototype.assign = function(...args) {
 
 
 /**
- * TODO:考虑到参数有冲突的问题，一下方法不支持嵌套对象的key设置
- * 例如：this.data.remove({string|Object}expr, {*}item, {Object?}option)
- *      => data.remove({*}item, {Object?}option)
+ * TODO:考虑到参数有冲突的问题，以下方法不支持嵌套对象的key设置
+ * data函数提供的方法和this.data方法的对应：
+ * remove为例：
+ *  this.data.remove({string|Object}expr, {*}item, {Object?}option)
+ *  =>
+ * const info = data('info', [//...]); 
+ * info.remove({*}item, {Object?}option)
  **/ 
 [
     'remove',
