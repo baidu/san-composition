@@ -296,48 +296,72 @@ class DataHandler {
         return this.shorten('merge', ...args);
     }
 
+    removeAt(...args) {
+        return this.shorten('removeAt', ...args);
+    }
+
+    pop(...args) {
+        return this.shorten('pop', ...args);
+    }
+
     assign(...args) {
         return this.dataCenter.assign(...args);
     }
 
+    
+
     /**
      * 快速设置
      * 
+     * 对于一些数组的方法，参数可能为string，如果直接用shorten方法进行设置，可能存在两种歧义，例如：
+     * const myData = data(...);
+     * 
+     * myData.remove('list', 'news');
+     * 
+     * 语义1：this.data.remove('myData', 'list');
+     * 语义2：this.data.remove('myData.list', 'news');
+     * 
+     * 这种情况下，根据语义环境来判断：
+     *
      * data函数提供的方法和this.data方法的对应：
      * remove为例：
      *  this.data.remove({string|Object}expr, {*}item, {Object?}option)
      *  =>
      * const info = data('info', [//...]); 
      * info.remove({*}item, {Object?}option)
-     * 
-     * 
-     * TODO:考虑到参数有冲突的问题，以下方法不支持嵌套对象的key设置
+     *
+     * @param {string} method 要设置的方法
+     * @param {Array} args 参数透传
      **/
     quickSet(method, ...args) {
-        if (this.key !== 'string') {
-            return;
+        let key = '';
+        if (typeof this.key === 'string') {
+            if (Array.isArray(this.dataCenter.get(this.key))) {
+                key = this.key;
+            }
+            else if (typeof args[0] === 'string') {
+                if (Array.isArray(this.dataCenter.get(this.key + '.' + args[0]))) {
+                    key = this.key + '.' + args[0];
+                    args.shift();
+                }
+            }
         }
-        return this.dataCenter[method](this.key, ...args);
+        else if (typeof args[0] === 'string') {
+            if (Array.isArray(this.dataCenter.get(args[0]))) {
+                key = args[0];
+                args.shift();
+            }
+        }
+
+        return key && this.dataCenter[method](key, ...args);
     }
 
     remove(...args) {
         return this.quickSet('remove', ...args);
-    }
-
-    removeAt(...args) {
-        return this.quickSet('removeAt', ...args);
     }
 
     push(...args) {
         return this.quickSet('push', ...args);
-    }
-
-    remove(...args) {
-        return this.quickSet('remove', ...args);
-    }
-
-    pop(...args) {
-        return this.quickSet('pop', ...args);
     }
 
     unshift(...args) {
