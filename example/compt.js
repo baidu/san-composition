@@ -1,10 +1,9 @@
 /**
  * @file 组合式API，demo4
  */
-
-import {defineComponent} from 'san';
+import san from 'san';
 import {
-    setupComponent,
+    defineComponent,
     template,
     data,
     computed,
@@ -20,9 +19,9 @@ import {
     onDetached,
     onDisposed,
     onUpdated
-} from '../src';
+} from '../index';
 
-export default setupComponent(() => {
+export default defineComponent(() => {
     template(/*html*/`
          <div>
              <span>count: {{ count }} </span>
@@ -127,8 +126,8 @@ export default setupComponent(() => {
     });
 
     components({
-        'my-child': defineComponent({
-            template: `<div>My Child</div>`
+        'my-child': san.defineComponent({
+            template: '<div>My Child</div>'
         })
     });
 
