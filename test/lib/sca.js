@@ -1,0 +1,19 @@
+const {
+    defineComponent,
+    template,
+    data,
+    computed,
+    messages,
+    filters,
+    watch,
+    components,
+    method,
+    onConstruct,
+    onCompiled,
+    onInited,
+    onCreated,
+    onAttached,
+    onDetached,
+    onDisposed,
+    onUpdated
+} = sca;

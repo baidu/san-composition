@@ -1,7 +1,7 @@
 {
   "name": "san-composition",
   "version": "0.1.0",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs.js",
   "private": true,
   "description": "San Composition API",
   "scripts": {
@@ -9,8 +9,10 @@
     "build": "yarn run clear && yarn run rollup",
     "rollup": "rollup -c",
     "clear": "rimraf ./dist",
-    "test": "jest --coverage",
-    "prepublish": "yarn run build",
+    "test": "npm run test:unit",
+    "test:unit": "npx karma start ./test/karma.conf.js --single-run",
+    "test:cov": "npm run test -- -- --coverage",
+    "prepublish": "npm run build",
     "lint": "eslint --ignore-path .eslintignore ./",
     "lint:fix": "eslint --ignore-path .eslintignore ./ --fix"
   },
@@ -21,6 +23,13 @@
   "author": "jinzhan <jinzhan@baidu.com>",
   "license": "MIT",
   "devDependencies": {
+    "jasmine-core": "^2.99.1",
+    "karma": "^4.0.1",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-coverage": "^1.1.2",
+    "karma-jasmine": "^2.0.1",
+    "karma-remap-istanbul": "^0.6.0",
+    "karma-sourcemap-loader": "^0.3.7",
     "less": "^3.11.1",
     "less-loader": "^5.0.0",
     "babel-plugin-import": "^1.13.0",
@@ -32,7 +41,6 @@
     "@babel/preset-env": "^7.12.1",
     "@rollup/plugin-babel": "^5.2.1",
     "@rollup/plugin-node-resolve": "^10.0.0",
-    "jest": "^27.0.6",
     "rimraf": "^3.0.2",
     "rollup": "^2.33.1",
     "axios": "^0.21.1",
@@ -42,14 +50,13 @@
     "@ecomfe/eslint-config": "^3.2.0",
     "eslint": "^6.8.0",
     "babel-eslint": "^10.1.0",
-    "eslint-plugin-babel": "^5.3.0",
-    "eslint-plugin-jest": "^23.8.2"
+    "eslint-plugin-babel": "^5.3.0"
   },
   "peerDependencies": {
     "san": "^3.10.0"
   },
   "lint-staged": {
-    "!(example|dist|output|__mocks__)/**/*.js": "eslint"
+    "!(example|dist|output|__mocks__|test)/**/*.js": "eslint"
   },
   "husky": {
       "hooks": {

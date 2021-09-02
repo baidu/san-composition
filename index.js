@@ -100,6 +100,14 @@ export const defineComponent = (creator, options = {}) => {
         }
     });
 
+    // construct方法，带参数
+    if (context.construct && context.construct.length) {
+        const constructFns = context.construct;
+        context.construct = function (options) {
+            constructFns.forEach(fn => fn.call(this, options));
+        };
+    }
+
     // 组件反解的数据，只能从options中拿到
     componentOptions.reversion.forEach(k => {
         if (options[k]) {
@@ -410,6 +418,10 @@ export const data = (key, val) => {
 const setLifecycleHooks = (action, callback) => {
     context[action] = context[action] || [];
     context[action].push(callback);
+};
+
+export const onConstruct = callback => {
+    return setLifecycleHooks('construct', callback);
 };
 
 export const onCompiled = callback => {
