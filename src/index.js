@@ -30,7 +30,7 @@ const componentOptions = {
 
 /**
  * 通过组合式API定义San组件
- * 
+ *
  * @param {Function} creator 通过调用组合式API的方法
  * @param {Object} options 这里传递，无法通过组合式API传递的参数
  * @param {string} [options.el] 组件根元素，不使用 template 渲染视图时使用，组件反解时使用
@@ -83,7 +83,7 @@ export const setupComponent = (creator, options = {}) => {
         Object.keys(watch).forEach(item => {
             context.attached = context.attached || [];
             context.attached.unshift(function () {
-                this.watch(item, watch[item])
+                this.watch(item, watch[item]);
             });
         });
         // 去掉收集的watch参数，否则会引起报错
@@ -112,7 +112,7 @@ export const setupComponent = (creator, options = {}) => {
 
 /**
  * 处理template方法
- * 
+ *
  * @param {string} tpl 组件的模板
 */
 export const template = tpl => {
@@ -122,7 +122,7 @@ export const template = tpl => {
 
 /**
  * 封装this.data的类
- * 
+ *
  * @param {string|Array} key
  * @param {Object} dataCenter Data实例
 */
@@ -145,18 +145,18 @@ class DataHandler {
      * 1. 支持不传参数：不传参数获取默认key设置的数据
      * const info = data('info', 'san composition api');
      * info.get();  // 'san composition api'
-     * 
+     *
      * 2. 支持对象形式的设置数据的get
      * const info = data({name: 'jinz', company: 'baidu'})
      * info.get('name') // 'jinz'，等价于 this.data.get('name')
-     * 
+     *
      * 3. 获取value为对象形式的数据
      * const info = data('info', {name: 'jinz', company: 'baidu'})
      * info.get() // {name: 'jinz', company: 'baidu'}
      * info.get('name') // 'jinz'，等价于: this.data.get('info.name')
      *
      * @param {string?} key 获取data()设置数据的key
-     * **/
+     * * */
     get(key) {
         // 为computed计算属性添加对应的watcher
         if (renderingContext.computing) {
@@ -174,10 +174,10 @@ class DataHandler {
             }
             else {
                 const realKey = typeof this.key === 'string'
-                ? typeof key === 'string' ? this.key + '.' + key
-                    : this.key
-                : key;
-        
+                    ? typeof key === 'string' ? this.key + '.' + key
+                        : this.key
+                    : key;
+
                 component && component.watch(realKey, () => component.data.set(expr, handler.call(component)));
             }
         }
@@ -203,32 +203,32 @@ class DataHandler {
 
     /**
      * 重写set方法
-     * 
+     *
      * 1. 支持直接设置value：
      * const info = data('info', 'sca');
      * info.set({*}item)
-     * 
+     *
      * 2. 支持批量设置value
      * const info = data('info', {name:'', company: ''});
      * info.set({
      *    name: 'jinz',
      *    company: 'tencent'
      * });
-     * 
+     *
      * 3. 支持通过2个参数设置：
      * const info = data('info', {name:'', company: ''});
      * info.set('name', 'jinz');
-     * 
+     *
      * 4. 一些限制？只设置data中存在的项目
      * const info = data({
      *    name: 'jinz',
      *    company: 'tencent'
      * });
-     * 
+     *
      * info.set('sex', 'male'); // set失败
      * info.get();  // {name: 'jinz', company: 'tencent'}
-     * 
-     * **/
+     *
+     * * */
     set(...args) {
         if (args.length === 1) {
             const data = args[0];
@@ -254,23 +254,23 @@ class DataHandler {
 
     /**
      * 当this.data下的原始方法的第一个参数不为string的情况，可以省略第一个参数
-     * 
+     *
      * 两种情况：
      * const someData = data('someData', [...]);
-     * 
+     *
      * 1. someData.splice([1, 1]);
      *  等价于： this.data.splice('someData', [1, 1]);
-     * 
+     *
      * 2. someData.splice('list', [1, 1]);
      * 等价于： this.data.splice('someData.list', [1, 1]);
-     * 
+     *
      * 3. 批量设置的key，是需要传参数的
      * const someData = data({
      *     name: 'dataList',
      *     list: []
      * });
      * someData.splice('list', [1, 1]);
-     * 
+     *
      * @param {string} method 要设置的方法
      * @param {Array} args 参数透传
     */
@@ -280,7 +280,7 @@ class DataHandler {
         if (typeof key !== 'string') {
             key = '';
         }
-        
+
         if (typeof args[0] === 'string') {
             key = key ? (key + '.') + args[0] : args[0];
             args.shift();
@@ -315,27 +315,27 @@ class DataHandler {
 
     /**
      * 快速设置
-     * 
+     *
      * 对于一些数组的方法，参数可能为string，如果直接用shorten方法进行设置，可能存在两种歧义，例如：
      * const myData = data(...);
-     * 
+     *
      * myData.remove('list', 'news');
-     * 
+     *
      * 语义1：this.data.remove('myData', 'list');
      * 语义2：this.data.remove('myData.list', 'news');
-     * 
+     *
      * 这种情况下，根据语义环境来判断：
      *
      * data函数提供的方法和this.data方法的对应：
      * remove为例：
      *  this.data.remove({string|Object}expr, {*}item, {Object?}option)
      *  =>
-     * const info = data('info', [//...]); 
+     * const info = data('info', [//...]);
      * info.remove({*}item, {Object?}option)
      *
      * @param {string} method 要设置的方法
      * @param {Array} args 参数透传
-     **/
+     * */
     quickSet(method, ...args) {
         let key = '';
         if (typeof this.key === 'string') {
@@ -376,11 +376,11 @@ class DataHandler {
  * 操作数据的API
  * const info = data('info', 'san composition api');
  * info.get();  // 'san composition api'
- * 
+ *
  * 2. 支持对象形式的设置数据的get
  * const info = data({name: 'jinz', company: 'baidu'})
  * info.get('name') // 'jinz'，等价于 this.data.get('name')
- * 
+ *
  * 3. 获取value为对象形式的数据
  * const info = data('info', {name: 'jinz', company: 'baidu'})
  * info.get() // {name: 'jinz', company: 'baidu'}
@@ -389,9 +389,9 @@ class DataHandler {
  * @param {string|Object} key 数据的key，或者键值对
  * @param {*} val 设置的数据
  * @returns {Object} 返回一个带有包装有 this.data 相关数据操作API的对象
- **/
+ * */
 export const data = (key, val) => {
-    const obj = typeof key === 'string' ? { [key]: val } : key;
+    const obj = typeof key === 'string' ? {[key]: val} : key;
     dataCache.assign(obj);
     const dataKey = typeof key === 'string' ? key : Object.keys(key);
     context.dataManager = context.dataManager || [];
@@ -444,12 +444,12 @@ export const onUpdated = callback => {
  * 处理static option对应的API
  *
  * @param {string} method api名称
- * @param {string|Object} key 数据的key，或者键值对 
+ * @param {string|Object} key 数据的key，或者键值对
  * @param {Function|Object} val 静态属性对应的回调方法或者组件
 */
 const setStaticOption = (method, key, val) => {
     // 参数可以是key、val两个参数，也可以是对象的形式
-    const obj = typeof key === 'string' ? { [key]: val } : key;
+    const obj = typeof key === 'string' ? {[key]: val} : key;
     context[method] = context[method] || {};
     Object.assign(context[method], obj);
 };
@@ -478,11 +478,11 @@ export const watch = (...args) => {
 /**
  * 为组件添加方法
  * 参数可以是key、val两个参数，也可以是对象的形式
- * 
- * @param {string|Object} name 数据的key，或者键值对 
- * @param {Function} handler 添加的函数 
+ *
+ * @param {string|Object} name 数据的key，或者键值对
+ * @param {Function} handler 添加的函数
 */
 export const method = (name, handler) => {
-    const obj = typeof name === 'string' ? { [name]: handler } : name;
+    const obj = typeof name === 'string' ? {[name]: handler} : name;
     Object.assign(context, obj);
 };
