@@ -451,26 +451,35 @@ const setStaticOption = (method, key, val) => {
     Object.assign(context[method], obj);
 };
 
+// TODO: comments
+function componentOptionCreator(optionName) {
+    return function (name, value) {
 
-export const filters = (...args) => {
-    return setStaticOption('filters', ...args);
-};
+        let target = context;
+        if (optionName) {
+            target = context[optionName] = context[optionName] || {};
+        }
 
-export const computed = (...args) => {
-    return setStaticOption('computed', ...args);
-};
+        if (name) {
+            switch (typeof name) {
+                case 'string': 
+                    target[name] = value;
+                    break;
+    
+                case 'object':
+                    Object.assign(target, name);
+            }
+        }    
+    };
+}
 
-export const messages = (...args) => {
-    return setStaticOption('messages', ...args);
-};
+export const filters = componentOptionCreator('filters');
+export const computed = componentOptionCreator('computed');
+export const messages = componentOptionCreator('messages');
 
-export const components = (...args) => {
-    return setStaticOption('components', ...args);
-};
+export const components = componentOptionCreator('components');
 
-export const watch = (...args) => {
-    return setStaticOption('watch', ...args);
-};
+export const watch = componentOptionCreator('watch');
 
 /**
  * 为组件添加方法
@@ -479,15 +488,4 @@ export const watch = (...args) => {
  * @param {string|Object} name 数据的key，或者键值对
  * @param {Function} handler 添加的函数
 */
-export const method = (name, handler) => {
-    if (name) {
-        switch (typeof name) {
-            case 'string': 
-                context[name] = handler;
-                break;
-
-            case 'object':
-                Object.assign(context, name);
-        }
-    }
-};
+export const method = componentOptionCreator();
