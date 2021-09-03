@@ -34,11 +34,11 @@ const Counter = defineComponent(() => {
             dataObj.set('num', dataObj.get('num') + 1);
         }
     });
-});
+}, san);
 
 const Line = defineComponent(() => {template(`
     <div style="padding: 20px 0;">-------------------</div>
-`)});
+`)}, san);
 
 const MyComponent = defineComponent(() => {
     template(`
@@ -62,7 +62,7 @@ const MyComponent = defineComponent(() => {
             return info.get('first') + ' ' + info.get('last');
         }
     });
-});
+}, san);
 
 export default defineComponent(() => {
     template(/*html*/`
@@ -138,8 +138,8 @@ export default defineComponent(() => {
         }
     });
 
-    watch('count', newVal => {
-        console.log('count updated~', newVal);
+    watch('count', (oldVal, newVal) => {
+        console.log('count updated~', {oldVal, newVal});
     });
 
 
@@ -185,6 +185,6 @@ export default defineComponent(() => {
     onCreated(() => {
         console.log('onCreated');
     });
-});
+}, san);
 
 

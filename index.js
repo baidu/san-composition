@@ -2,15 +2,10 @@
  * @file San组合式API
 */
 
-
-
-// 存储data的临时对象
-let dataCache;
-
-// 渲染相关的临时上下文
-let renderingContext = {};
-
-
+/**
+ * 组件生命周期钩子
+ * @type {Array}
+*/
 const LIFECYCLE_HOOKS = [
     'construct',
     'compiled',
@@ -24,7 +19,19 @@ const LIFECYCLE_HOOKS = [
 ];
 
 /**
- * description
+ * 存储组件data的临时变量
+ * @type {Object?}
+ */
+let dataCache;
+
+/**
+ * 在组件渲染期间临时上下文对象
+ * @type {Object?}
+ */
+let renderingContext = {};
+
+/**
+ * 用于定义组件数据的临时对象
  * @type {Object?}
  */
 let context;
@@ -40,15 +47,15 @@ let context;
 export const defineComponent = (creator, san) => {
     let defineOptions = {};
 
-    let watch = {};
+    let watches = {};
 
     let data = {};
 
     // 初始化context上下文
     context = {
         methods: defineOptions,
-        watch: watch,
-        data: data
+        watches,
+        data
     };
 
     // 初始化数据
@@ -62,15 +69,13 @@ export const defineComponent = (creator, san) => {
     if (context.dataManager) {
         const dataManager = context.dataManager;
         const rawData = dataCache.raw;
-        context.initData = () => rawData;
+        defineOptions.initData = () => rawData;
 
         const computed = context.computed;
-
         context.inited = context.inited || [];
         context.inited.unshift(function () {
             // 将data API的方法挂载到组件上
             dataManager.forEach(dataHandler => dataHandler.setData(this.data));
-
             // 处理computed属性
             if (computed) {
                 Object.keys(computed).forEach(expr => {
@@ -83,20 +88,17 @@ export const defineComponent = (creator, san) => {
                     // call(this)，保证原始的this.data.get等相关API兼容
                     computed[expr].call(this);
                 });
-                delete renderingContext.computing;
             }
         });
-
-        delete context.dataManager;
     }
 
     // 处理watch，尽量在生命周期靠后的阶段执行，注意调用的顺序
-    if (watch) {
-        const watchKeys = Object.keys(watch);
+    const watchKeys = Object.keys(watches);
+    if (watchKeys.length) {
         context.attached = context.attached || [];
         context.attached.push(function () {
             watchKeys.forEach(key => {
-                this.watch(key, watch[key].call(this));
+                this.watch(key, watches[key].bind(this));
             });
         });
     }
@@ -104,23 +106,34 @@ export const defineComponent = (creator, san) => {
     // 生命周期方法
     LIFECYCLE_HOOKS.forEach(lifeCycle => {
         const hooks = context[lifeCycle];
-
         if (hooks) {
-            var len = hooks.length;
-            defineOptions[lifeCycle] = function (arg1, arg2, arg3) {
+            let len = hooks.length;
+            defineOptions[lifeCycle] = function (...args) {
                 for (let i = 0; i < len; i++) {
-                    hooks[i].call(this, arg1, arg2, arg3);
+                    hooks[i].apply(this, args);
                 }
             };
         }
     });
 
-    defineOptions.initData = function () {
+    if (context.template) {
+        defineOptions.template = context.template;
+    }
 
-    };
+    if (context.computed) {
+        defineOptions.computed = context.computed;
+    }
+
+    if (context.messages) {
+        defineOptions.messages = context.messages;
+    }
 
     if (context.filters) {
         defineOptions.filters = context.filters;
+    }
+
+    if (context.components) {
+        defineOptions.components = context.components;
     }
 
     context = null;
@@ -245,7 +258,7 @@ class DataHandler {
      * info.set('sex', 'male'); // set失败
      * info.get();  // {name: 'jinz', company: 'tencent'}
      *
-     * * */
+     */
     set(...args) {
         if (args.length === 1) {
             const data = args[0];
@@ -408,9 +421,7 @@ class DataHandler {
  * @returns {Object} 返回一个带有包装有 this.data 相关数据操作API的对象
  * */
 export const data = (key, val) => {
-    context.data[key] = val;
-
-
+    // TODO:context.data[key] = val;
     const obj = typeof key === 'string' ? {[key]: val} : key;
     dataCache.assign(obj);
     const dataKey = typeof key === 'string' ? key : Object.keys(key);
@@ -421,20 +432,23 @@ export const data = (key, val) => {
 };
 
 
-// TODO: update comment
 /**
- * 处理生命周期钩子
+ * 创建生命周期钩子方法的高阶函数
  *
- * @param {string} action 生命周期阶段，inited, attached...等
- * @param {Function} callback 生命周期钩子，回调方法
+ * @param {string} name 生命周期钩子名称，inited, attached...等
+ * @returns {Function}
  */
 function hookMethodCreator(name) {
+    /**
+     * 创建生命周期钩子方法的函数
+     *
+     * @param {Function} handler 生命周期钩子，回调方法
+     */
     return function (handler) {
         context[name] = context[name] || [];
         context[name].push(handler);
     };
 }
-
 
 export const onConstruct = hookMethodCreator('construct');
 export const onCompiled = hookMethodCreator('compiled');
@@ -447,21 +461,32 @@ export const onUpdated = hookMethodCreator('updated');
 export const onError = hookMethodCreator('error');
 
 
-// TODO: comments
+/**
+ * 创建组件属性API的高阶函数，
+ * 负责：filters、computed、messages、components、watch等API创建
+ *
+ * @param {string} name 数据的key，或者键值对
+ * @returns {Function}
+*/
 function componentOptionCreator(optionName) {
+    /**
+     * 创建组件属性API方法
+     * 参数可以是key、val两个参数，也可以是对象的形式
+     *
+     * @param {string|Object} name 数据的key，或者键值对
+     * @param {Function} handler 添加的函数
+    */
     return function (name, value) {
         context[optionName] = context[optionName] || {};
 
-        if (name) {
-            switch (typeof name) {
-                case 'string': 
-                    context[optionName][name] = value;
-                    break;
-    
-                case 'object':
-                    Object.assign(context[optionName], name);
-            }
-        }    
+        switch (typeof name) {
+            case 'string':
+                context[optionName][name] = value;
+                break;
+
+            case 'object':
+                Object.assign(context[optionName], name);
+        }
     };
 }
 
@@ -469,7 +494,7 @@ export const filters = componentOptionCreator('filters');
 export const computed = componentOptionCreator('computed');
 export const messages = componentOptionCreator('messages');
 export const components = componentOptionCreator('components');
-export const watch = componentOptionCreator('watch');
+export const watch = componentOptionCreator('watches');
 
 /**
  * 为组件添加方法
