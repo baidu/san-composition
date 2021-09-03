@@ -40,13 +40,37 @@ const Line = defineComponent(() => {template(`
     <div style="padding: 20px 0;">-------------------</div>
 `)});
 
+const MyComponent = defineComponent(() => {
+    template(`
+        <div>
+            <div><span title="{{msg}}">{{msg}}</span></div>
+            <div><span>{{msg2}}</span></div>
+        </div>
+    `);
+
+    const info = data({
+        first: 'first',
+        last: 'last',
+        email: 'name@name.com'
+    });
+
+    computed({
+        msg: function () {
+            return this.data.get('name') + '(' + info.get('email') + ')';
+        },
+        name: function () {
+            return info.get('first') + ' ' + info.get('last');
+        }
+    });
+});
+
 export default defineComponent(() => {
     template(/*html*/`
          <div>
-             <x-c />
-
+             <x-computed />
              <x-line />
- 
+             <x-c />
+             <x-line />
              <span>count: {{ count }} </span>
              <input type="text" value="{= count =}"/>
              <div>double: {{ double }} </div>
@@ -54,9 +78,7 @@ export default defineComponent(() => {
              <button on-click="increment"> +1 </button>
              <button on-click="decrement"> -1 </button>
              <my-child></my-child>
-             
              <x-line />
- 
              <div>{{name}}</div>
              <div>{{company}}</div>
              <div>{{extra}}</div>
@@ -69,7 +91,8 @@ export default defineComponent(() => {
 
      components({
         'x-c': Counter,
-        'x-line': Line
+        'x-line': Line,
+        'x-computed': MyComponent
     });
 
     // 处理数据

@@ -1,6 +1,4 @@
 describe('[messages]: ', () => {
-    // TODO:
-    return;
     it("dispatch should pass message up, util the first component which recieve it", function (done) {
         var Select = defineComponent(() => {
             template('<ul><slot></slot></ul>');

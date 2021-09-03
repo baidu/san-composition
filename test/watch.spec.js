@@ -56,12 +56,9 @@ describe('[watch]: ', () => {
     });
 
     it("watch property accessor", function (done) {
-        // TODO:
-        return done();
-
         var MyComponent = defineComponent(() => {
             template('<a><span title="{{projects[0].author.email}}">{{projects[0].author.email}}</span></a>');
-            data({
+            const projects = data({
                 projects: [
                     {
                         name: 'etpl',
@@ -83,7 +80,7 @@ describe('[watch]: ', () => {
                 expect(value.email).toBe('erik168@163.com');
                 expect(e.oldValue.email).toBe(oldEmail);
                 expect(e.newValue).toBe(value);
-                expect(this.data.get('projects[0].author.email')).toBe(value.email);
+                expect(projects.get('projects[0].author.email')).toBe(value.email);
                 
                 watchTriggerTimes++;
             });
@@ -92,7 +89,7 @@ describe('[watch]: ', () => {
                 expect(value).toBe('erik168@163.com');
                 expect(e.oldValue).toBe(oldEmail);
                 expect(e.newValue).toBe(value);
-                expect(this.data.get('projects[0].author.email')).toBe(value);
+                expect(projects.get('projects[0].author.email')).toBe(value);
                 emailTriggerTimes++;
             });
         });

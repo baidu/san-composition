@@ -85,7 +85,7 @@ export const defineComponent = (creator, options = {}) => {
         Object.keys(watch).forEach(item => {
             context.attached = context.attached || [];
             context.attached.unshift(function () {
-                this.watch(item, watch[item]);
+                this.watch(item, watch[item].call(this));
             });
         });
         // 去掉收集的watch参数，否则会引起报错
@@ -205,7 +205,7 @@ class DataHandler {
                 return result;
             }
             else if (this.key.indexOf(key) > -1) {
-                // 不能打没有设置的数据，避免混乱
+                // 不能拿没有设置的数据，避免混乱
                 return this.dataCenter.get(key);
             }
         }

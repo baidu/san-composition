@@ -15,6 +15,9 @@ export default {
         {
             file: 'dist/index.umd.js',
             name: 'sca',
+            globals: {
+                'san': 'san'
+            },
             format: 'umd'
         }
     ],
