@@ -2,11 +2,7 @@
  * @file San组合式API
 */
 
-import san from 'san';
 
-// 组件的上下文 context，组件创建时候临时使用
-let context;
-const initContext = () => context = {};
 
 // 存储data的临时对象
 let dataCache;
@@ -14,34 +10,49 @@ let dataCache;
 // 渲染相关的临时上下文
 let renderingContext = {};
 
-const componentOptions = {
-    lifecycleHooks: [
-        'compiled',
-        'inited',
-        'created',
-        'attached',
-        'detached',
-        'disposed',
-        'updated'
-    ],
-    // 组件反解的方法
-    reversion: ['el', 'data']
-};
+
+const LIFECYCLE_HOOKS = [
+    'construct',
+    'compiled',
+    'inited',
+    'created',
+    'attached',
+    'detached',
+    'disposed',
+    'updated',
+    'error'
+];
+
+/**
+ * description
+ * @type {Object?}
+ */
+let context;
+
 
 /**
  * 通过组合式API定义San组件
  *
  * @param {Function} creator 通过调用组合式API的方法
- * @param {Object} options 这里传递，无法通过组合式API传递的参数
- * @param {string} [options.el] 组件根元素，不使用 template 渲染视图时使用，组件反解时使用
- * @param {Object} [options.data] 组件数据，组件反解时使用
+ * @param {Object} san
  * @return {Function} 返回 san.defineComponent 定义的类
 */
-export const defineComponent = (creator, options = {}) => {
+export const defineComponent = (creator, san) => {
+    let defineOptions = {};
+
+    let watch = {};
+
+    let data = {};
+
     // 初始化context上下文
-    const context = initContext();
+    context = {
+        methods: defineOptions,
+        watch: watch,
+        data: data
+    };
 
     // 初始化数据
+    // TODO: dont new Data
     dataCache = new san.Data({});
 
     // 执行san组合api
@@ -80,44 +91,40 @@ export const defineComponent = (creator, options = {}) => {
     }
 
     // 处理watch，尽量在生命周期靠后的阶段执行，注意调用的顺序
-    if (context.watch) {
-        const watch = context.watch;
-        Object.keys(watch).forEach(item => {
-            context.attached = context.attached || [];
-            context.attached.unshift(function () {
-                this.watch(item, watch[item].call(this));
+    if (watch) {
+        const watchKeys = Object.keys(watch);
+        context.attached = context.attached || [];
+        context.attached.push(function () {
+            watchKeys.forEach(key => {
+                this.watch(key, watch[key].call(this));
             });
         });
-        // 去掉收集的watch参数，否则会引起报错
-        delete context.watch;
     }
 
     // 生命周期方法
-    componentOptions.lifecycleHooks.forEach(action => {
-        const actionFns = context[action];
-        if (actionFns && actionFns.length) {
-            context[action] = function () {
-                actionFns.forEach(fn => fn.call(this));
+    LIFECYCLE_HOOKS.forEach(lifeCycle => {
+        const hooks = context[lifeCycle];
+
+        if (hooks) {
+            var len = hooks.length;
+            defineOptions[lifeCycle] = function (arg1, arg2, arg3) {
+                for (let i = 0; i < len; i++) {
+                    hooks[i].call(this, arg1, arg2, arg3);
+                }
             };
         }
     });
 
-    // construct方法，带参数
-    if (context.construct && context.construct.length) {
-        const constructFns = context.construct;
-        context.construct = function (options) {
-            constructFns.forEach(fn => fn.call(this, options));
-        };
+    defineOptions.initData = function () {
+
+    };
+
+    if (context.filters) {
+        defineOptions.filters = context.filters;
     }
 
-    // 组件反解的数据，只能从options中拿到
-    componentOptions.reversion.forEach(k => {
-        if (options[k]) {
-            context[k] = options[k];
-        }
-    });
-
-    return san.defineComponent(context);
+    context = null;
+    return san.defineComponent(defineOptions);
 };
 
 /**
@@ -401,6 +408,9 @@ class DataHandler {
  * @returns {Object} 返回一个带有包装有 this.data 相关数据操作API的对象
  * */
 export const data = (key, val) => {
+    context.data[key] = val;
+
+
     const obj = typeof key === 'string' ? {[key]: val} : key;
     dataCache.assign(obj);
     const dataKey = typeof key === 'string' ? key : Object.keys(key);
@@ -440,20 +450,16 @@ export const onError = hookMethodCreator('error');
 // TODO: comments
 function componentOptionCreator(optionName) {
     return function (name, value) {
-
-        let target = context;
-        if (optionName) {
-            target = context[optionName] = context[optionName] || {};
-        }
+        context[optionName] = context[optionName] || {};
 
         if (name) {
             switch (typeof name) {
                 case 'string': 
-                    target[name] = value;
+                    context[optionName][name] = value;
                     break;
     
                 case 'object':
-                    Object.assign(target, name);
+                    Object.assign(context[optionName], name);
             }
         }    
     };
@@ -462,9 +468,7 @@ function componentOptionCreator(optionName) {
 export const filters = componentOptionCreator('filters');
 export const computed = componentOptionCreator('computed');
 export const messages = componentOptionCreator('messages');
-
 export const components = componentOptionCreator('components');
-
 export const watch = componentOptionCreator('watch');
 
 /**
@@ -474,4 +478,4 @@ export const watch = componentOptionCreator('watch');
  * @param {string|Object} name 数据的key，或者键值对
  * @param {Function} handler 添加的函数
 */
-export const method = componentOptionCreator();
+export const method = componentOptionCreator('methods');
