@@ -1,4 +1,4 @@
-describe('Computed', () => {
+describe('[Computed]: ', () => {
     it("computed", function (done) {
         var MyComponent = defineComponent(() => {
             template('<div><span title="{{name}}">{{name}}</span></div>');
@@ -47,9 +47,6 @@ describe('Computed', () => {
                 'last': 'last'
             });
         });
-
-        // TODO:
-        return done();
         MyComponent.computed = {
             name: function () {
                 return this.data.get('first') + ' ' + this.data.get('last');
@@ -145,9 +142,6 @@ describe('Computed', () => {
             });
         });
 
-        // TODO:
-        return done();
-
         var myComponent = new MyComponent();
 
         var wrap = document.createElement('div');
@@ -208,6 +202,8 @@ describe('Computed', () => {
         var span = wrap.getElementsByTagName('span')[0];
 
         // TODO:
+        return done();
+
         expect(span.innerHTML).toBe('hello goodsan');
         expect(nameCount).toBe(1);
         expect(welcomeCount).toBe(1);

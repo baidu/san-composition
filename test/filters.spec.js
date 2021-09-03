@@ -1,4 +1,4 @@
-describe('filters', () => {
+describe('[filters]: ', () => {
     it("filters as static property", function () {
         var MyComponent = defineComponent(() => {
             template('<span title="{{color|up}}">{{color|up}}</span>');

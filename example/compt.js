@@ -21,9 +21,32 @@ import {
     onUpdated
 } from '../index';
 
+
+const Counter = defineComponent(() => {
+    template('<u on-click="add">num: {{num}}</u>');
+
+    const dataObj = data({
+        num: 2
+    });
+
+    method({
+        add() {
+            dataObj.set('num', dataObj.get('num') + 1);
+        }
+    });
+});
+
+const Line = defineComponent(() => {template(`
+    <div style="padding: 20px 0;">-------------------</div>
+`)});
+
 export default defineComponent(() => {
     template(/*html*/`
          <div>
+             <x-c />
+
+             <x-line />
+ 
              <span>count: {{ count }} </span>
              <input type="text" value="{= count =}"/>
              <div>double: {{ double }} </div>
@@ -32,7 +55,7 @@ export default defineComponent(() => {
              <button on-click="decrement"> -1 </button>
              <my-child></my-child>
              
-             <br/>
+             <x-line />
  
              <div>{{name}}</div>
              <div>{{company}}</div>
@@ -43,6 +66,11 @@ export default defineComponent(() => {
              <button on-click="assign"> assign </button>
          </div>
      `);
+
+     components({
+        'x-c': Counter,
+        'x-line': Line
+    });
 
     // 处理数据
     const count = data('count', 1);

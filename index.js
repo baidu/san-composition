@@ -54,24 +54,26 @@ export const defineComponent = (creator, options = {}) => {
         context.initData = () => rawData;
 
         const computed = context.computed;
+
         context.inited = context.inited || [];
         context.inited.unshift(function () {
             // 将data API的方法挂载到组件上
             dataManager.forEach(dataHandler => dataHandler.setData(this.data));
 
             // 处理computed属性
-            Object.keys(computed).forEach(expr => {
-                renderingContext.computing = {
-                    expr,
-                    handler: computed[expr],
-                    component: this
-                };
-
-                // 执行一次computed方法，保证能收集到computed相关的依赖
-                // call(this)，保证原始的this.data.get等相关API兼容
-                computed[expr].call(this);
-            });
-            delete renderingContext.computing;
+            if (computed) {
+                Object.keys(computed).forEach(expr => {
+                    renderingContext.computing = {
+                        expr,
+                        handler: computed[expr],
+                        component: this
+                    };
+                    // 执行一次computed方法，保证能收集到computed相关的依赖
+                    // call(this)，保证原始的this.data.get等相关API兼容
+                    computed[expr].call(this);
+                });
+                delete renderingContext.computing;
+            }
         });
 
         delete context.dataManager;

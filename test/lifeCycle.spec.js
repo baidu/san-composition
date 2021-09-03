@@ -1,4 +1,4 @@
-describe('life cycle', () => {
+describe('[life cycle]: ', () => {
     it('life cycle', () => {
         let mainConstruct = 0;
         let mainInited = 0;

@@ -1,4 +1,4 @@
-describe('defineComponent', () => {
+describe('[messages]: ', () => {
     // TODO:
     return;
     it("dispatch should pass message up, util the first component which recieve it", function (done) {

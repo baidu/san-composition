@@ -9,10 +9,10 @@
     "build": "yarn run clear && yarn run rollup",
     "rollup": "rollup -c",
     "clear": "rimraf ./dist",
-    "test": "npm run test:unit",
+    "test": "yarn run rollup && yarn run test:unit",
     "test:unit": "npx karma start ./test/karma.conf.js --single-run",
-    "test:cov": "npm run test -- -- --coverage",
-    "prepublish": "npm run build",
+    "test:cov": "yarn run test -- -- --coverage",
+    "prepublish": "yarn run build",
     "lint": "eslint --ignore-path .eslintignore ./",
     "lint:fix": "eslint --ignore-path .eslintignore ./ --fix"
   },

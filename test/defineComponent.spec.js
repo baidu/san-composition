@@ -1,4 +1,4 @@
-describe('defineComponent', () => {
+describe('[defineComponent]: ', () => {
     it("attach without parentEl, and dispose, got collect life cycle", function () {
         var MyComponent = defineComponent(() => {
             template('<div>hello san</div>');

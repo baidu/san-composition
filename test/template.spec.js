@@ -1,4 +1,4 @@
-describe('template', () => {
+describe('[template]: ', () => {
     it("template as static property", function () {
         var MyComponent = defineComponent(() => {});
         MyComponent.template = '<span title="{{color}}">{{color}}</span>';

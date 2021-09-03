@@ -1,4 +1,4 @@
-describe('components', () => {
+describe('[components]: ', () => {
     // TODO:
     // it("components function", function () {
     //     var MyComponent = defineComponent(() => {
