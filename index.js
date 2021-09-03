@@ -411,48 +411,31 @@ export const data = (key, val) => {
 };
 
 
+// TODO: update comment
 /**
  * 处理生命周期钩子
  *
  * @param {string} action 生命周期阶段，inited, attached...等
  * @param {Function} callback 生命周期钩子，回调方法
-*/
-const setLifecycleHooks = (action, callback) => {
-    context[action] = context[action] || [];
-    context[action].push(callback);
-};
+ */
+function hookMethodCreator(name) {
+    return function (handler) {
+        context[name] = context[name] || [];
+        context[name].push(handler);
+    };
+}
 
-export const onConstruct = callback => {
-    return setLifecycleHooks('construct', callback);
-};
 
-export const onCompiled = callback => {
-    return setLifecycleHooks('compiled', callback);
-};
+export const onConstruct = hookMethodCreator('construct');
+export const onCompiled = hookMethodCreator('compiled');
+export const onInited = hookMethodCreator('inited');
+export const onCreated = hookMethodCreator('created');
+export const onAttached = hookMethodCreator('attached');
+export const onDetached = hookMethodCreator('detached');
+export const onDisposed = hookMethodCreator('disposed');
+export const onUpdated = hookMethodCreator('updated');
+export const onError = hookMethodCreator('error');
 
-export const onInited = callback => {
-    return setLifecycleHooks('inited', callback);
-};
-
-export const onCreated = callback => {
-    return setLifecycleHooks('created', callback);
-};
-
-export const onAttached = callback => {
-    return setLifecycleHooks('attached', callback);
-};
-
-export const onDetached = callback => {
-    return setLifecycleHooks('detached', callback);
-};
-
-export const onDisposed = callback => {
-    return setLifecycleHooks('disposed', callback);
-};
-
-export const onUpdated = callback => {
-    return setLifecycleHooks('updated', callback);
-};
 
 /**
  * 处理static option对应的API
@@ -497,6 +480,14 @@ export const watch = (...args) => {
  * @param {Function} handler 添加的函数
 */
 export const method = (name, handler) => {
-    const obj = typeof name === 'string' ? {[name]: handler} : name;
-    Object.assign(context, obj);
+    if (name) {
+        switch (typeof name) {
+            case 'string': 
+                context[name] = handler;
+                break;
+
+            case 'object':
+                Object.assign(context, name);
+        }
+    }
 };
