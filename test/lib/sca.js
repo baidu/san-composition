@@ -1,5 +1,4 @@
 const {
-    defineComponent,
     template,
     data,
     computed,
@@ -17,3 +16,6 @@ const {
     onDisposed,
     onUpdated
 } = sca;
+
+
+const defineComponent = creator => sca.defineComponent(creator, san);
