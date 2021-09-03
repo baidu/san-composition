@@ -437,20 +437,6 @@ export const onUpdated = hookMethodCreator('updated');
 export const onError = hookMethodCreator('error');
 
 
-/**
- * 处理static option对应的API
- *
- * @param {string} method api名称
- * @param {string|Object} key 数据的key，或者键值对
- * @param {Function|Object} val 静态属性对应的回调方法或者组件
-*/
-const setStaticOption = (method, key, val) => {
-    // 参数可以是key、val两个参数，也可以是对象的形式
-    const obj = typeof key === 'string' ? {[key]: val} : key;
-    context[method] = context[method] || {};
-    Object.assign(context[method], obj);
-};
-
 // TODO: comments
 function componentOptionCreator(optionName) {
     return function (name, value) {
