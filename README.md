@@ -5,15 +5,15 @@ Composition API的目标是让代码的共享和重用变得更为简单和便�
 ## 1. Options API  vs Composition API
 
 1. Options API通过使用San单文件中data、method、computed、watch来定义属性和方法，共同处理页面逻辑；
-2. Composition API根据逻辑相关性组织代码的，提高可读性和可维护性，基于函数组合的 API 更好的重用逻辑代码。
+2. Composition API则是将属性转换为对应的函数，通过逻辑相关性来组织代码，从而实现更好的代码复用，提高可读性和可维护性。
 
 
 ## 2. Basic example
 
 ```js
-import {defineComponent} from 'san';
+import san from 'san';
 import {
-    setupComponent,
+    defineComponent,
     template,
     data,
     computed,
@@ -31,7 +31,7 @@ import {
     onUpdated
 } from 'san-composition';
 
-export default setupComponent(() => {
+export default defineComponent(() => {
     template(/*html*/`
         <div>
             <span>count: {{ count }} </span>
@@ -94,7 +94,7 @@ export default setupComponent(() => {
     onCreated(() => {
         console.log('onCreated');
     });
-});
+}, san);
 
 ```
 
