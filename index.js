@@ -224,8 +224,9 @@ class DataHandler {
                 this.key.forEach(k => result[k] = data[k]);
                 return result;
             }
-            else if (this.key.indexOf(key) > -1) {
-                // 不能拿没有设置的数据，避免混乱
+            // 不能拿没有设置的数据，避免混乱，考虑 a.b, a[0]的情况
+            const realKey = key.split(/[.[]/)[0];
+            if (this.key.indexOf(realKey) > -1) {
                 return this.dataCenter.get(key);
             }
         }

@@ -40,6 +40,7 @@ const Line = defineComponent(() => {template(`
     <div style="padding: 20px 0;">-------------------</div>
 `)}, san);
 
+
 const MyComponent = defineComponent(() => {
     template(`
         <div>
@@ -86,8 +87,26 @@ export default defineComponent(() => {
              <button on-click="baidu"> baidu </button>
              <button on-click="tencent"> tencent </button>
              <button on-click="assign"> assign </button>
+
+             <x-line />
+             <a><span title="{{projects[0].author.email}}">projects[0].author.email: {{projects[0].author.email}}</span></a>
          </div>
      `);
+
+    let oldEmail = 'errorrik@gmail.com';
+    const projects = data({
+        projects: [
+            {
+                name: 'etpl',
+                author: {
+                    email: oldEmail,
+                    name: 'errorrik'
+                }
+            }
+        ]
+    });
+
+    console.log("projects.get('projects[0].author.email'):", projects.get('projects[0].author.email'));
 
      components({
         'x-c': Counter,
