@@ -1,14 +1,14 @@
 describe('[messages]: ', () => {
     it("dispatch should pass message up, util the first component which recieve it", function (done) {
-        var Select = defineComponent(() => {
+        let Select = defineComponent(() => {
             template('<ul><slot></slot></ul>');
 
             messages({
                 'UI:select-item-selected': function (arg) {
-                    var value = arg.value;
+                    let value = arg.value;
                     this.data.set('value', value);
 
-                    var len = this.items.length;
+                    let len = this.items.length;
                     while (len--) {
                         this.items[len].data.set('selectValue', value);
                     }
@@ -20,7 +20,7 @@ describe('[messages]: ', () => {
                 },
 
                 'UI:select-item-detached': function (arg) {
-                    var len = this.items.length;
+                    let len = this.items.length;
                     while (len--) {
                         if (this.items[len] === arg.target) {
                             this.items.splice(len, 1);
@@ -34,14 +34,14 @@ describe('[messages]: ', () => {
             });
         });
 
-        var selectValue;
-        var item;
-        var SelectItem = defineComponent(() => {
+        let selectValue;
+        let item;
+        let SelectItem = defineComponent(() => {
             template('<li on-click="select" style="{{value === selectValue ? \'border: 1px solid red\' : \'\'}}"><slot></slot></li>');
 
             method({
                 select: function () {
-                    var value = this.data.get('value');
+                    let value = this.data.get('value');
                     this.dispatch('UI:select-item-selected', value);
                     selectValue = value;
                 }
@@ -57,7 +57,7 @@ describe('[messages]: ', () => {
             });
         });
 
-        var MyComponent = defineComponent(() => {
+        let MyComponent = defineComponent(() => {
             components({
                 'ui-select': Select,
                 'ui-selectitem': SelectItem
@@ -85,8 +85,8 @@ describe('[messages]: ', () => {
             });
         });
 
-        var myComponent = new MyComponent();
-        var wrap = document.createElement('div');
+        let myComponent = new MyComponent();
+        let wrap = document.createElement('div');
         document.body.appendChild(wrap);
         myComponent.attach(wrap);
 
@@ -108,124 +108,126 @@ describe('[messages]: ', () => {
 
     });
 
-    // it("messages static property", function (done) {
-    //     var Select = defineComponent(() => {
-    //         template('<ul><slot></slot></ul>');
+    it("messages static property", function (done) {
+        let Select = defineComponent(() => {
+            template('<ul><slot></slot></ul>');
 
-    //         onInited(function () {
-    //             this.items = [];
-    //         });
-    //     });
+            onInited(function () {
+                this.items = [];
+            });
+        });
 
-    //     Select.messages = {
-    //         'UI:select-item-selected': function (arg) {
-    //             var value = arg.value;
-    //             this.data.set('value', value);
+        Select.messages = {
+            'UI:select-item-selected': function (arg) {
+                let value = arg.value;
+                this.data.set('value', value);
 
-    //             var len = this.items.length;
-    //             while (len--) {
-    //                 this.items[len].data.set('selectValue', value);
-    //             }
-    //         },
+                let len = this.items.length;
+                while (len--) {
+                    this.items[len].data.set('selectValue', value);
+                }
+            },
 
-    //         'UI:select-item-attached': function (arg) {
-    //             this.items.push(arg.target);
-    //             arg.target.data.set('selectValue', this.data.get('value'));
-    //         },
+            'UI:select-item-attached': function (arg) {
+                this.items.push(arg.target);
+                arg.target.data.set('selectValue', this.data.get('value'));
+            },
 
-    //         'UI:select-item-detached': function (arg) {
-    //             var len = this.items.length;
-    //             while (len--) {
-    //                 if (this.items[len] === arg.target) {
-    //                     this.items.splice(len, 1);
-    //                 }
-    //             }
-    //         }
-    //     };
+            'UI:select-item-detached': function (arg) {
+                let len = this.items.length;
+                while (len--) {
+                    if (this.items[len] === arg.target) {
+                        this.items.splice(len, 1);
+                    }
+                }
+            }
+        };
 
-    //     var selectValue;
-    //     var item;
-    //     var SelectItem = defineComponent(() => {
-    //         template('<li on-click="select" style="{{value === selectValue ? \'border: 1px solid red\' : \'\'}}"><slot></slot></li>',
+        let selectValue;
+        let item;
+        let SelectItem = defineComponent(() => {
+            template('<li on-click="select" style="{{value === selectValue ? \'border: 1px solid red\' : \'\'}}"><slot></slot></li>');
 
-    //         select: function () {
-    //             var value = this.data.get('value');
-    //             this.dispatch('UI:select-item-selected', value);
-    //             selectValue = value;
-    //         },
+            method('select', function () {
+                let value = this.data.get('value');
+                this.dispatch('UI:select-item-selected', value);
+                selectValue = value;
+            });
 
-    //         attached: function () {
-    //             item = this.el;
-    //             this.dispatch('UI:select-item-attached');
-    //         },
+            onAttached(function () {
+                item = this.el;
+                this.dispatch('UI:select-item-attached');
+            });
 
-    //         detached: function () {
-    //             this.dispatch('UI:select-item-detached');
-    //         }
-    //     });
+            onDetached(function () {
+                this.dispatch('UI:select-item-detached');
+            });
+        });
 
-    //     var MyComponent = defineComponent(() => {
-    //         components: {
-    //             'ui-select': Select,
-    //             'ui-selectitem': SelectItem
-    //         },
+        let MyComponent = defineComponent(() => {
+            components({
+                'ui-select': Select,
+                'ui-selectitem': SelectItem
+            });
 
-    //         template('<div><ui-select value="{=v=}">'
-    //             + '<ui-selectitem value="1">one</ui-selectitem>'
-    //             + '<ui-selectitem value="2">two</ui-selectitem>'
-    //             + '<ui-selectitem value="3">three</ui-selectitem>'
-    //             + '</ui-select>please click to select a item<b title="{{v}}">{{v}}</b></div>');
-    //     });
+            template(
+                '<div><ui-select value="{=v=}">'
+                + '<ui-selectitem value="1">one</ui-selectitem>'
+                + '<ui-selectitem value="2">two</ui-selectitem>'
+                + '<ui-selectitem value="3">three</ui-selectitem>'
+                + '</ui-select>please click to select a item<b title="{{v}}">{{v}}</b></div>'
+            );
+        });
 
-    //     MyComponent.messages = {
-    //         'UI:select-item-selected': function () {
-    //             expect(false).toBeTruthy();
-    //         },
+        MyComponent.messages = {
+            'UI:select-item-selected': function () {
+                expect(false).toBeTruthy();
+            },
 
-    //         'UI:select-item-attached': function () {
-    //             expect(false).toBeTruthy();
-    //         },
+            'UI:select-item-attached': function () {
+                expect(false).toBeTruthy();
+            },
 
-    //         'UI:select-item-detached': function () {
-    //             expect(false).toBeTruthy();
-    //         }
-    //     };
+            'UI:select-item-detached': function () {
+                expect(false).toBeTruthy();
+            }
+        };
 
-    //     var myComponent = new MyComponent();
-    //     var wrap = document.createElement('div');
-    //     document.body.appendChild(wrap);
-    //     myComponent.attach(wrap);
+        let myComponent = new MyComponent();
+        let wrap = document.createElement('div');
+        document.body.appendChild(wrap);
+        myComponent.attach(wrap);
 
-    //     function detectDone() {
-    //         if (selectValue) {
-    //             expect(wrap.getElementsByTagName('b')[0].title).toBe(selectValue);
+        function detectDone() {
+            if (selectValue) {
+                expect(wrap.getElementsByTagName('b')[0].title).toBe(selectValue);
 
-    //             myComponent.dispose();
-    //             document.body.removeChild(wrap);
-    //             done();
-    //             return;
-    //         }
+                myComponent.dispose();
+                document.body.removeChild(wrap);
+                done();
+                return;
+            }
 
-    //         setTimeout(detectDone, 500);
-    //     }
+            setTimeout(detectDone, 500);
+        }
 
-    //     detectDone();
-    //     triggerEvent(item, 'click');
+        detectDone();
+        triggerEvent(item, 'click');
 
-    // });
+    });
 
     it("message * would receive all message", function (done) {
-        var selectMessageX;
-        var justtestReceived;
-        var Select = defineComponent(() => {
+        let selectMessageX;
+        let justtestReceived;
+        let Select = defineComponent(() => {
             template('<ul><slot></slot></ul>');
 
             messages({
                 'UI:select-item-selected': function (arg) {
-                    var value = arg.value;
+                    let value = arg.value;
                     this.data.set('value', value);
 
-                    var len = this.items.length;
+                    let len = this.items.length;
                     while (len--) {
                         this.items[len].data.set('selectValue', value);
                     }
@@ -237,7 +239,7 @@ describe('[messages]: ', () => {
                 },
 
                 'UI:select-item-detached': function (arg) {
-                    var len = this.items.length;
+                    let len = this.items.length;
                     while (len--) {
                         if (this.items[len] === arg.target) {
                             this.items.splice(len, 1);
@@ -259,14 +261,14 @@ describe('[messages]: ', () => {
             });
         });
 
-        var selectValue;
-        var item;
-        var SelectItem = defineComponent(() => {
+        let selectValue;
+        let item;
+        let SelectItem = defineComponent(() => {
             template('<li on-click="select" style="{{value === selectValue ? \'border: 1px solid red\' : \'\'}}"><slot></slot></li>');
 
             method({
                 select: function () {
-                    var value = this.data.get('value');
+                    let value = this.data.get('value');
                     this.dispatch('UI:select-item-selected', value);
                     this.dispatch('justtest', value);
                     selectValue = value;
@@ -283,7 +285,7 @@ describe('[messages]: ', () => {
             });
         });
 
-            var MyComponent = defineComponent(() => {
+            let MyComponent = defineComponent(() => {
                 components({
                     'ui-select': Select,
                     'ui-selectitem': SelectItem
@@ -318,8 +320,8 @@ describe('[messages]: ', () => {
                 });
             });
 
-            var myComponent = new MyComponent();
-            var wrap = document.createElement('div');
+            let myComponent = new MyComponent();
+            let wrap = document.createElement('div');
             document.body.appendChild(wrap);
             myComponent.attach(wrap);
 
