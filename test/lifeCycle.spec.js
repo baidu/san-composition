@@ -176,9 +176,9 @@ describe('[life cycle]: ', () => {
     });
 
     it("life cycle and event", function () {
-        var phases = {};
+        let phases = {};
 
-        var Label = defineComponent(() => {
+        let Label = defineComponent(() => {
             template('<span>test</span>');
 
             onInited(function () {
@@ -198,7 +198,7 @@ describe('[life cycle]: ', () => {
             });
         });
 
-        var MyComponent = defineComponent(() => {
+        let MyComponent = defineComponent(() => {
             components({
                 'ui-label': Label
             });
@@ -213,9 +213,9 @@ describe('[life cycle]: ', () => {
         });
 
 
-        var myComponent = new MyComponent();
+        let myComponent = new MyComponent();
 
-        var wrap = document.createElement('div');
+        let wrap = document.createElement('div');
         document.body.appendChild(wrap);
         myComponent.attach(wrap);
         expect(phases.inited).toBeTruthy();
@@ -229,7 +229,7 @@ describe('[life cycle]: ', () => {
     });
 
     it("life cycle construct", function () {
-        var MyComponent = defineComponent(() => {
+        let MyComponent = defineComponent(() => {
             template('<a><span title="{{email}}">{{name}}</span></a>');
 
             onConstruct(function (options) {
@@ -241,7 +241,7 @@ describe('[life cycle]: ', () => {
             });
         });
 
-        var myComponent = new MyComponent({
+        let myComponent = new MyComponent({
             from: 'err',
             data: {
                 'email': 'errorrik@gmail.com',
@@ -250,11 +250,11 @@ describe('[life cycle]: ', () => {
         });
 
 
-        var wrap = document.createElement('div');
+        let wrap = document.createElement('div');
         document.body.appendChild(wrap);
         myComponent.attach(wrap);
 
-        var span = wrap.getElementsByTagName('span')[0];
+        let span = wrap.getElementsByTagName('span')[0];
         expect(span.innerHTML.indexOf('errorrik')).toBe(0);
         myComponent.dispose();
         document.body.removeChild(wrap);
@@ -262,20 +262,20 @@ describe('[life cycle]: ', () => {
     });
 
     it("life cycle updated", function (done) {
-        var times = 0;
+        let times = 0;
 
-        var MyComponent = defineComponent(() => {
+        let MyComponent = defineComponent(() => {
             template('<a><span title="{{email}}">{{name}}</span></a>');
 
             onUpdated(function () {
                 times++;
             });
         });
-        var myComponent = new MyComponent();
+        let myComponent = new MyComponent();
         myComponent.data.set('email', 'errorrik@gmail.com');
         myComponent.data.set('name', 'errorrik');
 
-        var wrap = document.createElement('div');
+        let wrap = document.createElement('div');
         document.body.appendChild(wrap);
         myComponent.attach(wrap);
 
@@ -288,7 +288,7 @@ describe('[life cycle]: ', () => {
         san.nextTick(function () {
             expect(times).toBe(1);
 
-            var span = wrap.getElementsByTagName('span')[0];
+            let span = wrap.getElementsByTagName('span')[0];
             expect(span.innerHTML.indexOf('erik')).toBe(0);
             myComponent.dispose();
             document.body.removeChild(wrap);
@@ -298,11 +298,11 @@ describe('[life cycle]: ', () => {
     });
 
     it("life cycle must correct when call dispose after detach immediately", function () {
-        var P = defineComponent(() => {
+        let P = defineComponent(() => {
             template('<p><slot/></p>');
         });
 
-        var MyComponent = defineComponent(() => {
+        let MyComponent = defineComponent(() => {
             components({
                 'x-p': P
             });
@@ -310,12 +310,12 @@ describe('[life cycle]: ', () => {
             template('<div><h3>title</h3><x-p s-ref="p">content</x-p></div>');
         });
 
-        var myComponent = new MyComponent();
-        var wrap = document.createElement('div');
+        let myComponent = new MyComponent();
+        let wrap = document.createElement('div');
         document.body.appendChild(wrap);
         myComponent.attach(wrap);
 
-        var myP = myComponent.ref('p');
+        let myP = myComponent.ref('p');
 
         expect(myComponent.lifeCycle.attached).toBeTruthy();
         expect(myP.lifeCycle.attached).toBeTruthy();
@@ -329,8 +329,8 @@ describe('[life cycle]: ', () => {
 
 
     it("owner and child component life cycle, and el is ready when attached", function () {
-        var uState = {};
-        var U = defineComponent(() => {
+        let uState = {};
+        let U = defineComponent(() => {
             template('<u><slot></slot></u>'),
 
             onCompiled(function () {
@@ -360,11 +360,12 @@ describe('[life cycle]: ', () => {
             });
         });
 
-        var mainState = {};
-        var MyComponent = defineComponent(() => {
+        let mainState = {};
+        let MyComponent = defineComponent(() => {
             components({
                 'ui-u': U
-            })
+            });
+        
             template('<b>hello <ui-u san-ref="u">erik</ui-u></b>'),
 
             onCompiled(function () {
@@ -394,13 +395,13 @@ describe('[life cycle]: ', () => {
             });
         });
 
-        var myComponent = new MyComponent();
+        let myComponent = new MyComponent();
 
-        var wrap = document.createElement('div');
+        let wrap = document.createElement('div');
         document.body.appendChild(wrap);
         myComponent.attach(wrap);
 
-        var u = myComponent.ref('u');
+        let u = myComponent.ref('u');
         expect(myComponent.el.tagName).toBe('B');
         expect(u.el.tagName).toBe('U');
 

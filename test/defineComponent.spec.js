@@ -1,10 +1,10 @@
 describe('[defineComponent]: ', () => {
     it("attach without parentEl, and dispose, got collect life cycle", function () {
-        var MyComponent = defineComponent(() => {
+        let MyComponent = defineComponent(() => {
             template('<div>hello san</div>');
         });
 
-        var myComponent = new MyComponent();
+        let myComponent = new MyComponent();
     
         myComponent.attach();
 

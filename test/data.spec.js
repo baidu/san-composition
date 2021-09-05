@@ -1,7 +1,7 @@
 describe('defineComponent', () => {
     it("data set in inited should not update view", function (done) {
-        var up = false;
-        var MyComponent = defineComponent(() => {
+        let up = false;
+        let MyComponent = defineComponent(() => {
             template('<a><span title="{{name}}-{{email}}">{{name}}</span></a>');
 
             onInited(function () {
@@ -18,12 +18,12 @@ describe('defineComponent', () => {
             });
         });
 
-        var myComponent = new MyComponent();
-        var wrap = document.createElement('div');
+        let myComponent = new MyComponent();
+        let wrap = document.createElement('div');
         document.body.appendChild(wrap);
         myComponent.attach(wrap);
 
-        var span = wrap.getElementsByTagName('span')[0];
+        let span = wrap.getElementsByTagName('span')[0];
         expect(span.title).toBe('errorrik-errorrik@gmail.com');
         expect(up).toBeFalsy();
 
@@ -39,7 +39,7 @@ describe('defineComponent', () => {
 
 
     it("data set object", function (done) {
-        var Counter = defineComponent(() => {
+        let Counter = defineComponent(() => {
             template('<u on-click="add">{{num}}</u>');
 
             const dataObj = data({
@@ -53,22 +53,19 @@ describe('defineComponent', () => {
             });
         });
 
-        // TODO: 这里有些问题
-        return done();
-
-        var MyComponent = defineComponent(() => {
+        let MyComponent = defineComponent(() => {
             components({
                 'x-c': Counter
             });
             template('<div><x-c /></div>');
         });
 
-        var myComponent = new MyComponent();
-        var wrap = document.createElement('div');
+        let myComponent = new MyComponent();
+        let wrap = document.createElement('div');
         document.body.appendChild(wrap);
         myComponent.attach(wrap);
 
-        var u = wrap.getElementsByTagName('u')[0];
+        let u = wrap.getElementsByTagName('u')[0];
         expect(u.innerHTML).toBe('2');
 
         triggerEvent(u, 'click');

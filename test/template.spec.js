@@ -1,14 +1,14 @@
 describe('[template]: ', () => {
     it("template as static property", function () {
-        var MyComponent = defineComponent(() => {});
+        let MyComponent = defineComponent(() => {});
         MyComponent.template = '<span title="{{color}}">{{color}}</span>';
-        var myComponent = new MyComponent({data: {color: 'red'}});
+        let myComponent = new MyComponent({data: {color: 'red'}});
 
-        var wrap = document.createElement('div');
+        let wrap = document.createElement('div');
         document.body.appendChild(wrap);
         myComponent.attach(wrap);
 
-        var span = wrap.getElementsByTagName('span')[0];
+        let span = wrap.getElementsByTagName('span')[0];
         expect(span.title).toBe('red');
 
         myComponent.dispose();
@@ -16,22 +16,22 @@ describe('[template]: ', () => {
     });
 
     it("template as static property in inherits component", function () {
-        var B = defineComponent(() => {});
+        let B = defineComponent(() => {});
         B.template = '<b title="b">b</b>';
 
-        var MyComponent = function (option) {
+        let MyComponent = function (option) {
             B.call(this, option);
         };
         san.inherits(MyComponent, B);
         MyComponent.template = '<u title="u">u</u>';
 
-        var wrap = document.createElement('div');
+        let wrap = document.createElement('div');
         document.body.appendChild(wrap);
-        var b = new B();
+        let b = new B();
         b.attach(wrap);
         expect(wrap.getElementsByTagName('b').length).toBe(1);
 
-        var myComponent = new MyComponent();
+        let myComponent = new MyComponent();
         myComponent.attach(wrap);
         expect(wrap.getElementsByTagName('b').length).toBe(1);
         expect(wrap.getElementsByTagName('u').length).toBe(1);

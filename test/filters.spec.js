@@ -1,6 +1,6 @@
 describe('[filters]: ', () => {
     it("filters as static property", function () {
-        var MyComponent = defineComponent(() => {
+        let MyComponent = defineComponent(() => {
             template('<span title="{{color|up}}">{{color|up}}</span>');
             filters({
                 up(source) {
@@ -9,13 +9,13 @@ describe('[filters]: ', () => {
             });
         });
 
-        var myComponent = new MyComponent({data: {color: 'red'}});
+        let myComponent = new MyComponent({data: {color: 'red'}});
 
-        var wrap = document.createElement('div');
+        let wrap = document.createElement('div');
         document.body.appendChild(wrap);
         myComponent.attach(wrap);
 
-        var span = wrap.getElementsByTagName('span')[0];
+        let span = wrap.getElementsByTagName('span')[0];
         expect(span.title).toBe('RED');
 
         myComponent.dispose();

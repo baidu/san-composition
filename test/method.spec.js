@@ -1,5 +1,5 @@
 describe('[method]: ', () => {
-    var ColorPicker = defineComponent(() => {
+    let ColorPicker = defineComponent(() => {
         template('<div><b title="{{value}}">{{value}}</b>'
             + '<ul class="ui-colorpicker">'
             +    '<li '
