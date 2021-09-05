@@ -1,14 +1,30 @@
 describe('[components]: ', () => {
     it("components function", function () {
-        let UILabel = defineComponent(() => {
-            template('<span title="{{text}}">{{text}}</span>')
-        });
-
         let MyComponent = defineComponent(() => {
             template('<div><ui-label text="erik"></ui-label>');
 
             components({
-                'ui-label': UILabel
+                'ui-label': defineComponent(() => {
+                    template(`
+                        <div>
+                            <span title="{{text}}">{{text}}</span>
+                            <ui-label-junior></ui-label-junior>
+                        </div>
+                    `);
+
+                    components({
+                        'ui-label-junior': defineComponent(() => {
+                            template(`
+                                <div>
+                                    <span title="{{text}}">{{text}}</span>
+                                </div>
+                            `);
+                            data({
+                                text: 'Hello'
+                            });
+                        })
+                    });
+                })
             });
         });
 

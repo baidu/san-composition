@@ -36,6 +36,12 @@ let renderingContext = {};
  */
 let context;
 
+/**
+ * 用于存储多个context
+ * @type {Array}
+ */
+let contexts = [];
+
 
 /**
  * 通过组合式API定义San组件
@@ -52,6 +58,11 @@ export const defineComponent = (creator, san) => {
     let data = {};
 
     // 初始化context上下文
+    if (context) {
+        // 如果上一个context存在，说明组件的定义尚未完成
+        contexts.push(context);
+    }
+
     context = {
         methods: defineOptions,
         watches,
@@ -116,6 +127,7 @@ export const defineComponent = (creator, san) => {
         }
     });
 
+    // 将能透传的一些属性直接赋值
     if (context.template) {
         defineOptions.template = context.template;
     }
@@ -136,7 +148,9 @@ export const defineComponent = (creator, san) => {
         defineOptions.components = context.components;
     }
 
-    context = null;
+    // 重置 context
+    context = contexts.pop();
+
     return san.defineComponent(defineOptions);
 };
 
