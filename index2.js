@@ -4,18 +4,6 @@
 
 
 /**
- * 存储组件data的临时变量
- * @type {Object?}
- */
-let dataCache;
-
-/**
- * 在组件渲染期间临时上下文对象
- * @type {Object?}
- */
-let renderingContext = {};
-
-/**
  * 用于定义组件数据的临时对象
  * @type {Object?}
  */
@@ -76,7 +64,7 @@ function componentInitComputed() {
             watcher.call(this);
 
             for (let j = 0; j < computedDatas.length; j++) {
-                this.watch(computedDatas[j], watcher);
+                this.watch(computedDatas[j].name, watcher);
             }
 
             this.__scContext.computedDatas = null;
@@ -258,6 +246,11 @@ class ComputedProxy {
     
     get() {
         if (this.name) {
+            let computedDatas = this.instance.__scContext.computedDatas;
+            if (computedDatas) {
+                computedDatas.push(this);
+            }
+
             return this.instance.data.get(this.name);
         }
     }
