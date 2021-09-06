@@ -124,7 +124,7 @@ export const defineComponent = (creator, san) => {
         context = this.__scContext;
         contexts.push(context);
 
-        let creatorAsInstance = context.creator;
+        let creatorAsInstance = defineContext.creator;
         creatorAsInstance();
 
         contexts.pop();
@@ -236,6 +236,10 @@ class DataProxy {
 
     switch (typeof key) {
         case 'string':
+            if (!context.initData) {
+                context.initData = {};
+            }
+            
             context.initData[key] = value;
             return new DataProxy(key);
 
