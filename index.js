@@ -112,6 +112,7 @@ export const defineComponent = (creator, san) => {
         context = this.__scContext;
         contexts.push(context);
 
+        // 重新赋值，改变下 this
         let creatorAsInstance = defineContext.creator;
         creatorAsInstance();
 
@@ -222,17 +223,17 @@ export const data = (key, value) => {
         return;
     }
 
+    if (!context.initData) {
+        context.initData = {};
+    }
+
     switch (typeof key) {
         case 'string':
-            if (!context.initData) {
-                context.initData = {};
-            }
-
             context.initData[key] = value;
             return new DataProxy(key);
 
         case 'object':
-            context.initData = key;
+            Object.assign(context.initData, key);
     }
 
     return new DataProxy();
