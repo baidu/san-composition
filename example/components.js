@@ -1,8 +1,7 @@
 /**
- * @file 组合式API，demo
+ * @file san composition api demo
  */
-import san from 'san';
-import {
+const {
     defineComponent,
     template,
     data,
@@ -19,7 +18,7 @@ import {
     onDetached,
     onDisposed,
     onUpdated
-} from '../index';
+} = sca;
 
 
 const Counter = defineComponent(() => {
@@ -65,7 +64,7 @@ const MyComponent = defineComponent(() => {
     });
 }, san);
 
-export default defineComponent(() => {
+const App =  defineComponent(() => {
     template(/*html*/`
          <div>
              <x-computed />
@@ -206,4 +205,4 @@ export default defineComponent(() => {
     });
 }, san);
 
-
+(new App()).attach(document.getElementById('app'));
