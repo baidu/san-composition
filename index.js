@@ -87,7 +87,7 @@ function getComputedWatcher(name, fn) {
   * @param {Object} san
   * @return {Function} 返回 san.defineComponent 定义的类
  */
-export const defineComponent = (creator, san) => {
+export function defineComponent(creator, san) {
     let defineContext = {
         creator: creator
     };
@@ -160,7 +160,7 @@ export const defineComponent = (creator, san) => {
   *
   * @param {string} tpl 组件的模板
  */
-export const template = tpl => {
+export function template(tpl) {
     if (context.creator) {
         context.template = tpl;
     }
@@ -218,7 +218,7 @@ class DataProxy {
   * @param {*} value 设置的数据
   * @returns {Object} 返回一个带有包装有 this.data 相关数据操作API的对象
   * */
-export const data = (key, value) => {
+export function data(key, value) {
     if (context.creator) {
         return;
     }
