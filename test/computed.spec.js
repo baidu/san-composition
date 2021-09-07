@@ -85,13 +85,13 @@ describe('[Computed]: ', () => {
                 email: 'name@name.com'
             });
 
-            computed({
+            const computedObj = computed({
                 name: function () {
                     return info.get('first') + ' ' + info.get('last');
                 },
 
                 msg: function () {
-                    return this.data.get('name') + '(' + info.get('email') + ')';
+                    return computedObj.get('name') + '(' + info.get('email') + ')';
                 }
             });
         });
@@ -129,12 +129,12 @@ describe('[Computed]: ', () => {
                 email: 'name@name.com'
             });
 
-            computed({
-                msg: function () {
-                    return this.data.get('name') + '(' + info.get('email') + ')'
-                },
+            const computedObj = computed({
                 name: function () {
                     return info.get('first') + ' ' + info.get('last');
+                },
+                msg: function () {
+                    return computedObj.get('name') + '(' + info.get('email') + ')'
                 }
             });
         });
@@ -161,9 +161,7 @@ describe('[Computed]: ', () => {
 
     });
 
-    it("computed item compute once when init", function (done) {
-        // TODO: 已知问题，computed计算了2次
-        return done();
+    it("computed item compute once when init", function () {
         let nameCount = 0;
         let welcomeCount = 0;
         let MyComponent = defineComponent(() => {
@@ -174,19 +172,19 @@ describe('[Computed]: ', () => {
                 hello: 'hello'
             });
 
-            computed({
+            const computedObj = computed({
                 name: function () {
                     nameCount++;
                     return 'good' + info.get('realname');
                 },
 
-                text: function () {
-                    return this.data.get('welcome') + this.data.get('name');
-                },
-
                 welcome: function () {
                     welcomeCount++;
                     return info.get('hello') + ' ';
+                },
+
+                text: function () {
+                    return computedObj.get('welcome') + computedObj.get('name');
                 }
             });
         })
@@ -206,6 +204,5 @@ describe('[Computed]: ', () => {
 
         myComponent.dispose();
         document.body.removeChild(wrap);
-
     });
 });

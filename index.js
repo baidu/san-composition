@@ -64,7 +64,7 @@ function componentInitComputed() {
             watcher.call(this);
 
             for (let j = 0; j < computedDatas.length; j++) {
-                this.watch(computedDatas[j].name, watcher);
+                this.watch(computedDatas[j], watcher);
             }
 
             this.__scContext.computedDatas = null;
@@ -180,24 +180,52 @@ export function template(tpl) {
     }
 };
 
+
+
+/**
+ * 组件数据的代理类
+ * @class DataProxy
+ */
 class DataProxy {
+    /**
+     * 组件数据的代理类
+     *
+     * @param {string|Array} name 数据的key，如果是通过键值对声明的数据，则name是一个数组
+    */
     constructor(name) {
         this.name = name;
         this.instance = context.instance;
     }
 
     get(name) {
-        if (this.name) {
-            let computedDatas = this.instance.__scContext.computedDatas;
+        let computedDatas = this.instance.__scContext.computedDatas;
+        if (typeof this.name === 'string') {
+            const fullName = name ? this.name + '.' + name : this.name;
             if (computedDatas) {
-                computedDatas.push(this);
+                computedDatas.push(fullName);
             }
-
-            return this.instance.data.get(this.name);
+            return this.instance.data.get(fullName);
         }
 
-        if (name) {
-            return this.instance.data.get(name);
+        if (Array.isArray(this.name)) {
+            // 数组的情况，可以直接通过name拿到Data
+            if (name) {
+                // 考虑name的值是a.b, a[0]的情况
+                const realName = name.split(/[.[]/)[0];
+
+                // 不能拿没有设置的数据，避免混乱
+                if (this.name.indexOf(realName) > -1) {
+                    if (computedDatas) {
+                        computedDatas.push(name);
+                    }
+                    return this.instance.data.get(name);
+                }
+            } else {
+                const result = {};
+                this.name.forEach(n => result[n] = this.instance.data.get(name));
+                // get不传参数，获取多个键值对的情况下，这里不进行 computed
+                return result;
+            }
         }
     }
 
@@ -248,6 +276,7 @@ export function data(key, value) {
 
         case 'object':
             Object.assign(context.initData, key);
+            return new DataProxy(Object.keys(key));
     }
 
     return new DataProxy();
@@ -259,14 +288,25 @@ class ComputedProxy {
         this.instance = context.instance;
     }
 
-    get() {
-        if (this.name) {
-            let computedDatas = this.instance.__scContext.computedDatas;
+    get(name) {
+        let computedDatas = this.instance.__scContext.computedDatas;
+        if (typeof this.name === 'string') {
             if (computedDatas) {
-                computedDatas.push(this);
+                computedDatas.push(name);
             }
-
             return this.instance.data.get(this.name);
+        }
+
+        if (Array.isArray(this.name)) {
+            if (name) {
+                if (computedDatas) {
+                    computedDatas.push(name);
+                }
+                return this.instance.data.get(name);
+            }
+            const result = {};
+            this.name.forEach(n => result[n] = this.instance.data.get(name));
+            return result;
         }
     }
 }
@@ -280,8 +320,17 @@ export function computed(name, fn) {
         context.computed = {};
     }
 
-    context.computed[name] = fn;
-    return new ComputedProxy(name);
+    switch (typeof name) {
+        case 'string':
+            context.computed[name] = fn;
+            return new ComputedProxy(name);
+
+        case 'object':
+            Object.assign(context.computed, name);
+            return new ComputedProxy(Object.keys(name));
+    }
+
+    return new ComputedProxy();
 }
 
 

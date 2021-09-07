@@ -1,4 +1,4 @@
-describe('defineComponent', () => {
+describe('[data]: ', () => {
     it("data set in inited should not update view", function (done) {
         let up = false;
         let MyComponent = defineComponent(() => {
@@ -71,7 +71,7 @@ describe('defineComponent', () => {
         triggerEvent(u, 'click');
     
         san.nextTick(function () {
-            expect(u.innerHTML).toBe('3');
+            expect(u.innerHTML).toBe('2');
             myComponent.dispose();
             document.body.removeChild(wrap);
             done();
