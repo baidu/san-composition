@@ -72,6 +72,17 @@ function componentInitComputed() {
     }
 }
 
+function componentInitWatch() {
+    let watches = this.__scContext.instance.watches;
+    if (watches) {
+        let names = Object.keys(watches);
+        for (let i = 0; i < names.length; i++) {
+            let name = names[i];
+            this.watch(name, watches[name].bind(this.__scContext.instance));
+        }
+    }
+}
+
 function getComputedWatcher(name, fn) {
     return function () {
         let value = fn();
@@ -107,6 +118,9 @@ export function defineComponent(creator, san) {
             instance: this,
             inited: [
                 componentInitComputed
+            ],
+            attached: [
+                componentInitWatch
             ]
         };
         context = this.__scContext;
