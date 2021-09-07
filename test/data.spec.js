@@ -71,7 +71,7 @@ describe('[data]: ', () => {
         triggerEvent(u, 'click');
     
         san.nextTick(function () {
-            expect(u.innerHTML).toBe('2');
+            expect(u.innerHTML).toBe('3');
             myComponent.dispose();
             document.body.removeChild(wrap);
             done();
