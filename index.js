@@ -197,6 +197,23 @@ class DataProxy {
         this.instance = context.instance;
     }
 
+    /**
+     * get方法
+     *
+     * 1. const info = data('info', 'san composition api');
+     * info.get();  // 'san composition api'
+     *
+     * 2. 支持对象形式的设置数据的get
+     * const info = data({name: 'jinz', company: 'baidu'})
+     * info.get('name') // 'jinz'，等价于 this.data.get('name')
+     *
+     * 3. 获取value为对象形式的数据
+     * const info = data('info', {name: 'jinz', company: 'baidu'})
+     * info.get() // {name: 'jinz', company: 'baidu'}
+     * info.get('name') // 'jinz'，等价于: this.data.get('info.name')
+     *
+     * @param {string?} name 获取 data 方法设置的数据的 名称
+     */
     get(name) {
         let computedDatas = this.instance.__scContext.computedDatas;
         if (typeof this.name === 'string') {
@@ -222,19 +239,52 @@ class DataProxy {
                 }
             } else {
                 const result = {};
-                this.name.forEach(n => result[n] = this.instance.data.get(name));
-                // get不传参数，获取多个键值对的情况下，这里不进行 computed
+                this.name.forEach(n => result[n] = this.instance.data.get(n));
+                if (computedDatas) {
+                    computedDatas.push(...this.name);
+                }
                 return result;
             }
         }
     }
 
+    /**
+     * set方法
+     *
+     * 1. const info = data('info', 'san composition api');
+     * info.set('sca');
+     * info.get();  // 'sca'
+     *
+     * 2. 支持对象形式的设置数据的set
+     * const info = data({name: 'jinz', company: 'baidu'})
+     * info.set('name', 'erik') // 'jinz'，等价于 this.data.set('name', 'erik')
+     * info.set({name: 'erik', company: 'baidu'}) // 'jinz'，等价于 this.data.set('name', 'erik')
+     *
+     * 3. 设置value为对象形式的数据
+     * const info = data('info', {name: 'jinz', company: 'baidu'})
+     * info.set('name', 'erik') // 'jinz'，等价于: this.data.set('info.name', 'erik')
+     *
+     * @param {string|Object|*} name name可能是数据的key名称，或者键值对，或者直接是value，等3种情况
+     * @param {*} value
+     */
     set(name, value) {
-        if (this.name) {
-            this.instance.data.set(this.name, name);
+        if (typeof this.name === 'string') {
+            // 直接设置value
+            if (arguments.length === 1) {
+                this.instance.data.set(this.name, name);
+            }
+            // 设置子对象的值
+            this.instance.data.set(this.name + '.' + name, value);
         }
-        else {
-            this.instance.data.set(name, value);
+        else if (Array.isArray(this.name)) {
+            if (arguments.length > 1) {
+                this.instance.data.set(name, value);
+            }
+            else if (typeof name === 'object') {
+                Object.keys(name).forEach(key => {
+                    this.instance.data.set(key, name[key]);
+                });
+            }
         }
     }
 
@@ -243,18 +293,7 @@ class DataProxy {
 
 
 /**
-  * 操作数据的API
-  * const info = data('info', 'san composition api');
-  * info.get();  // 'san composition api'
-  *
-  * 2. 支持对象形式的设置数据的get
-  * const info = data({name: 'jinz', company: 'baidu'})
-  * info.get('name') // 'jinz'，等价于 this.data.get('name')
-  *
-  * 3. 获取value为对象形式的数据
-  * const info = data('info', {name: 'jinz', company: 'baidu'})
-  * info.get() // {name: 'jinz', company: 'baidu'}
-  * info.get('name') // 'jinz'，等价于: this.data.get('info.name')
+  * 操作数据的API，提供 get 和 set 方法
   *
   * @param {string|Object} key 数据的key，或者键值对
   * @param {*} value 设置的数据
