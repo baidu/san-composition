@@ -224,27 +224,25 @@ class DataProxy {
             return this.instance.data.get(fullName);
         }
 
-        if (Array.isArray(this.name)) {
-            // 数组的情况，可以直接通过name拿到Data
-            if (name) {
-                // 考虑name的值是a.b, a[0]的情况
-                const realName = name.split(/[.[]/)[0];
-
-                // 不能拿没有设置的数据，避免混乱
-                if (this.name.indexOf(realName) > -1) {
-                    if (computedDatas) {
-                        computedDatas.push(name);
-                    }
-                    return this.instance.data.get(name);
-                }
-            } else {
-                const result = {};
-                this.name.forEach(n => result[n] = this.instance.data.get(n));
-                if (computedDatas) {
-                    computedDatas.push(...this.name);
-                }
-                return result;
+        // 数组的情况，可以直接通过name拿到Data
+        if (!name) {
+            const result = {};
+            this.name.forEach(n => result[n] = this.instance.data.get(n));
+            if (computedDatas) {
+                computedDatas.push(...this.name);
             }
+            return result;
+        }
+
+        // 考虑name的值是a.b, a[0]的情况
+        const realName = name.split(/[.[]/)[0];
+
+        // 不能拿没有设置的数据，避免混乱
+        if (this.name.indexOf(realName) > -1) {
+            if (computedDatas) {
+                computedDatas.push(name);
+            }
+            return this.instance.data.get(name);
         }
     }
 
@@ -274,17 +272,16 @@ class DataProxy {
                 this.instance.data.set(this.name, name);
             }
             // 设置子对象的值
-            this.instance.data.set(this.name + '.' + name, value);
+            return this.instance.data.set(this.name + '.' + name, value);
         }
-        else if (Array.isArray(this.name)) {
-            if (arguments.length > 1) {
-                this.instance.data.set(name, value);
-            }
-            else if (typeof name === 'object') {
-                Object.keys(name).forEach(key => {
-                    this.instance.data.set(key, name[key]);
-                });
-            }
+
+        if (arguments.length > 1) {
+            this.instance.data.set(name, value);
+        }
+        else if (typeof name === 'object') {
+            Object.keys(name).forEach(key => {
+                this.instance.data.set(key, name[key]);
+            });
         }
     }
 
@@ -336,17 +333,16 @@ class ComputedProxy {
             return this.instance.data.get(this.name);
         }
 
-        if (Array.isArray(this.name)) {
-            if (name) {
-                if (computedDatas) {
-                    computedDatas.push(name);
-                }
-                return this.instance.data.get(name);
+        // 数组的情况
+        if (name) {
+            if (computedDatas) {
+                computedDatas.push(name);
             }
-            const result = {};
-            this.name.forEach(n => result[n] = this.instance.data.get(name));
-            return result;
+            return this.instance.data.get(name);
         }
+        const result = {};
+        this.name.forEach(n => result[n] = this.instance.data.get(n));
+        return result;
     }
 }
 
