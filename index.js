@@ -85,7 +85,7 @@ function componentInitWatch() {
 
 function getComputedWatcher(name, fn) {
     return function () {
-        let value = fn();
+        let value = fn.call(this);
         this.data.set(name, value);
     };
 }
@@ -203,11 +203,7 @@ class DataProxy {
      * 1. const info = data('info', 'san composition api');
      * info.get();  // 'san composition api'
      *
-     * 2. 支持对象形式的设置数据的get
-     * const info = data({name: 'jinz', company: 'baidu'})
-     * info.get('name') // 'jinz'，等价于 this.data.get('name')
-     *
-     * 3. 获取value为对象形式的数据
+     * 2. 获取value为对象形式的数据
      * const info = data('info', {name: 'jinz', company: 'baidu'})
      * info.get() // {name: 'jinz', company: 'baidu'}
      * info.get('name') // 'jinz'，等价于: this.data.get('info.name')
@@ -216,34 +212,11 @@ class DataProxy {
      */
     get(name) {
         let computedDatas = this.instance.__scContext.computedDatas;
-        if (typeof this.name === 'string') {
-            const fullName = name ? this.name + '.' + name : this.name;
-            if (computedDatas) {
-                computedDatas.push(fullName);
-            }
-            return this.instance.data.get(fullName);
+        const fullName = name ? this.name + '.' + name : this.name;
+        if (computedDatas) {
+            computedDatas.push(fullName);
         }
-
-        // 数组的情况，可以直接通过name拿到Data
-        if (!name) {
-            const result = {};
-            this.name.forEach(n => result[n] = this.instance.data.get(n));
-            if (computedDatas) {
-                computedDatas.push(...this.name);
-            }
-            return result;
-        }
-
-        // 考虑name的值是a.b, a[0]的情况
-        const realName = name.split(/[.[]/)[0];
-
-        // 不能拿没有设置的数据，避免混乱
-        if (this.name.indexOf(realName) > -1) {
-            if (computedDatas) {
-                computedDatas.push(name);
-            }
-            return this.instance.data.get(name);
-        }
+        return this.instance.data.get(fullName);
     }
 
     /**
@@ -253,12 +226,7 @@ class DataProxy {
      * info.set('sca');
      * info.get();  // 'sca'
      *
-     * 2. 支持对象形式的设置数据的set
-     * const info = data({name: 'jinz', company: 'baidu'})
-     * info.set('name', 'erik') // 'jinz'，等价于 this.data.set('name', 'erik')
-     * info.set({name: 'erik', company: 'baidu'}) // 'jinz'，等价于 this.data.set('name', 'erik')
-     *
-     * 3. 设置value为对象形式的数据
+     * 2. 设置value为对象形式的数据
      * const info = data('info', {name: 'jinz', company: 'baidu'})
      * info.set('name', 'erik') // 'jinz'，等价于: this.data.set('info.name', 'erik')
      *
@@ -266,25 +234,13 @@ class DataProxy {
      * @param {*} value
      */
     set(name, value) {
-        if (typeof this.name === 'string') {
-            // 直接设置value
-            if (arguments.length === 1) {
-                this.instance.data.set(this.name, name);
-            }
-            // 设置子对象的值
-            return this.instance.data.set(this.name + '.' + name, value);
-        }
-
-        if (arguments.length > 1) {
-            this.instance.data.set(name, value);
-        }
-        else if (typeof name === 'object') {
-            Object.keys(name).forEach(key => {
-                this.instance.data.set(key, name[key]);
-            });
+        // 直接设置value
+        if (arguments.length === 1) {
+            this.instance.data.set(this.name, name);
+        } else if (typeof this.name === 'string') {
+            this.instance.data.set(this.name + '.' + name, value);
         }
     }
-
     // TODO: proxy any other methods
 }
 
@@ -292,11 +248,15 @@ class DataProxy {
 /**
   * 操作数据的API，提供 get 和 set 方法
   *
-  * @param {string|Object} key 数据的key，或者键值对
+  * @param {string} key 数据的key
   * @param {*} value 设置的数据
   * @returns {Object} 返回一个带有包装有 this.data 相关数据操作API的对象
   * */
 export function data(key, value) {
+    if (typeof key !== 'string') {
+        return;
+    }
+
     if (context.creator) {
         return;
     }
@@ -305,17 +265,8 @@ export function data(key, value) {
         context.initData = {};
     }
 
-    switch (typeof key) {
-        case 'string':
-            context.initData[key] = value;
-            return new DataProxy(key);
-
-        case 'object':
-            Object.assign(context.initData, key);
-            return new DataProxy(Object.keys(key));
-    }
-
-    return new DataProxy();
+    context.initData[key] = value;
+    return new DataProxy(key);
 };
 
 class ComputedProxy {
@@ -324,29 +275,20 @@ class ComputedProxy {
         this.instance = context.instance;
     }
 
-    get(name) {
+    get() {
         let computedDatas = this.instance.__scContext.computedDatas;
-        if (typeof this.name === 'string') {
-            if (computedDatas) {
-                computedDatas.push(name);
-            }
-            return this.instance.data.get(this.name);
+        if (computedDatas) {
+            computedDatas.push(this.name);
         }
-
-        // 数组的情况
-        if (name) {
-            if (computedDatas) {
-                computedDatas.push(name);
-            }
-            return this.instance.data.get(name);
-        }
-        const result = {};
-        this.name.forEach(n => result[n] = this.instance.data.get(n));
-        return result;
+        return this.instance.data.get(this.name);
     }
 }
 
 export function computed(name, fn) {
+    if (typeof name !== 'string') {
+        return;
+    }
+
     if (context.creator) {
         return;
     }
@@ -355,17 +297,8 @@ export function computed(name, fn) {
         context.computed = {};
     }
 
-    switch (typeof name) {
-        case 'string':
-            context.computed[name] = fn;
-            return new ComputedProxy(name);
-
-        case 'object':
-            Object.assign(context.computed, name);
-            return new ComputedProxy(Object.keys(name));
-    }
-
-    return new ComputedProxy();
+    context.computed[name] = fn;
+    return new ComputedProxy(name);
 }
 
 
