@@ -19,9 +19,7 @@ describe('[components]: ', () => {
                                     <span title="{{text}}">{{text}}</span>
                                 </div>
                             `);
-                            data({
-                                text: 'Hello'
-                            });
+                            data('text', 'Hello');
                         })
                     });
                 })
@@ -44,9 +42,7 @@ describe('[components]: ', () => {
     it("components use s-is", function () {
         let Label = defineComponent(() => {
             template('<span title="{{text}}">{{text}}</span>');
-            data({
-                text: 'erik'
-            });
+            data('text', 'erik');
         });
 
         let MyComponent = defineComponent(() => {
@@ -54,9 +50,7 @@ describe('[components]: ', () => {
                 'x-label': Label,
             });
             
-            data({
-                cmpt: 'x-label'
-            });
+            data('cmpt', 'x-label');
         });
 
         MyComponent.template = '<div><test s-is="cmpt"/></div>';
@@ -77,24 +71,20 @@ describe('[components]: ', () => {
     it("s-is value update", function (done) {
         let Label = defineComponent(() => {
             template('<span title="{{text}}" >{{text}}</span>');
-            data({text: 'erik'});
+            data('text', 'erik');
         });
 
         let H2 = defineComponent(() => {
             template('<h2>{{text}}.baidu</h2>');
-            data({
-                text: 'erik'
-            });
+            data('text', 'erik');
         });
 
         let MyComponent = defineComponent(() => {
             components({
                 'x-label': Label,
                 'x-h2': H2
-            })
-            data({
-                cmpt: 'x-label'
             });
+            data('cmpt', 'x-label');
         });
 
         MyComponent.template = '<div><test s-is="cmpt"/></div>';
@@ -134,9 +124,7 @@ describe('[components]: ', () => {
                 'x-u': U
             });
             
-            data({
-                cmpt: 'x-f'
-            });
+            data('cmpt', 'x-f');
 
             template('<p><test s-is="cmpt">erik</test></p>');
         });
@@ -175,12 +163,9 @@ describe('[components]: ', () => {
             components({
                 'x-label': Label
             });
-            
-            data({
-                    cmpt: 'h1',
-                    text: 'hello'
-                });
 
+            data('cmpt', 'h1');
+            data('text', 'hello');
             template('<div><span s-is="cmpt" id="comp">{{text}}</span></div>');
         });
 

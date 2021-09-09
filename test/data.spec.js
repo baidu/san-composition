@@ -8,10 +8,9 @@ describe('[data]: ', () => {
                 this.data.set('name', 'errorrik');
             });
 
-            data({
-                name: 'erik',
-                email: 'errorrik@gmail.com'
-            });
+            data('name', 'erik',);
+
+            data('email', 'errorrik@gmail.com');
 
             onUpdated(function () {
                 up = true;
@@ -42,13 +41,11 @@ describe('[data]: ', () => {
         let Counter = defineComponent(() => {
             template('<u on-click="add">{{num}}</u>');
 
-            const dataObj = data({
-                num: 2
-            });
+            const num = data('num', 2);
 
             method({
                 add() {
-                    dataObj.set('num', dataObj.get('num') + 1);
+                    num.set(num.get() + 1);
                 }
             });
         });

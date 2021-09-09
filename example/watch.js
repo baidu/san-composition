@@ -15,6 +15,7 @@ document.body.appendChild(wrapper);
 const App =  defineComponent(() => {
     template(`
         <div>
+            <div><strong>Watch Function</strong></div>
             <span>name: {{name}}</span>
             <button on-click="rename">rename</button>
             <br ><br >
@@ -23,18 +24,16 @@ const App =  defineComponent(() => {
         </div>
     `);
 
-    const info = data({
-        company: 'baidu'
-    });
+    const info = data('company', 'baidu');
 
     // Watch失效了啊？
     watch('company', function (value, e) {
-        const company = info.get('company');
+        const company = info.get();
         console.log(`data changes, new company: ${company}`);
     });
 
     method('hop', () => {
-        info.set('company', 'baidu~' + Math.random());
+        info.set('baidu~' + Math.random());
     });
 
     const nameData = data('name', 'myName');

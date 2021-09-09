@@ -212,7 +212,11 @@ class DataProxy {
      */
     get(name) {
         let computedDatas = this.instance.__scContext.computedDatas;
-        const fullName = name ? this.name + '.' + name : this.name;
+        let fullName = this.name;
+        if (name) {
+            const separator = /^[[.]/.test(name) ? '' : '.';
+            fullName = this.name + separator + name;
+        }
         if (computedDatas) {
             computedDatas.push(fullName);
         }

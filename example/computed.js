@@ -17,32 +17,31 @@ const App =  defineComponent(() => {
     template(`
         <div>            
             <div><strong>Computed Function</strong></div>
-
-            <div><span title="{{msg}}">{{msg}}</span></div>
-            <div><span>{{msg2}}</span></div>
+            <div><span>info.first: {{info.first}}</span></div>
+            <div><span>name: {{name}}</span></div>
+            <div><span>msg: {{msg}}</span></div>
+            <div><span>more: {{more}}</span></div>
         </div>
     `);
 
-    const info = data({
+    const info = data('info', {
         first: 'first',
         last: 'last',
         email: 'name@name.com'
     });
 
-    // TODO: issue2，computed支持对象的形式，另外，this.data可以使用，但不推荐使用
-    const computedInfo = computed({
-        msg() {
-            return this.data.get('name') + '(' + info.get('email') + ')';
-        },
-        name() {
-            return info.get('first') + ' ' + info.get('last');
-        },
-        more() {
-            return computedInfo.get('msg') + ' | ' + computedInfo.get('name');
-        }
+    const name = computed('name', function () {
+        return info.get('first') + ' ' + info.get('last');
     });
 
+    // 虽然不推荐用this，但是内部的this还是支持的
+    const msg = computed('msg', function () {
+        return this.data.get('name') + '(' + info.get('email') + ')';
+    });
 
+    const more = computed('more', function () {
+        return msg.get() + ' | ' + name.get();
+    });
 }, san);
 
 (new App()).attach(wrapper);

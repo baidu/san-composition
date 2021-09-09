@@ -24,13 +24,11 @@ import {
 const Counter = defineComponent(() => {
     template('<u on-click="add">num: {{num}}</u>');
 
-    const dataObj = data({
-        num: 2
-    });
+    const num = data('num', 2);
 
     method({
         add() {
-            dataObj.set('num', dataObj.get('num') + 1);
+            num.set(num.get() + 1);
         }
     });
 }, san);
@@ -48,19 +46,18 @@ const MyComponent = defineComponent(() => {
         </div>
     `);
 
-    const info = data({
+    const info = data('info', {
         first: 'first',
         last: 'last',
         email: 'name@name.com'
     });
 
-    const computedObj = computed({
-        msg: function () {
-            return computedObj.get('name') + '(' + info.get('email') + ')';
-        },
-        name: function () {
-            return info.get('first') + ' ' + info.get('last');
-        }
+    const name = computed('name', () => {
+        return info.get('first') + ' ' + info.get('last');
+    });
+
+    const msg = computed('msg', () => {
+        return name.get() + '(' + info.get('email') + ')';
     });
 }, san);
 
@@ -79,10 +76,10 @@ const App =  defineComponent(() => {
              <button on-click="decrement"> -1 </button>
              <my-child></my-child>
              <x-line />
-             <div>{{name}}</div>
-             <div>{{company}}</div>
-             <div>{{extra}}</div>
-             <div>{{usrInfo}}</div>
+             <div>{{info.name}}</div>
+             <div>{{info.company}}</div>
+             <div>{{info.extra}}</div>
+             <div>{{info.usrInfo}}</div>
              <button on-click="baidu"> baidu </button>
              <button on-click="tencent"> tencent </button>
              <button on-click="assign"> assign </button>
@@ -94,17 +91,15 @@ const App =  defineComponent(() => {
      `);
 
     let oldEmail = 'errorrik@gmail.com';
-    const projects = data({
-        projects: [
-            {
-                name: 'etpl',
-                author: {
-                    email: oldEmail,
-                    name: 'errorrik'
-                }
+    const projects = data('projects', [
+        {
+            name: 'etpl',
+            author: {
+                email: oldEmail,
+                name: 'errorrik'
             }
-        ]
-    });
+        }
+    ]);
 
     // TODO: get方法的实现
     // console.log("projects.get('projects[0].author.email'):", projects.get('projects[0].author.email'));
@@ -118,7 +113,7 @@ const App =  defineComponent(() => {
     // 处理数据
     const count = data('count', 1);
 
-    const info = data({
+    const info = data('info', {
         name: 'jinz',
         company: 'baidu'
     });

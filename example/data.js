@@ -21,8 +21,8 @@ const App =  defineComponent(() => {
              <div>count: {{ count }} </div>
              <div>newCount: {{ newCount }} </div>
              <input type="text" value="{= count =}"/>
-             <div>name: {{ name }} </div>
-             <div>company: {{ company }} </div>
+             <div>name: {{ info.name }} </div>
+             <div>company: {{ info.company }} </div>
              <div>deepCount: {{deepCount}}</div>
              <div>deeperCount: {{deeperCount}}</div>
              <button on-click="increment"> +1 </button>
@@ -32,8 +32,10 @@ const App =  defineComponent(() => {
 
     // 处理数据
     const count = data('count', 1);
+    const deepCount = computed('deepCount', () => count.get() + ' ===> ');
+    computed('deeperCount', () => deepCount.get() + ' ===> ');
 
-    const info = data({
+    const info = data('info', {
         name: 'jinz',
         company: 'baidu'
     });
@@ -41,15 +43,6 @@ const App =  defineComponent(() => {
     const extraInfo = data('extra', {
         sex: 'male',
         country: 'China'
-    });
-
-    const computedData = computed({
-        'deepCount': () => {
-            return count.get() + ' ===> ';
-        },
-        'deeperCount': () => {
-            return computedData.get('deepCount')  + ' ===> ';
-        }
     });
 
     method({

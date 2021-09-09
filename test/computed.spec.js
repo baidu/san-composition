@@ -3,15 +3,11 @@ describe('[Computed]: ', () => {
         let MyComponent = defineComponent(() => {
             template('<div><span title="{{name}}">{{name}}</span></div>');
 
-            const myData = data({
-                'first': 'first',
-                'last': 'last'
-            });
+            const first = data('first', 'first');
+            const last = data('last', 'last');
 
-            computed({
-                name: function () {
-                    return myData.get('first') + ' ' + myData.get('last');
-                }
+            computed('name', function () {
+                return first.get('') + ' ' + last.get('');
             });
         });
 
@@ -41,18 +37,15 @@ describe('[Computed]: ', () => {
     it("static computed property", function (done) {
         let MyComponent = defineComponent(() => {
             template('<div><span title="{{name}}">{{name}}</span></div>');
-
-            data({
-                'first': 'first',
-                'last': 'last'
-            });
+            data('first', 'first');
+            data('last', 'last');
         });
+
         MyComponent.computed = {
             name: function () {
                 return this.data.get('first') + ' ' + this.data.get('last');
             }
         };
-
 
         let myComponent = new MyComponent();
 
@@ -79,20 +72,18 @@ describe('[Computed]: ', () => {
         let MyComponent = defineComponent(() => {
             template('<div><span title="{{msg}}">{{msg}}</span></div>');
 
-            const info = data({
+            const info = data('info', {
                 first: 'first',
                 last: 'last',
                 email: 'name@name.com'
             });
 
-            const computedObj = computed({
-                name: function () {
-                    return info.get('first') + ' ' + info.get('last');
-                },
+            const name = computed('name', function () {
+                return info.get('first') + ' ' + info.get('last');
+            });
 
-                msg: function () {
-                    return computedObj.get('name') + '(' + info.get('email') + ')';
-                }
+            const msg = computed('msg', function () {
+                return name.get() + '(' + info.get('email') + ')'
             });
         });
 
@@ -106,7 +97,7 @@ describe('[Computed]: ', () => {
         let span = wrap.getElementsByTagName('span')[0];
         expect(span.title).toBe('first last(name@name.com)');
 
-        myComponent.data.set('last', 'xxx')
+        myComponent.data.set('info.last', 'xxx')
 
         san.nextTick(function () {
             let span = wrap.getElementsByTagName('span')[0];
@@ -123,19 +114,18 @@ describe('[Computed]: ', () => {
         let MyComponent = defineComponent(() => {
             template('<div><span title="{{msg}}">{{msg}}</span></div>');
 
-            const info = data({
+            const info = data('info', {
                 first: 'first',
                 last: 'last',
                 email: 'name@name.com'
             });
 
-            const computedObj = computed({
-                name: function () {
-                    return info.get('first') + ' ' + info.get('last');
-                },
-                msg: function () {
-                    return computedObj.get('name') + '(' + info.get('email') + ')'
-                }
+            const name = computed('name', function () {
+                return info.get('first') + ' ' + info.get('last');
+            });
+
+            const msg = computed('msg', function () {
+                return name.get() + '(' + info.get('email') + ')'
             });
         });
 
@@ -148,7 +138,7 @@ describe('[Computed]: ', () => {
         let span = wrap.getElementsByTagName('span')[0];
         expect(span.title).toBe('first last(name@name.com)');
 
-        myComponent.data.set('email', 'san@san.com')
+        myComponent.data.set('info.email', 'san@san.com')
 
         san.nextTick(function () {
             let span = wrap.getElementsByTagName('span')[0];
@@ -167,27 +157,25 @@ describe('[Computed]: ', () => {
         let MyComponent = defineComponent(() => {
             template('<span>{{text}}</span>');
 
-            const info = data({
+            const info = data('info', {
                 realname: 'san',
                 hello: 'hello'
             });
 
-            const computedObj = computed({
-                name: function () {
-                    nameCount++;
-                    return 'good' + info.get('realname');
-                },
-
-                welcome: function () {
-                    welcomeCount++;
-                    return info.get('hello') + ' ';
-                },
-
-                text: function () {
-                    return computedObj.get('welcome') + computedObj.get('name');
-                }
+            const name = computed('name', function () {
+                nameCount++;
+                return 'good' + info.get('realname');
             });
-        })
+
+            const welcome = computed('welcome', function () {
+                welcomeCount++;
+                return info.get('hello') + ' ';
+            });
+
+            const text = computed('text', function () {
+                return welcome.get() + name.get();
+            });
+        });
 
 
         let myComponent = new MyComponent();
