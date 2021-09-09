@@ -1,9 +1,0 @@
-{
-    "compilerOptions": {
-        "baseUrl": ".",
-        "paths": {
-            "@/*": ["example/*"],
-            "@app": ["example/lib/App.js"]
-        }
-    }
-}

@@ -64,7 +64,7 @@ function componentInitComputed() {
             watcher.call(this);
 
             for (let j = 0; j < computedDatas.length; j++) {
-                this.watch(computedDatas[j].name, watcher);
+                this.watch(computedDatas[j], watcher);
             }
 
             this.__scContext.computedDatas = null;
@@ -72,9 +72,20 @@ function componentInitComputed() {
     }
 }
 
+function componentInitWatch() {
+    let watches = this.__scContext.instance.watches;
+    if (watches) {
+        let names = Object.keys(watches);
+        for (let i = 0; i < names.length; i++) {
+            let name = names[i];
+            this.watch(name, watches[name].bind(this.__scContext.instance));
+        }
+    }
+}
+
 function getComputedWatcher(name, fn) {
     return function () {
-        let value = fn();
+        let value = fn.call(this);
         this.data.set(name, value);
     };
 }
@@ -107,6 +118,9 @@ export function defineComponent(creator, san) {
             instance: this,
             inited: [
                 componentInitComputed
+            ],
+            attached: [
+                componentInitWatch
             ]
         };
         context = this.__scContext;
@@ -166,59 +180,87 @@ export function template(tpl) {
     }
 };
 
+
+
+/**
+ * 组件数据的代理类
+ * @class DataProxy
+ */
 class DataProxy {
+    /**
+     * 组件数据的代理类
+     *
+     * @param {string|Array} name 数据的key，如果是通过键值对声明的数据，则name是一个数组
+    */
     constructor(name) {
         this.name = name;
         this.instance = context.instance;
     }
 
+    /**
+     * get方法
+     *
+     * 1. const info = data('info', 'san composition api');
+     * info.get();  // 'san composition api'
+     *
+     * 2. 获取value为对象形式的数据
+     * const info = data('info', {name: 'jinz', company: 'baidu'})
+     * info.get() // {name: 'jinz', company: 'baidu'}
+     * info.get('name') // 'jinz'，等价于: this.data.get('info.name')
+     *
+     * @param {string?} name 获取 data 方法设置的数据的 名称
+     */
     get(name) {
-        if (this.name) {
-            let computedDatas = this.instance.__scContext.computedDatas;
-            if (computedDatas) {
-                computedDatas.push(this);
-            }
-
-            return this.instance.data.get(this.name);
-        }
-
+        let computedDatas = this.instance.__scContext.computedDatas;
+        let fullName = this.name;
         if (name) {
-            return this.instance.data.get(name);
+            const separator = /^[[.]/.test(name) ? '' : '.';
+            fullName = this.name + separator + name;
         }
+        if (computedDatas) {
+            computedDatas.push(fullName);
+        }
+        return this.instance.data.get(fullName);
     }
 
+    /**
+     * set方法
+     *
+     * 1. const info = data('info', 'san composition api');
+     * info.set('sca');
+     * info.get();  // 'sca'
+     *
+     * 2. 设置value为对象形式的数据
+     * const info = data('info', {name: 'jinz', company: 'baidu'})
+     * info.set('name', 'erik') // 'jinz'，等价于: this.data.set('info.name', 'erik')
+     *
+     * @param {string|Object|*} name name可能是数据的key名称，或者键值对，或者直接是value，等3种情况
+     * @param {*} value
+     */
     set(name, value) {
-        if (this.name) {
+        // 直接设置value
+        if (arguments.length === 1) {
             this.instance.data.set(this.name, name);
-        }
-        else {
-            this.instance.data.set(name, value);
+        } else if (typeof this.name === 'string') {
+            this.instance.data.set(this.name + '.' + name, value);
         }
     }
-
     // TODO: proxy any other methods
 }
 
 
 /**
-  * 操作数据的API
-  * const info = data('info', 'san composition api');
-  * info.get();  // 'san composition api'
+  * 操作数据的API，提供 get 和 set 方法
   *
-  * 2. 支持对象形式的设置数据的get
-  * const info = data({name: 'jinz', company: 'baidu'})
-  * info.get('name') // 'jinz'，等价于 this.data.get('name')
-  *
-  * 3. 获取value为对象形式的数据
-  * const info = data('info', {name: 'jinz', company: 'baidu'})
-  * info.get() // {name: 'jinz', company: 'baidu'}
-  * info.get('name') // 'jinz'，等价于: this.data.get('info.name')
-  *
-  * @param {string|Object} key 数据的key，或者键值对
+  * @param {string} key 数据的key
   * @param {*} value 设置的数据
   * @returns {Object} 返回一个带有包装有 this.data 相关数据操作API的对象
   * */
 export function data(key, value) {
+    if (typeof key !== 'string') {
+        return;
+    }
+
     if (context.creator) {
         return;
     }
@@ -227,16 +269,8 @@ export function data(key, value) {
         context.initData = {};
     }
 
-    switch (typeof key) {
-        case 'string':
-            context.initData[key] = value;
-            return new DataProxy(key);
-
-        case 'object':
-            Object.assign(context.initData, key);
-    }
-
-    return new DataProxy();
+    context.initData[key] = value;
+    return new DataProxy(key);
 };
 
 class ComputedProxy {
@@ -246,18 +280,19 @@ class ComputedProxy {
     }
 
     get() {
-        if (this.name) {
-            let computedDatas = this.instance.__scContext.computedDatas;
-            if (computedDatas) {
-                computedDatas.push(this);
-            }
-
-            return this.instance.data.get(this.name);
+        let computedDatas = this.instance.__scContext.computedDatas;
+        if (computedDatas) {
+            computedDatas.push(this.name);
         }
+        return this.instance.data.get(this.name);
     }
 }
 
 export function computed(name, fn) {
+    if (typeof name !== 'string') {
+        return;
+    }
+
     if (context.creator) {
         return;
     }

@@ -5,6 +5,7 @@ import {
     defineComponent,
     template,
     data,
+    computed,
     method,
 }  from '../index';
 
@@ -17,10 +18,13 @@ const App =  defineComponent(() => {
          <div>
             <div><strong>Data Function</strong></div>
 
-             <span>count: {{ count }} </span>
+             <div>count: {{ count }} </div>
+             <div>newCount: {{ newCount }} </div>
              <input type="text" value="{= count =}"/>
-             <div>name: {{ name }} </div>
-             <div>company: {{ company }} </div>
+             <div>name: {{ info.name }} </div>
+             <div>company: {{ info.company }} </div>
+             <div>deepCount: {{deepCount}}</div>
+             <div>deeperCount: {{deeperCount}}</div>
              <button on-click="increment"> +1 </button>
              <button on-click="decrement"> -1 </button>
          </div>
@@ -28,8 +32,10 @@ const App =  defineComponent(() => {
 
     // 处理数据
     const count = data('count', 1);
+    const deepCount = computed('deepCount', () => count.get() + ' ===> ');
+    computed('deeperCount', () => deepCount.get() + ' ===> ');
 
-    const info = data({
+    const info = data('info', {
         name: 'jinz',
         company: 'baidu'
     });
@@ -41,8 +47,8 @@ const App =  defineComponent(() => {
 
     method({
         increment: () => {
-            // 支持为空？
-            console.log('info.get():', info.get());
+            // 支持为空
+            console.log('info.get():', info.get()); // => {name: 'jinz', company: 'baidu'}
 
             console.log('extraInfo.get():', extraInfo.get());
 
