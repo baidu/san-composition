@@ -198,6 +198,19 @@ class DataProxy {
     }
 
     /**
+     * 每个数据操作方法，最后都可以包含一个类型为 Object 的数据操作选项参数对象，
+     * 该对象中的参数可控制视图更新行为
+     *
+     * @param {Object} opt 设置数据操作选项参数
+     *          opt.silent: 静默更新数据，不触发视图变更
+     *          opt.force: 设置相同的数据时，强制触发视图变更
+     */
+    option(opt) {
+        this.option = opt;
+        return this;
+    }
+
+    /**
      * get方法
      *
      * 1. const info = data('info', 'san composition api');
@@ -224,7 +237,31 @@ class DataProxy {
     }
 
     /**
-     * set方法
+     * 代理组件data对象下面的方法，包括
+     * set
+     * assign
+     * merge
+     * apply
+     *
+     * 数组方法
+     * push
+     * unshift
+     * remove
+     * removeAt
+     * splice
+     *
+     * @param {Array} args 透传san组件的data方法的参数
+     */
+    handle(method, ...args) {
+        if (args.length === 1) {
+            this.instance.data[method](this.name, args[0], this.option);
+        } else if (typeof args[0] === 'string') {
+            this.instance.data[method](this.name + '.' + args[0], args[1], this.option);
+        }
+    }
+
+    /**
+     * set的用法
      *
      * 1. const info = data('info', 'san composition api');
      * info.set('sca');
@@ -234,16 +271,76 @@ class DataProxy {
      * const info = data('info', {name: 'jinz', company: 'baidu'})
      * info.set('name', 'erik') // 'jinz'，等价于: this.data.set('info.name', 'erik')
      *
-     * @param {string|Object|*} name name可能是数据的key名称，或者键值对，或者直接是value，等3种情况
-     * @param {*} value
      */
-    set(name, value) {
-        // 直接设置value
-        if (arguments.length === 1) {
-            this.instance.data.set(this.name, name);
-        } else if (typeof this.name === 'string') {
-            this.instance.data.set(this.name + '.' + name, value);
+    set(...args) {
+        this.handle('set', ...args);
+    }
+
+    /**
+     * 将传入数据对象（source）与 data 合并，进行批量更新
+     * 作用类似于 JavaScript 中的 Object.assign
+     *
+     * @param {Object} source
+     * @param {Object?} option
+     */
+    assign(source) {
+        this.instance.data.assign(source, this.option);
+    }
+
+    /**
+     * 对指定的数据项，使用传入数据对象（source）进行合并
+     *
+     * @param {string?} expr
+     * @param {Object} source
+     */
+    merge(...args) {
+        this.handle('merge', ...args);
+    }
+
+    /**
+     * 接受一个函数作为参数，传入当前的值到函数，然后用新返回的值更新它
+     *
+     * @param {function({*}):{*}} source
+     * @param {Object?} option
+     */
+    apply(...args) {
+        this.handle('apply', ...args);
+    }
+
+    push(...args) {
+        this.handle('push', ...args);
+    }
+
+    pop(expr) {
+        let key = this.name;
+        if (typeof expr === 'string') {
+            key += '.' + expr;
         }
+        this.instance.data.pop(key, this.option);
+    }
+
+    shift(expr) {
+        let key = this.name;
+        if (typeof expr === 'string') {
+            key += '.' + expr;
+        }
+        this.instance.data.shift(key, this.option);
+    }
+
+    unshift(...args) {
+        this.handle('unshift', ...args);
+    }
+
+    remove(...args) {
+        this.handle('remove', ...args);
+    }
+
+    removeAt(...args) {
+        this.handle('removeAt', ...args);
+    }
+
+    splice(...args) {
+        this.handle('splice', ...args);
     }
 }
 
