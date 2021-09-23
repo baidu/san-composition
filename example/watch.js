@@ -26,10 +26,10 @@ const App =  defineComponent(() => {
 
     const info = data('company', 'baidu');
 
-    // Watch失效了啊？
     watch('company', function (value, e) {
         const company = info.get();
-        console.log(`data changes, new company: ${company}`);
+        console.log(`data changes, new company: ${company}, val: ${value}`);
+        console.log({e});
     });
 
     method('hop', () => {
