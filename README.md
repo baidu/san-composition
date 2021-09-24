@@ -1,14 +1,24 @@
 # san-composition
 
-Composition API的目标是让代码的共享和重用变得更为简单和便捷，这个概念由Vue框架提出（受React Hooks影响），它对于San框架有一定的可借鉴意义。
-
-## 1. Options API  vs Composition API
-
-1. Options API通过使用San单文件中data、method、computed、watch来定义属性和方法，共同处理页面逻辑；
-2. Composition API则是将属性转换为对应的函数，通过逻辑相关性来组织代码，从而实现更好的代码复用，提高可读性和可维护性。
+[![NPM version](http://img.shields.io/npm/v/san-composition.svg?style=flat-square)](https://npmjs.org/package/san-composition)
+[![License](https://img.shields.io/github/license/baidu/san-composition.svg?style=flat-square)](https://npmjs.org/package/san-composition)
 
 
-## 2. Basic example
+随着业务的不断发展，前端项目往往变得越来越复杂，过去我们使用 options 定义组件的方式随着功能的迭代可读性可能会越来越差，当我们为组件添加额外功能时，可能需要修改（initData、attached、computed等）多个代码块；显然，在一些情况下按逻辑来组织代码更有意义，也使得更细粒度的代码复用成为可能。
+
+san-composition 提供一组与定义组件 options 的 key 对应的方法来定义组件的成员属性和方法，让开发者可以通过逻辑相关性来组织代码，从而提高代码的可读性和可维护性。
+
+## 安装
+
+**NPM**
+
+```
+npm install san-composition
+```
+
+## 基础用法
+
+下面的例子展示了如何使用 San 组合式 API 定义组件：
 
 ```js
 import san from 'san';
@@ -17,18 +27,12 @@ import {
     template,
     data,
     computed,
-    messages,
     filters,
     watch,
     components,
     method,
-    onCompiled,
-    onInited,
     onCreated,
-    onAttached,
-    onDetached,
-    onDisposed,
-    onUpdated
+    onAttached
 } from 'san-composition';
 
 export default defineComponent(() => {
@@ -46,7 +50,6 @@ export default defineComponent(() => {
 
     // 处理数据
     const count = data('count', 1);
-
     count.set(100);
 
     // 处理上下文
@@ -77,6 +80,12 @@ export default defineComponent(() => {
         }
     });
 
+    components({
+        'my-child': defineComponent({
+            template: `<div>My Child</div>`
+        })
+    }, san);
+
     onAttached(() => {
         console.log('onAttached');
     });
@@ -85,30 +94,31 @@ export default defineComponent(() => {
         console.log('onAttached1');
     });
 
-    components({
-        'my-child': defineComponent({
-            template: `<div>My Child</div>`
-        })
-    });
-
     onCreated(() => {
         console.log('onCreated');
     });
 }, san);
 
 ```
-
-## 3. Motivation
-
-### 1. 更好的代码组织和逻辑复用
-
-1. 随着功能的增加，复杂组件的代码变得更难推理。尤其是当开发者在阅读不是他们自己写的代码时，这种情况会发生。根本原因是现有的API强迫按选项组织代码，但在某些情况下，按逻辑关注点组织代码更有意义；
-2. 目前缺少一种简洁且低成本的机制来提取和重用多个组件之间的逻辑。
-
-### 2. 关于 setupComponent 的 return
-
-1. 我们将 option API全部转换为了函数方法（composition API），如果再增加额外的return，会导致返回语句变得冗长；
-2. 返回语句对可维护性有一定的帮助，但经过权衡，我们选择不 return。
+### 声明模板
 
 
+
+### 声明方法
+
+
+
+### 操作数据
+
+
+
+### 生命周期钩子
+
+
+
+## 进阶篇
+
+## API
+
+完整的 API 详见：[API](https://github.com/jinzhan/san-composition/blob/master/docs/api.md)
 
