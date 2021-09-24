@@ -1,8 +1,6 @@
 # san-composition API
 
-
-
-## 定义组件的方法
+## 组合式API
 
 ### defineComponent
 
@@ -34,13 +32,11 @@ defineComponent(() => {
 }, san);
 ```
 
+> 注意：defineComponent以外的其他 API 只能在 defineComponent 方法中的第一个函数参数中执行。
 
-## 组合式API
-
-通过可组合的方式定义组件的 API，这些 API 只能在 defineComponent 方法中使用。
 ### template(tpl)
 
-定义组件模板的的方法。
+定义组件模板的方法。
 
 **描述**
 
