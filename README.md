@@ -8,6 +8,10 @@
 
 san-composition 提供一组与定义组件 options 的 key 对应的方法来定义组件的属性和方法，让开发者可以通过逻辑相关性来组织代码，从而提高代码的可读性和可维护性。
 
+- [安装](#安装)
+- [基础用法](#基础用法)
+- [进阶篇](#进阶篇) 
+- [API](https://github.com/baidu/san-composition/blob/master/docs/api.md)
 ## 安装
 
 **NPM**
@@ -24,7 +28,7 @@ npm install san-composition
 
 ### 定义模板
 
-使用`template` 方法来定义组件的模板：
+使用 [template](https://github.com/baidu/san-composition/blob/master/docs/api.md#template) 方法来定义组件的模板：
 
 ```js
 import san from 'san';
@@ -41,11 +45,9 @@ export default defineComponent(() => {
 
 ```
 
+### 定义数据
 
-
-### 初始化数据
-
-使用 `data` 方法来初始化组件的一个数据项：
+使用 [data](https://github.com/baidu/san-composition/blob/master/docs/api.md#data) 方法来初始化组件的一个数据项：
 
 ```js
 import san from 'san';
@@ -57,11 +59,46 @@ const App = defineComponent(() => {
 }, san);
 ```
 
-`data` 的返回值是一个 [DataProxy](https://github.com/baidu/san-composition/blob/master/docs/api.md#dataproxy) 实例，我们可以通过它获取数据或者修改数据。
+`data` 的返回值是一个对象，包含get、set、merge、splice等方法。我们可以通过对象上的方法对数据进行获取和修改操作。
+
+### 定义计算数据
+
+使用 [computed](https://github.com/baidu/san-composition/blob/master/docs/api.md#computed) 方法来定义一个计算数据项：
+
+```js
+const App =  defineComponent(() => {
+    template(/* ... */);
+
+    const name = data('name', {
+        first: 'Donald',
+        last: 'Trump'
+    });
+
+    const fullName = computed('fullName',  function() {
+        return name.get('first') + ' ' + name.get('last');
+    });
+}, san);
+```
+
+
+### 定义过滤器
+
+使用 [filters](https://github.com/baidu/san-composition/blob/master/docs/api.md#filters) 方法来为组件添加过滤器：
+ 
+```js
+const App =  defineComponent(() => {
+    template('<div> {{ count|triple }} </div>');
+
+    const count = data('count', 1);
+ 
+    filters('triple', value => value * 3);
+}, san);
+```
+
 
 ### 定义方法
 
-使用 `method`来定义方法，我们强烈建议按照 `data` 和 `method` 根据业务逻辑就近定义：
+使用 [method](https://github.com/baidu/san-composition/blob/master/docs/api.md#method) 来定义方法，我们强烈建议按照 `data` 和 `method` 根据业务逻辑就近定义：
 
 ```js
 import san from 'san';
@@ -81,7 +118,7 @@ const App = defineComponent(() => {
 
 ### 生命周期钩子
 
-下面的`onAttached`方法，为组件添加 attached 生命周期钩子：
+下面的 [onAttached](https://github.com/baidu/san-composition/blob/master/docs/api.md#onAttached) 方法，为组件添加 attached 生命周期钩子：
 
 ```js
 import san from 'san';
@@ -178,28 +215,7 @@ export default defineComponent(() => {
 ```
 
 
-
 ## 进阶篇
-
-### this 的使用
-
-在组合式 API 中我们不推荐使用 `this` ，它会造成一些混淆，但有时候可能不得不使用，这时候注意不要在对应的方法中使用箭头函数。
-
-```js
-defineComponent(() => {
-    template(/* ... */);
-    const count = data('count', 1);
-
-    // 这里定义的方法不能使用剪头函数
-    method('increment', function () {
-        this.dispatch('increment:count', count.get());
-    });
-}, san);
-
-```
-
-
-
 ### 实现可组合
 
 假设我们要开发一个联系人列表，这个列表包含了联系人的查看、修改、删除、收藏等功能。这里首先使用 Class API 来开发，我们的组件随着功能的丰富逐渐变大，慢慢它的逻辑会变得越来越发散，代码的可读性会变差。
@@ -516,7 +532,19 @@ const ContactList = defineComponent(() => {
 }, san);
 ```
 
-## API
+### this 的使用
 
-完整的 API 详见：[API](https://github.com/baidu/san-composition/blob/master/docs/api.md)
+在组合式 API 中我们不推荐使用 `this` ，它会造成一些混淆，但有时候可能不得不使用，这时候注意不要在对应的方法中使用箭头函数。
 
+```js
+defineComponent(() => {
+    template(/* ... */);
+    const count = data('count', 1);
+
+    // 这里定义的方法不能使用剪头函数
+    method('increment', function () {
+        this.dispatch('increment:count', count.get());
+    });
+}, san);
+
+```
