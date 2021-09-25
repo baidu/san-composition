@@ -27,6 +27,12 @@ const App =  defineComponent(() => {
              <div>deeperCount: {{deeperCount}}</div>
              <button on-click="increment"> +1 </button>
              <button on-click="decrement"> -1 </button>
+
+             <ul>
+                <li s-for="i in state">i - {{i}}</li>
+                <li s-for="j in astate.data">j - {{j}}</li>
+             </ul>
+             <button on-click="updateState">updateState</button>
          </div>
      `);
 
@@ -39,6 +45,13 @@ const App =  defineComponent(() => {
         name: 'jinz',
         company: 'baidu'
     });
+
+    const state = data('state', [0, 1, 2, 3, 4]);
+    const aState = data('astate', {data: [0, 1, 2, 3, 4]});
+    method('updateState', () => {
+        state.pop();
+        aState.pop('data');
+    })
 
     const extraInfo = data('extra', {
         sex: 'male',

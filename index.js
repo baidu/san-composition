@@ -10,9 +10,9 @@
 let context;
 
 /**
-  * 用于存储多个context
-  * @type {Array}
-  */
+ * 用于存储多个context
+ * @type {Array}
+ */
 let contexts = [];
 
 
@@ -21,9 +21,9 @@ function componentInitData() {
 }
 
 /**
-  * 组件生命周期钩子
-  * @type {Array}
-  */
+ * 组件生命周期钩子
+ * @type {Array}
+ */
 const LIFECYCLE_HOOKS = [
     'construct',
     'compiled',
@@ -92,11 +92,11 @@ function getComputedWatcher(name, fn) {
 
 
 /**
-  * 通过组合式API定义San组件
-  *
-  * @param {Function} creator 通过调用组合式API的方法
-  * @param {Object} san
-  * @return {Function} 返回 san.defineComponent 定义的类
+ * 通过组合式API定义San组件
+ *
+ * @param {Function} creator 通过调用组合式API的方法
+ * @param {Object} san
+ * @return {Function} 返回 san.defineComponent 定义的类
  */
 export function defineComponent(creator, san) {
     let defineContext = {
@@ -139,7 +139,7 @@ export function defineComponent(creator, san) {
     };
 
 
-    function Empty() {}
+    function Empty() { }
     Empty.prototype = san.Component.prototype;
     ComponentClass.prototype = new Empty();
     ComponentClass.prototype.constructor = ComponentClass;
@@ -170,9 +170,9 @@ export function defineComponent(creator, san) {
 };
 
 /**
-  * 处理template方法
-  *
-  * @param {string} tpl 组件的模板
+ * 处理template方法
+ *
+ * @param {string} tpl 组件的模板
  */
 export function template(tpl) {
     if (context.creator) {
@@ -191,7 +191,7 @@ class DataProxy {
      * 组件数据的代理类
      *
      * @param {string|Array} name 数据的key，如果是通过键值对声明的数据，则name是一个数组
-    */
+     */
     constructor(name) {
         this.name = name;
         this.instance = context.instance;
@@ -224,7 +224,43 @@ class DataProxy {
     }
 
     /**
-     * set方法
+     * 代理组件data对象下面的方法，包括
+     * set
+     * assign
+     * merge
+     * apply
+     *
+     * 数组方法
+     * push
+     * unshift
+     * remove
+     * removeAt
+     * splice
+     *
+     * @param {string} method 上述方面名称
+     * @param {Array} args 透传san组件的data方法的参数
+     */
+    handle(method, ...args) {
+        switch (method) {
+            case 'pop':
+            case 'shift':
+                let key = this.name;
+                if (typeof args[0] === 'string') {
+                    key += '.' + args[0];
+                }
+                this.instance.data[method](key);
+                break;
+            default:
+                if (args.length === 1) {
+                    this.instance.data[method](this.name, args[0]);
+                } else if (typeof args[0] === 'string') {
+                    this.instance.data[method](this.name + '.' + args[0], args[1]);
+                }
+        }
+    }
+
+    /**
+     * set的用法
      *
      * 1. const info = data('info', 'san composition api');
      * info.set('sca');
@@ -234,28 +270,67 @@ class DataProxy {
      * const info = data('info', {name: 'jinz', company: 'baidu'})
      * info.set('name', 'erik') // 'jinz'，等价于: this.data.set('info.name', 'erik')
      *
-     * @param {string|Object|*} name name可能是数据的key名称，或者键值对，或者直接是value，等3种情况
-     * @param {*} value
+     * 支持2种参数形式
      */
-    set(name, value) {
-        // 直接设置value
-        if (arguments.length === 1) {
-            this.instance.data.set(this.name, name);
-        } else if (typeof this.name === 'string') {
-            this.instance.data.set(this.name + '.' + name, value);
-        }
+    set(...args) {
+        this.handle('set', ...args);
     }
-    // TODO: proxy any other methods
+
+    /**
+     * 将传入数据对象（source）与 data 合并，进行批量更新
+     * 作用类似于 JavaScript 中的 Object.assign
+     *
+     * @param {Object} source
+     */
+    assign(source) {
+        this.instance.data.assign(source);
+    }
+
+    merge(...args) {
+        this.handle('merge', ...args);
+    }
+
+    apply(...args) {
+        this.handle('apply', ...args);
+    }
+
+    push(...args) {
+        this.handle('push', ...args);
+    }
+
+    pop(expr) {
+        this.handle('pop', expr);
+    }
+
+    shift(expr) {
+        this.handle('shift', expr);
+    }
+
+    unshift(...args) {
+        this.handle('unshift', ...args);
+    }
+
+    remove(...args) {
+        this.handle('remove', ...args);
+    }
+
+    removeAt(...args) {
+        this.handle('removeAt', ...args);
+    }
+
+    splice(...args) {
+        this.handle('splice', ...args);
+    }
 }
 
 
 /**
-  * 操作数据的API，提供 get 和 set 方法
-  *
-  * @param {string} key 数据的key
-  * @param {*} value 设置的数据
-  * @returns {Object} 返回一个带有包装有 this.data 相关数据操作API的对象
-  * */
+ * 操作数据的API，提供 get 和 set 方法
+ *
+ * @param {string} key 数据的key
+ * @param {*} value 设置的数据
+ * @returns {Object} 返回一个带有包装有 this.data 相关数据操作API的对象
+ */
 export function data(key, value) {
     if (typeof key !== 'string') {
         return;
@@ -307,19 +382,19 @@ export function computed(name, fn) {
 
 
 /**
-  * 创建组件类成员API的高阶函数，
-  * 负责：filters、computed、messages、components、watch等API创建
-  *
-  * @param {string} memberName 类成员名称
-  * @returns {Function}
+ * 创建组件类成员API的高阶函数，
+ * 负责：filters、computed、messages、components、watch等API创建
+ *
+ * @param {string} memberName 类成员名称
+ * @returns {Function}
  */
 function classMemberCreator(memberName) {
     /**
-      * 创建组件属性API方法
-      * 参数可以是key、val两个参数，也可以是对象的形式
-      *
-      * @param {string|Object} name 数据的key，或者键值对
-      * @param {Function} handler 添加的函数
+     * 创建组件属性API方法
+     * 参数可以是key、val两个参数，也可以是对象的形式
+     *
+     * @param {string|Object} name 数据的key，或者键值对
+     * @param {Function} handler 添加的函数
      */
     return function (name, value) {
         if (context.creator) {
@@ -343,17 +418,17 @@ export const components = classMemberCreator('components');
 
 
 /**
-  * 创建生命周期钩子方法的高阶函数
-  *
-  * @param {string} name 生命周期钩子名称，inited, attached...等
-  * @returns {Function}
-  */
+ * 创建生命周期钩子方法的高阶函数
+ *
+ * @param {string} name 生命周期钩子名称，inited, attached...等
+ * @returns {Function}
+ */
 function hookMethodCreator(name) {
     /**
-      * 创建生命周期钩子方法的函数
-      *
-      * @param {Function} handler 生命周期钩子，回调方法
-      */
+     * 创建生命周期钩子方法的函数
+     *
+     * @param {Function} handler 生命周期钩子，回调方法
+     */
     return function (handler) {
         if (context.creator) {
             return;
@@ -376,20 +451,20 @@ export const onError = hookMethodCreator('error');
 
 
 /**
-  * 创建组件实例成员API的高阶函数，
-  * 负责：computed、messages、watch等API创建
-  *
-  * @param {string} memberName
-  * @returns {Function}
+ * 创建组件实例成员API的高阶函数，
+ * 负责：computed、messages、watch等API创建
+ *
+ * @param {string} memberName
+ * @returns {Function}
  */
 function instanceMemberCreator(memberName) {
     /**
-      * 创建组件属性API方法
-      * 参数可以是key、val两个参数，也可以是对象的形式
-      *
-      * @param {string|Object} name 数据的key，或者键值对
-      * @param {Function} handler 添加的函数
-      */
+     * 创建组件属性API方法
+     * 参数可以是key、val两个参数，也可以是对象的形式
+     *
+     * @param {string|Object} name 数据的key，或者键值对
+     * @param {Function} handler 添加的函数
+     */
     return function (name, value) {
         if (context.creator) {
             return;
@@ -416,12 +491,12 @@ export const messages = instanceMemberCreator('messages');
 export const watch = instanceMemberCreator('watches');
 
 /**
-  * 为组件添加方法
-  * 参数可以是key、val两个参数，也可以是对象的形式
-  *
-  * @param {string|Object} name 数据的key，或者键值对
-  * @param {Function} handler 添加的函数
-  */
+ * 为组件添加方法
+ * 参数可以是key、val两个参数，也可以是对象的形式
+ *
+ * @param {string|Object} name 数据的key，或者键值对
+ * @param {Function} handler 添加的函数
+ */
 export function method(name, value) {
     if (context.creator) {
         return;
