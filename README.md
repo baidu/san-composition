@@ -218,207 +218,149 @@ export default defineComponent(() => {
 ## 进阶篇
 ### 实现可组合
 
-假设我们要开发一个联系人列表，这个列表包含了联系人的查看、修改、删除、收藏等功能。这里首先使用 Class API 来开发，我们的组件随着功能的丰富逐渐变大，慢慢它的逻辑会变得越来越发散，代码的可读性会变差。
+假设我们要开发一个联系人列表，从业务逻辑上看，该组件具备以下功能：
 
-从业务逻辑上看，该组件具备以下功能：
+1. 联系人列表，以及查看、收藏操作；
+2. 收藏列表，以及查看、取消收藏操作；
+3. 通过表单筛选联系人
 
-1. 联系人/收藏的联系人的列表，包含：修改、删除、查看操作；
-2. 通过表单筛选联系人；
-3. 模态框的显示和隐藏，确认和取消；
+首先，我们用 Class API 来实现：
 
 ```js
 class ContactList extends san.Component {
     static template = /* html */`
-         <div class="contact-list">
+         <div class="container">
             <div class="contact-list-filter">
-                <s-input-search on-change="filterInputChange"></s-input-search>
+                <s-icon type="search">
+                <s-input on-change="changeKeyword"></s-input>
             </div>
 
-            <div class="empty-tip" if="!contactList || contactList.length === 0">
-                联系人列表空空如也
-            </div>
-
-            <div s-if="favoriteList && favoriteList.length > 0">
-                <h3>收藏联系人</h3>
-                <c-list
-                    list="{{favoriteList}}"
-                    on-edit="onEdit"
+            <div class="favorite-list">
+                <h2>个人收藏</h2>
+                <contact-list
+                    data="{{favoriteList|filterList(keyword)}}"
                     on-open="onOpen"
-                    on-remove="onRemove"
                     on-favorite="onFavorite"
                 />
             </div>
 
-            <div 
-                class="container contact-list-container"
-                s-if="normalList && normalList.length > 0">
-                <h3 s-if="favoriteList && favoriteList.length > 0">全部联系人</h3>
-                <c-list
-                   list="{{normalList}}"
-                    on-edit="onEdit"
+            <div class="contact-list">
+                <h2>联系人</h2>
+                <contact-list
+                    data="{{contactList|filterList(keyword)}}"
                     on-open="onOpen"
-                    on-remove="onRemove"
                     on-favorite="onFavorite"
                 />
             </div>
-
-            <s-modal
-                title="修改联系人" 
-                visible="{=isVisible=}"
-                on-confirm="handleModalConfirm" on-cancel="handleModalCancel">
-                <s-input value="{=contactListName=}" />
-                <!--.....-->
-            </s-modal>
         </div>
     `;
 
-    static computed = {
-        favoriteList() {
-            // 功能 1
-            // ...
-        },
-        normalList() {
-            // 功能 1
-            // ...
-        },
-        filterList() {
-            // 功能 2
-            // ...
-        }
-    };
-
     initData() {
         return {
-            // 功能 1 & 3
-            isVisible: false,
+            // 功能 1
+            contactList: []
+            // 功能 2
+            favoriteList: [],
             // 功能 3
-            contactListName: '',
+            keyword: ''
         };
     }
 
+    filters: {
+        filterList(item, keyword) {
+            // ...
+        }
+    },
+
     static components = {
-        's-alert': Alert,
-        's-avatar': Avatar,
-        's-badge': Badge,
-        's-button': Button,
-        's-card': Card,
-        's-dropdown': Dropdown,
-        's-form': Form,
         's-icon': Icon,
         's-input': Input,
-        's-input-search': Input.Search,
-        'c-list': ListComponent,
+        's-button': Button,
+        'contact-list': ContactListComponent,
+    }
+
+    attached() {
+        this.getContactList();
+        this.getFavoriteList();
     }
 
     // 功能 1
-    attached() {
-        this.getContactList();
+    getContactList() {
+        // ...
     }
 
     // 功能 2
-    filterInputChange(filterInput) {
+    getFavoriteList() {
         // ...
     }
 
-    // 功能 1
-    async getContactList() {
-        // ...
-    }
-    // 功能 1
-    async onOpen({ item }) {
+    // 功能 1 & 2
+    async onOpen(item) {
         // ...
     }
 
-    // 功能 1
-    async onRemove(e) {
-        // ..
-    }
-
-    // 功能 1
-    async onFavorite(e) {
+    // 功能 1 & 2
+    async onFavorite(item) {
         // ...
     }
 
-    // 功能 1
-    onEdit(e) {
-        // ...
-    }
     // 功能 3
-    async handleModalConfirm() {
-        // ..
-        this.data.set('isVisible', false);
-    }
-    // 功能 3
-    handleModalCancel() {
-        this.data.set('isVisible', false);
+    changeKeyword(value) {
+        this.data.set('keyword', value);
     }
 }
 
 ```
 
-
-
-接下来，我们通过组合式 API 按照功能来组织代码：
+随着组件功能的丰富，Class API 的逻辑会变得越来越发散，我们往往需要在多个模块中跳跃来阅读某个功能的实现，代码的可读性会变差。接下来，我们通过组合式 API 按照功能来组织代码：
 
 ```js
 const ContactList = defineComponent(() => {
     template('/* ... */');
     components({
-        's-alert': Alert,
-        's-avatar': Avatar,
-        's-badge': Badge,
-        's-button': Button,
-        's-card': Card,
-        's-dropdown': Dropdown,
-        's-form': Form,
         's-icon': Icon,
         's-input': Input,
-        's-input-search': Input.Search,
-        'c-list': ListComponent,
+        's-button': Button,
+        'contact-list': ContactListComponent,
     });
 
-    const contactList = data('contactList', []);
-    const visibility = data('isVisible', false);
+    // 功能 1 & 2
+    method({
+        onOpen: item => {/* ... */},
+        onFavorite: item => {/* ... */}
+    });
+
+    filters('filterList', (item, keyword) => {
+        // ...
+    });
 
     // 功能 1
-    const favoriteList = computed('favoriteList', () => contactList.get().filter(/* ... */));
-    const normalList = computed('normalList', () => contactList.get().filter(/* ... */));
-    method({
-        getContactList: () => {/* ... */},
-        onOpen: e => {/* ... */},
-        onRemove: e => {/* ... */},
-        onFavorite: e => {/* ... */},
-        onEdit: e => visibility.set(true)
+    const contactList = data('contactList', []);
+    method('getContactList', () => {
+        // ...
     });
-
     onAttached(function () { this.getContactList(); });
 
 
     // 功能 2
-    const filterList = computed('filterList', () => contactList.get().filter(/* ... */));
-    method('filterInputChange', filterInput => {
-        // do something with 'filterInput'
+    const favoriteList = data('favoriteList', []);
+    method('getFavoriteList', () => {
+        // ...
     });
-
+    onAttached(function () { this.getFavoriteList(); });
+    
 
     // 功能 3
-    method('handleModalConfirm', filterInput => {
-        // ...
-        visibility.set(false);
-    });
-
-    method('handleModalCancel', filterInput => {
-        // ...
-        visibility.set(false);
-    });
+    const keyword = data('keyword', '');
+    method('changeKeyword', value => {
+        keyword.set(value);
+    });    
 }, san);
 ```
 
-
-
 ### 实现可复用
 
-假设，我们需要再开发一个类似的联系人列表组件，该组件只支持查看，不支持修改和删除；那么，我们可以考虑对组合式 API 进行一个封装：
+按照功能来组织的代码有时候逻辑代码块也会比较长，我们可以考虑对组合的逻辑进行一个封装：
 
 ```js
 /**
@@ -428,107 +370,105 @@ const ContactList = defineComponent(() => {
 import { ... } from 'san-composition';
 
 // 功能 1
-export const useList = (contactList, visibility) => {
-    const favoriteList = computed('favoriteList', () => contactList.get().filter(/* ... */));
-    const normalList = computed('normalList', () => contactList.get().filter(/* ... */));
-    method({
-        getContactList: () => {/* ... */},
-        onOpen: e => {/* ... */},
-        onRemove: e => {/* ... */},
-        onFavorite: e => {/* ... */},
-        onEdit: e => visibility && visibility.set(true)
+export const useContactList = () => {
+    const contactList = data('contactList', []);
+    method('getContactList', () => {
+        // ...
     });
+    onAttached(function () { this.getContactList(); });
 };
 
 // 功能 2
-export const useFilterList = () => {
-    const filterList = computed('filterList', () => contactList.get().filter(/* ... */));
-    method('filterInputChange', filterInput => {
+export const useFavoriteList = () => {
+    const favoriteList = data('favoriteList', []);
+    method('getFavoriteList', () => {
         // ...
     });
+    onAttached(function () { this.getFavoriteList(); });
 };
 
 
 // 功能 3
-export const useModel = visibility => {
-    method('handleModalConfirm', filterInput => {
-        // ...
-        visibility.set(false);
-    });
-
-    method('handleModalCancel', filterInput => {
-        // ...
-        visibility.set(false);
-    });
+export const useSearchBox = () => {
+    const keyword = data('keyword', '');
+    method('changeKeyword', value => {
+        keyword.set(value);
+    });    
 };
 
-// 对于一些基础组件，我们也可以封装一个方法，减少重复代码
-export const useComponents = () => {
-    components({
-        's-alert': Alert,
-        's-avatar': Avatar,
-        's-badge': Badge,
-        's-button': Button,
-        's-card': Card,
-        's-dropdown': Dropdown,
-        's-form': Form,
-        's-icon': Icon,
-        's-input': Input,
-        's-input-search': Input.Search
+export const useFilterList = () => {
+    filters('filterList', (item, keyword) => {
+        // ...
     });
 };
 
 ```
+
+另外，对于一些常用基础 UI 组件，我们也可以封装一个方法：
+
+```js
+export const useUIComponents = () => {
+    components({
+        's-button': Button,
+        's-icon': Icon,
+        's-input': Input
+    });
+};
+```
+
 
 重构之前的组件：
 
 ```js
-import { useList, useFilterList, useModel, useComponents } from 'utils.js';
+import { useContactList, useFavoriteList, useSearchBox, useUIComponents, useFilterList } from 'utils.js';
 const ContactList = defineComponent(() => {
     template('/* ... */');
 
-    useComponents();
+    useUIComponents();
 
     components({
-        'c-list': ListComponent,
+        'contact-list': ContactListComponent,
     });
 
-    const contactList = data('contactList', []);
-    const visibility = data('isVisible', false);
+    method({
+        onOpen: item => {/* ... */},
+        onFavorite: item => {/* ... */}
+    });
+
+    useFilterList();
 
     // 功能 1
-    useList(contactList, visibility);
+    useContactList(contactList);
 
     // 功能 2
-    useFilterList();
+    useFavoriteList();
 
     // 功能 3
-    useModel(visibility);
+    useSearchBox();
 }, san);
-
 ```
 
-创建一个类似的组件，但去掉联系人的编辑功能：
+假设新的需求来了，我们需要一个新的组件，不展示收藏联系人：
 
 ```js
-import { useList, useFilterList, useModel, useComponents } from 'utils.js';
+import { useContactList, useFavoriteList, useSearchBox, useUIComponents } from 'utils.js';
 const ContactList = defineComponent(() => {
-    // 当然，模板要做一些调整，这里省略了...
     template('/* ... */');
 
-    useComponents();
+    useUIComponents();
 
     components({
-        'c-list': ListComponent,
+        'contact-list': ContactListComponent,
     });
 
-    const contactList = data('contactList', []);
+    method({
+        onOpen: item => {/* ... */},
+        onFavorite: item => {/* ... */}
+    });
 
-    // 功能 1
-    useList(contactList);
-
-    // 功能 2
     useFilterList();
+    useContactList(contactList);
+    useSearchBox();
 }, san);
 ```
 
