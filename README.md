@@ -28,7 +28,7 @@ npm install san-composition
 
 ```js
 import san from 'san';
-import {defineComponent, template} from 'san-composition';
+import { defineComponent, template } from 'san-composition';
 
 export default defineComponent(() => {
     template(`
@@ -38,6 +38,7 @@ export default defineComponent(() => {
         </div>
     `);
 }, san);
+
 ```
 
 
@@ -48,9 +49,9 @@ export default defineComponent(() => {
 
 ```js
 import san from 'san';
-import {defineComponent, template, data} from 'san-composition';
+import { defineComponent, template, data } from 'san-composition';
 
-const App =  defineComponent(() => {
+const App = defineComponent(() => {
     template(/* ... */);
     const count = data('count', 1);
 }, san);
@@ -64,21 +65,19 @@ const App =  defineComponent(() => {
 
 ```js
 import san from 'san';
-import {defineComponent, template, data, method} from 'san-composition';
+import { defineComponent, template, data, method } from 'san-composition';
 
-const App =  defineComponent(() => {
-    template(`
-				<div>
+const App = defineComponent(() => {
+    template(/* html */`
+        <div>
             <span>count: {{ count }} </span>
             <button on-click="increment"> +1 </button>
         </div>
-		`);
+	`);
     const count = data('count', 1);
     method('increment', () => count.set(count.get() + 1));
 }, san);
 ```
-
-
 
 ### 生命周期钩子
 
@@ -131,10 +130,10 @@ import {
 
 export default defineComponent(() => {
     // 定义模板
-    template(`
+    template(/* html */`
         <div>
             <span>count: {{ count }} </span>
-            <input type="text" value="{= count =}"/>
+            <input type="text" value="{= count =}" />
             <div>double: {{ double }} </div>
             <div>triple: {{ count|triple }} </div>
             <button on-click="increment"> +1 </button>
@@ -160,7 +159,7 @@ export default defineComponent(() => {
     filters('triple', n => n * 3);
 
     // 定义子组件
-    components({'my-child': defineComponent(() => template('<div>My Child</div>'), san)});
+    components({ 'my-child': defineComponent(() => template('<div>My Child</div>'), san) });
 
     // 生命周期钩子方法
     onAttached(() => {
@@ -188,12 +187,12 @@ export default defineComponent(() => {
 
 ```js
 defineComponent(() => {
-  	template(/* ... */);
+    template(/* ... */);
     const count = data('count', 1);
-    
+
     // 这里定义的方法不能使用剪头函数
-  	method('increment', function() {
-      	this.dispatch('increment:count', count.get());
+    method('increment', function () {
+        this.dispatch('increment:count', count.get());
     });
 }, san);
 
@@ -251,7 +250,7 @@ class ContactList extends san.Component {
                 title="修改联系人" 
                 visible="{=isVisible=}"
                 on-confirm="handleModalConfirm" on-cancel="handleModalCancel">
-				<s-input value="{=contactListName=}">
+                <s-input value="{=contactListName=}" />
                 <!--.....-->
             </s-modal>
         </div>
@@ -263,18 +262,18 @@ class ContactList extends san.Component {
             // ...
         },
         normalList() {
-          	// 功能 1
+            // 功能 1
             // ...
         },
-         filterList() {
-          	// 功能 2
+        filterList() {
+            // 功能 2
             // ...
         }
     };
 
     initData() {
         return {
-          	// 功能 1 & 3
+            // 功能 1 & 3
             isVisible: false,
             // 功能 3
             contactListName: '',
@@ -300,7 +299,7 @@ class ContactList extends san.Component {
         this.getContactList();
     }
 
-	// 功能 2
+    // 功能 2
     filterInputChange(filterInput) {
         // ...
     }
@@ -310,11 +309,11 @@ class ContactList extends san.Component {
         // ...
     }
     // 功能 1
-    async onOpen({item}) {
+    async onOpen({ item }) {
         // ...
     }
 
-	// 功能 1
+    // 功能 1
     async onRemove(e) {
         // ..
     }
@@ -346,7 +345,7 @@ class ContactList extends san.Component {
 接下来，我们通过组合式 API 按照功能来组织代码：
 
 ```js
-const ContactList =  defineComponent(() => {
+const ContactList = defineComponent(() => {
     template('/* ... */');
     components({
         's-alert': Alert,
@@ -370,13 +369,13 @@ const ContactList =  defineComponent(() => {
     const normalList = computed('normalList', () => contactList.get().filter(/* ... */));
     method({
         getContactList: () => {/* ... */},
-      	onOpen: e => {/* ... */},
+        onOpen: e => {/* ... */},
         onRemove: e => {/* ... */},
         onFavorite: e => {/* ... */},
         onEdit: e => visibility.set(true)
     });
 
-    onAttached(function() {this.getContactList();});
+    onAttached(function () { this.getContactList(); });
 
 
     // 功能 2
@@ -384,8 +383,8 @@ const ContactList =  defineComponent(() => {
     method('filterInputChange', filterInput => {
         // do something with 'filterInput'
     });
-    
-    
+
+
     // 功能 3
     method('handleModalConfirm', filterInput => {
         // ...
@@ -408,9 +407,9 @@ const ContactList =  defineComponent(() => {
 ```js
 /**
  * @file utils.js
- */ 
+ */
 
-import {...} from 'san-composition';
+import { ... } from 'san-composition';
 
 // 功能 1
 export const useList = (contactList, visibility) => {
@@ -418,7 +417,7 @@ export const useList = (contactList, visibility) => {
     const normalList = computed('normalList', () => contactList.get().filter(/* ... */));
     method({
         getContactList: () => {/* ... */},
-      	onOpen: e => {/* ... */},
+        onOpen: e => {/* ... */},
         onRemove: e => {/* ... */},
         onFavorite: e => {/* ... */},
         onEdit: e => visibility && visibility.set(true)
@@ -426,17 +425,17 @@ export const useList = (contactList, visibility) => {
 };
 
 // 功能 2
-export const useFilterList  = () => {
+export const useFilterList = () => {
     const filterList = computed('filterList', () => contactList.get().filter(/* ... */));
     method('filterInputChange', filterInput => {
-        // do something with 'filterInput'
+        // ...
     });
 };
 
 
 // 功能 3
 export const useModel = visibility => {
-   method('handleModalConfirm', filterInput => {
+    method('handleModalConfirm', filterInput => {
         // ...
         visibility.set(false);
     });
@@ -449,7 +448,7 @@ export const useModel = visibility => {
 
 // 对于一些基础组件，我们也可以封装一个方法，减少重复代码
 export const useComponents = () => {
-   components({
+    components({
         's-alert': Alert,
         's-avatar': Avatar,
         's-badge': Badge,
@@ -462,17 +461,18 @@ export const useComponents = () => {
         's-input-search': Input.Search
     });
 };
+
 ```
 
 重构之前的组件：
 
 ```js
-import {useList, useFilterList, useModel, useComponents} from 'utils.js';
-const ContactList =  defineComponent(() => {
+import { useList, useFilterList, useModel, useComponents } from 'utils.js';
+const ContactList = defineComponent(() => {
     template('/* ... */');
-  	
-  	useComponents();
-  
+
+    useComponents();
+
     components({
         'c-list': ListComponent,
     });
@@ -484,23 +484,24 @@ const ContactList =  defineComponent(() => {
     useList(contactList, visibility);
 
     // 功能 2
-    useFilterList();    
-    
+    useFilterList();
+
     // 功能 3
     useModel(visibility);
 }, san);
+
 ```
 
 创建一个类似的组件，但去掉联系人的编辑功能：
 
 ```js
-import {useList, useFilterList, useModel, useComponents} from 'utils.js';
-const ContactList =  defineComponent(() => {
-  	// 当然，模板要做一些调整，这里省略了...
+import { useList, useFilterList, useModel, useComponents } from 'utils.js';
+const ContactList = defineComponent(() => {
+    // 当然，模板要做一些调整，这里省略了...
     template('/* ... */');
-  	
-  	useComponents();
-  
+
+    useComponents();
+
     components({
         'c-list': ListComponent,
     });
@@ -511,7 +512,7 @@ const ContactList =  defineComponent(() => {
     useList(contactList);
 
     // 功能 2
-    useFilterList();    
+    useFilterList();
 }, san);
 ```
 
