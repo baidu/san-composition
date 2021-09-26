@@ -338,6 +338,7 @@ const ContactList = defineComponent(() => {
     const contactList = data('contactList', []);
     method('getContactList', () => {
         // ...
+        contactList.set([/* ... */]);
     });
     onAttached(function () { this.getContactList(); });
 
@@ -346,6 +347,7 @@ const ContactList = defineComponent(() => {
     const favoriteList = data('favoriteList', []);
     method('getFavoriteList', () => {
         // ...
+        favoriteList.set([/* ... */]);
     });
     onAttached(function () { this.getFavoriteList(); });
     
@@ -374,6 +376,7 @@ export const useContactList = () => {
     const contactList = data('contactList', []);
     method('getContactList', () => {
         // ...
+        contactList.set([/* ... */]);
     });
     onAttached(function () { this.getContactList(); });
 };
@@ -383,6 +386,7 @@ export const useFavoriteList = () => {
     const favoriteList = data('favoriteList', []);
     method('getFavoriteList', () => {
         // ...
+        favoriteList.set([/* ... */]);
     });
     onAttached(function () { this.getFavoriteList(); });
 };
@@ -416,8 +420,7 @@ export const useUIComponents = () => {
 };
 ```
 
-
-重构之前的组件：
+我们对联系人列表组件再进行一下重构：
 
 ```js
 import { useContactList, useFavoriteList, useSearchBox, useUIComponents, useFilterList } from 'utils.js';
@@ -438,7 +441,7 @@ const ContactList = defineComponent(() => {
     useFilterList();
 
     // 功能 1
-    useContactList(contactList);
+    useContactList();
 
     // 功能 2
     useFavoriteList();
@@ -453,6 +456,7 @@ const ContactList = defineComponent(() => {
 ```js
 import { useContactList, useFavoriteList, useSearchBox, useUIComponents } from 'utils.js';
 const ContactList = defineComponent(() => {
+    // 模板当然也要做一些调整，这里省略了
     template('/* ... */');
 
     useUIComponents();
@@ -467,7 +471,7 @@ const ContactList = defineComponent(() => {
     });
 
     useFilterList();
-    useContactList(contactList);
+    useContactList();
     useSearchBox();
 }, san);
 ```
