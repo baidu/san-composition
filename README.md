@@ -400,8 +400,9 @@ export const useSearchBox = () => {
     });    
 };
 
-export const useFilterList = () => {
-    filters('filterList', (item, keyword) => {
+// 该 hook 函数提供一个默认名字为 filterList 的过滤器，可以通过参数修改这个过滤器的名称
+export const useFilterList = ({filterList = 'filterList'}) => {
+    filters(filterList, (item, keyword) => {
         // ...
     });
 };
