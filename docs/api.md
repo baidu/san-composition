@@ -22,7 +22,7 @@
 
 ## defineComponent
 
-定义组件的方法，它的作用类似于 san.defineComponent，但是传的参数不同。
+定义组件。
 
 **描述**
 
@@ -44,13 +44,15 @@
 ```js
 import san from 'san';
 import {defineComponent, template, data} from 'san-composition';
-defineComponent(() => {
+
+const HelloComponent = defineComponent(() => {
    template('<div>Hello {{name}}.</div>');
    data('name', 'san');
 }, san);
 ```
 
-> 注意：defineComponent以外的其他 API 只能在 defineComponent 方法中的第一个函数参数中执行。
+> 注意：除 defineComponent 以外，其他 API 只能在 defineComponent 方法中的第一个函数参数中执行。
+
 
 ## template
 
@@ -80,7 +82,7 @@ defineComponent(() => {
 
 ## data
 
-初始化数据的方法，它的作用相当于使用 initData 来初始化数据，可以被调用多次。
+初始化一个数据项。
 
 **描述**
 
@@ -138,7 +140,7 @@ defineComponent(() => {
 
 1. data 方法返回的 DataProxy 实例对象提供的 12 个API，除了 assign 方法（该方法不需要 key ）与San 组件的 data 上提供的方法完全相同以外，其他的方法都省略了 key 参数，默认使用调用 data 方法时传的 key 参数，详见 <a href="#DataProxy">DataProxy</a> 部分。
 
-2. data 方法返回的对象，可以在 method、computed等其他组合式API方法中使用，不能在 defineComponent 中直接调用。
+2. data 方法返回的对象，可以在 method、computed 等其他组合式 API 方法中使用，不能在 defineComponent 中直接调用。
 
    ```js
    const App =  defineComponent(() => {
@@ -443,7 +445,7 @@ onAttached(() => {
 在数组开始处插入一条数据
 
 **描述**
-`unshift(exprOrVal, [value])`
+`unshift(exprOrVal[, value])`
 
 **参数**
 
@@ -654,7 +656,7 @@ onAttached(() => {
 **示例**
 
 ```js
-const App =  defineComponent(() => {
+const App = defineComponent(() => {
     template(/* ... */);
 
     const count = data('count', 1);
@@ -679,11 +681,11 @@ const App =  defineComponent(() => {
 
 **描述**
 
-`watch(exprOrObj, [handler])`
+`watch(exprOrWatchers[, handler])`
 
 **参数**
 
-- `{string|Object} exprOrObj`  监听的数据的name或表达式，或者对象键值对的形式定义多个监听方法
+- `{string|Object} exprOrWatchers`  监听的数据的name或表达式，或者对象键值对的形式定义多个监听方法
 - `{Function?} handler` 数据变化后的回调方法，如果第一个参数是对象的形式，第二个参数会被忽略
 
 **返回**
@@ -710,6 +712,7 @@ const App =  defineComponent(() => {
     method('hop', () => {
         info.set('baidu ~' + Math.random());
     });
+}, san);
 ```
 
 ## computed
@@ -771,11 +774,11 @@ const App =  defineComponent(() => {
 
 **描述**
 
-`filters(nameOrObj, [handler])`
+`filters(nameOrFilters[, handler])`
 
 **参数**
 
-- `{string|Object} nameOrObj`  为组件添加的过滤器名称，或者对象键值对的形式定义多个过滤器
+- `{string|Object} nameOrFilters`  为组件添加的过滤器名称，或者对象键值对的形式定义多个过滤器
 - `{Function?} handler` 无副作用的纯函数来定义过滤器的逻辑，如果第一个参数是对象的形式，第二个参数会被忽略
 
 **返回**
@@ -804,12 +807,12 @@ const App =  defineComponent(() => {
 
 **描述**
 
-`components(nameOrObj, [compt])`
+`components(nameOrCmpts[, cmpt])`
 
 **参数**
 
-- `{string|Object} nameOrObj`  为组件添加的子组件名称，或者对象键值对的形式定义多个子组件
-- `{ComponentClass?} compt` 无副作用的纯函数来定义过滤器的逻辑，如果第一个参数是对象的形式，第二个参数会被忽略
+- `{string|Object} nameOrCmpts`  为组件添加的子组件名称，或者对象键值对的形式定义多个子组件
+- `{ComponentClass?} cmpt` 无副作用的纯函数来定义过滤器的逻辑，如果第一个参数是对象的形式，第二个参数会被忽略
 
 **返回**
 
@@ -839,11 +842,11 @@ const MyComponent = defineComponent(() => {
 
 **描述**
 
-`messages(nameOrObj, [handler])`
+`messages(nameOrMsgs[, handler])`
 
 **参数**
 
-- `{string|Object} nameOrObj`  子组件派发消息的名称，或者对象键值对的形式定义多个子组件
+- `{string|Object} nameOrMsgs`  子组件派发消息的名称，或者对象键值对的形式定义多个子组件
 - `{Function?} handler` 收到子组件派发的消息后的回调方法，如果第一个参数是对象的形式，第二个参数会被忽略
 
 **返回**
