@@ -62,23 +62,21 @@ describe('[watch]: ', () => {
 
         let MyComponent = defineComponent(() => {
             template('<a><span title="{{projects[0].author.email}}">{{projects[0].author.email}}</span></a>');
-            const projects = data({
-                projects: [
-                    {
-                        name: 'etpl',
-                        author: {
-                            email: testEmail,
-                            name: 'errorrik'
-                        }
+            const projects = data('projects', [
+                {
+                    name: 'etpl',
+                    author: {
+                        email: testEmail,
+                        name: 'errorrik'
                     }
-                ]
-            });
+                }
+            ]);
 
             watch('projects[0].author', function (value, e) {
                 expect(value.email).toBe('erik168@163.com');
                 expect(e.oldValue.email).toBe(testEmail);
                 expect(e.newValue).toBe(value);
-                expect(projects.get('projects[0].author.email')).toBe(value.email);
+                expect(projects.get('[0].author.email')).toBe(value.email);
                 watchTriggerTimes++;
             });
 
@@ -86,7 +84,7 @@ describe('[watch]: ', () => {
                 expect(value).toBe('erik168@163.com');
                 expect(e.oldValue).toBe(testEmail);
                 expect(e.newValue).toBe(value);
-                expect(projects.get('projects[0].author.email')).toBe(value);
+                expect(projects.get('[0].author.email')).toBe(value);
                 emailTriggerTimes++;
             });
         });

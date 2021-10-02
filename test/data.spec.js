@@ -1,4 +1,4 @@
-describe('defineComponent', () => {
+describe('[data]: ', () => {
     it("data set in inited should not update view", function (done) {
         let up = false;
         let MyComponent = defineComponent(() => {
@@ -8,10 +8,9 @@ describe('defineComponent', () => {
                 this.data.set('name', 'errorrik');
             });
 
-            data({
-                name: 'erik',
-                email: 'errorrik@gmail.com'
-            });
+            data('name', 'erik',);
+
+            data('email', 'errorrik@gmail.com');
 
             onUpdated(function () {
                 up = true;
@@ -42,13 +41,11 @@ describe('defineComponent', () => {
         let Counter = defineComponent(() => {
             template('<u on-click="add">{{num}}</u>');
 
-            const dataObj = data({
-                num: 2
-            });
+            const num = data('num', 2);
 
             method({
                 add() {
-                    dataObj.set('num', dataObj.get('num') + 1);
+                    num.set(num.get() + 1);
                 }
             });
         });

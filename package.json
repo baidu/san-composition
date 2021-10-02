@@ -2,17 +2,15 @@
   "name": "san-composition",
   "version": "0.1.0",
   "main": "./dist/index.cjs.js",
-  "private": true,
   "description": "San Composition API",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development san serve --config ./example/san.config.js",
+    "dev": "web-dev-server --open example/ --node-resolve --watch",
     "build": "yarn run clear && yarn run rollup",
     "rollup": "rollup -c",
     "clear": "rimraf ./dist",
     "test": "yarn run rollup && yarn run test:unit",
     "test:unit": "npx karma start ./test/karma.conf.js --single-run",
     "test:cov": "yarn run test -- -- --coverage",
-    "prepublish": "yarn run build",
     "lint": "eslint --ignore-path .eslintignore ./",
     "lint:fix": "eslint --ignore-path .eslintignore ./ --fix"
   },
@@ -20,9 +18,17 @@
     "San",
     "San Composition API"
   ],
-  "author": "jinzhan <jinzhan@baidu.com>",
   "license": "MIT",
   "devDependencies": {
+    "@ecomfe/eslint-config": "^3.2.0",
+    "@babel/core": "^7.12.3",
+    "@babel/preset-env": "^7.12.1",
+    "@rollup/plugin-babel": "^5.2.1",
+    "@rollup/plugin-node-resolve": "^10.0.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-babel": "^5.3.0",
+    "husky": "^4.0.0",
     "jasmine-core": "^2.99.1",
     "karma": "^4.0.1",
     "karma-chrome-launcher": "^2.0.0",
@@ -30,27 +36,11 @@
     "karma-jasmine": "^2.0.1",
     "karma-remap-istanbul": "^0.6.0",
     "karma-sourcemap-loader": "^0.3.7",
-    "less": "^3.11.1",
-    "less-loader": "^5.0.0",
-    "babel-plugin-import": "^1.13.0",
-    "cross-env": "^7.0.2",
-    "postcss-import": "^14.0.2",
-    "postcss-url": "^10.1.3",
-    "san-cli": "^4.0.0",
-    "@babel/core": "^7.12.3",
-    "@babel/preset-env": "^7.12.1",
-    "@rollup/plugin-babel": "^5.2.1",
-    "@rollup/plugin-node-resolve": "^10.0.0",
+    "lint-staged": "^9.2.5",
     "rimraf": "^3.0.2",
     "rollup": "^2.33.1",
-    "axios": "^0.21.1",
     "san": "^3.10.0",
-    "husky": "^4.0.0",
-    "lint-staged": "^9.2.5",
-    "@ecomfe/eslint-config": "^3.2.0",
-    "eslint": "^6.8.0",
-    "babel-eslint": "^10.1.0",
-    "eslint-plugin-babel": "^5.3.0"
+    "@web/dev-server": "^0.1.22"
   },
   "peerDependencies": {
     "san": "^3.10.0"
@@ -59,8 +49,8 @@
     "!(example|dist|output|__mocks__|test)/**/*.js": "eslint"
   },
   "husky": {
-      "hooks": {
-          "pre-commit": "lint-staged && yarn test"
-      }
+    "hooks": {
+      "pre-commit": "lint-staged && yarn test"
+    }
   }
 }

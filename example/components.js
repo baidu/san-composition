@@ -1,7 +1,6 @@
 /**
- * @file 组合式API，demo
+ * @file san composition api demo
  */
-import san from 'san';
 import {
     defineComponent,
     template,
@@ -25,13 +24,11 @@ import {
 const Counter = defineComponent(() => {
     template('<u on-click="add">num: {{num}}</u>');
 
-    const dataObj = data({
-        num: 2
-    });
+    const num = data('num', 2);
 
     method({
         add() {
-            dataObj.set('num', dataObj.get('num') + 1);
+            num.set(num.get() + 1);
         }
     });
 }, san);
@@ -49,23 +46,22 @@ const MyComponent = defineComponent(() => {
         </div>
     `);
 
-    const info = data({
+    const info = data('info', {
         first: 'first',
         last: 'last',
         email: 'name@name.com'
     });
 
-    computed({
-        msg: function () {
-            return this.data.get('name') + '(' + info.get('email') + ')';
-        },
-        name: function () {
-            return info.get('first') + ' ' + info.get('last');
-        }
+    const name = computed('name', () => {
+        return info.get('first') + ' ' + info.get('last');
+    });
+
+    const msg = computed('msg', () => {
+        return name.get() + '(' + info.get('email') + ')';
     });
 }, san);
 
-export default defineComponent(() => {
+const App =  defineComponent(() => {
     template(/*html*/`
          <div>
              <x-computed />
@@ -80,33 +76,33 @@ export default defineComponent(() => {
              <button on-click="decrement"> -1 </button>
              <my-child></my-child>
              <x-line />
-             <div>{{name}}</div>
-             <div>{{company}}</div>
-             <div>{{extra}}</div>
-             <div>{{usrInfo}}</div>
+             <div>{{info.name}}</div>
+             <div>{{info.company}}</div>
+             <div>{{info.extra}}</div>
+             <div>{{info.usrInfo}}</div>
              <button on-click="baidu"> baidu </button>
              <button on-click="tencent"> tencent </button>
              <button on-click="assign"> assign </button>
 
              <x-line />
+
              <a><span title="{{projects[0].author.email}}">projects[0].author.email: {{projects[0].author.email}}</span></a>
          </div>
      `);
 
     let oldEmail = 'errorrik@gmail.com';
-    const projects = data({
-        projects: [
-            {
-                name: 'etpl',
-                author: {
-                    email: oldEmail,
-                    name: 'errorrik'
-                }
+    const projects = data('projects', [
+        {
+            name: 'etpl',
+            author: {
+                email: oldEmail,
+                name: 'errorrik'
             }
-        ]
-    });
+        }
+    ]);
 
-    console.log("projects.get('projects[0].author.email'):", projects.get('projects[0].author.email'));
+    // TODO: get方法的实现
+    // console.log("projects.get('projects[0].author.email'):", projects.get('projects[0].author.email'));
 
      components({
         'x-c': Counter,
@@ -117,7 +113,7 @@ export default defineComponent(() => {
     // 处理数据
     const count = data('count', 1);
 
-    const info = data({
+    const info = data('info', {
         name: 'jinz',
         company: 'baidu'
     });
@@ -135,16 +131,18 @@ export default defineComponent(() => {
             });
         },
 
-        assign() {
-            info.assign({
-                name: 'yuxin',
-                company: 'tencent',
-                extra: 'boy'
-            });
-        }
+        // TODO: 方法待实现
+        // assign() {
+        //     info.assign({
+        //         name: 'yuxin',
+        //         company: 'tencent',
+        //         extra: 'boy'
+        //     });
+        // }
     });
 
-    count.set(100);
+    // Error: 不能在非组合 API 上下文中 set
+    // count.set(100);
 
     // 处理上下文
     method({
@@ -164,7 +162,9 @@ export default defineComponent(() => {
 
     computed({
         double() {
-            const name = this.data.get('name');
+            // 不能在这里面使用 this
+            // const name = this.data.get('name');
+            const name = info.get('name');
             return name + ' got ' + count.get() * 2;
         },
         usrInfo() {
@@ -206,4 +206,4 @@ export default defineComponent(() => {
     });
 }, san);
 
-
+(new App()).attach(document.getElementById('app'));
