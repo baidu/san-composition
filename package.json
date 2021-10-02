@@ -11,12 +11,15 @@
     "test": "yarn run rollup && yarn run test:unit",
     "test:unit": "npx karma start ./test/karma.conf.js --single-run",
     "test:cov": "yarn run test -- -- --coverage",
-    "lint": "eslint --ignore-path .eslintignore ./",
-    "lint:fix": "eslint --ignore-path .eslintignore ./ --fix"
+    "lint": "eslint --ignore-path .eslintignore ./"
   },
   "keywords": [
     "San",
     "San Composition API"
+  ],
+  "files": [
+    "index.js",
+    "dist"
   ],
   "license": "MIT",
   "devDependencies": {
@@ -28,7 +31,6 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.8.0",
     "eslint-plugin-babel": "^5.3.0",
-    "husky": "^4.0.0",
     "jasmine-core": "^2.99.1",
     "karma": "^4.0.1",
     "karma-chrome-launcher": "^2.0.0",
@@ -47,10 +49,5 @@
   },
   "lint-staged": {
     "!(example|dist|output|__mocks__|test)/**/*.js": "eslint"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged && yarn test"
-    }
   }
 }
