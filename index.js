@@ -216,52 +216,14 @@ class DataProxy {
      * @param {string?} name 获取 data 方法设置的数据的 名称
      */
     get(name) {
+        let fullName = name ? this._resolveName(name) : this.name;
+
         let computedDatas = this.instance.__scContext.computedDatas;
-        let fullName = this.name;
-        if (name) {
-            const separator = /^[[.]/.test(name) ? '' : '.';
-            fullName = this.name + separator + name;
-        }
         if (computedDatas) {
             computedDatas.push(fullName);
         }
-        return this.instance.data.get(fullName);
-    }
 
-    /**
-     * 代理组件data对象下面的方法，包括
-     * set
-     * assign
-     * merge
-     * apply
-     *
-     * 数组方法
-     * push
-     * unshift
-     * remove
-     * removeAt
-     * splice
-     *
-     * @param {string} method 上述方面名称
-     * @param {Array} args 透传san组件的data方法的参数
-     */
-    handle(method, ...args) {
-        switch (method) {
-            case 'pop':
-            case 'shift':
-                let key = this.name;
-                if (typeof args[0] === 'string') {
-                    key += '.' + args[0];
-                }
-                this.instance.data[method](key);
-                break;
-            default:
-                if (args.length === 1) {
-                    this.instance.data[method](this.name, args[0]);
-                } else if (typeof args[0] === 'string') {
-                    this.instance.data[method](this.name + '.' + args[0], args[1]);
-                }
-        }
+        return this.instance.data.get(fullName);
     }
 
     /**
@@ -277,55 +239,115 @@ class DataProxy {
      *
      * 支持2种参数形式
      */
-    set(...args) {
-        this.handle('set', ...args);
+    set(nameOrValue, value) {
+        if (typeof value === 'undefined') {
+            this.instance.data.set(this.name, nameOrValue);
+        }
+        else {
+            this.instance.data.set(this._resolveName(nameOrValue), value);
+        }
     }
 
     /**
      * 将传入数据对象（source）与 data 合并，进行批量更新
      * 作用类似于 JavaScript 中的 Object.assign
      *
-     * @param {Object} source
+     * @param {string|Object} nameOrSource
+     * @param {Object?} source
      */
-    assign(source) {
-        this.instance.data.assign(source);
+    assign(nameOrSource, source) {
+        if (source) {
+            this.instance.data.merge(this._resolveName(nameOrSource), source);
+        }
+        else {
+            this.instance.data.merge(this.name, nameOrSource);
+        }
     }
 
-    merge(...args) {
-        this.handle('merge', ...args);
+    merge(nameOrSource, source) {
+        if (source) {
+            this.instance.data.merge(this._resolveName(nameOrSource), source);
+        }
+        else {
+            this.instance.data.merge(this.name, nameOrSource);
+        }
     }
 
-    apply(...args) {
-        this.handle('apply', ...args);
+    apply(nameOrFn, fn) {
+        if (fn) {
+            this.instance.data.apply(this._resolveName(nameOrFn), fn);
+        }
+        else {
+            this.instance.data.merge(this.name, nameOrFn);
+        }
     }
 
-    push(...args) {
-        this.handle('push', ...args);
+    push(nameOrItem, item) {
+        if (typeof item === 'undefined') {
+            return this.instance.data.push(this.name, nameOrItem);
+        }
+        
+        return this.instance.data.push(this._resolveName(nameOrItem), item);
     }
 
-    pop(expr) {
-        this.handle('pop', expr);
+    pop(name) {
+        if (typeof name === 'string') {
+            return this.instance.data.pop(this._resolveName(name));
+        }
+        
+        return this.instance.data.pop(this.name);
     }
 
-    shift(expr) {
-        this.handle('shift', expr);
+    shift(name) {
+        if (typeof name === 'string') {
+            return this.instance.data.shift(this._resolveName(name));
+        }
+        
+        return this.instance.data.shift(this.name);
     }
 
-    unshift(...args) {
-        this.handle('unshift', ...args);
+    unshift(nameOrItem, item) {
+        if (typeof item === 'undefined') {
+            return this.instance.data.unshift(this.name, nameOrItem);
+        }
+        
+        return this.instance.data.unshift(this._resolveName(nameOrItem), item);
     }
 
-    remove(...args) {
-        this.handle('remove', ...args);
+    remove(nameOrItem, item) {
+        if (typeof item === 'undefined') {
+            return this.instance.data.remove(this.name, nameOrItem);
+        }
+        
+        return this.instance.data.remove(this._resolveName(nameOrItem), item);
     }
 
-    removeAt(...args) {
-        this.handle('removeAt', ...args);
+    removeAt(nameOrIndex, index) {
+        if (typeof index === 'undefined') {
+            return this.instance.data.removeAt(this.name, nameOrIndex);
+        }
+        
+        return this.instance.data.removeAt(this._resolveName(nameOrIndex), index);
     }
 
-    splice(...args) {
-        this.handle('splice', ...args);
+    splice(nameOrArgs, args) {
+        if (typeof args === 'undefined') {
+            return this.instance.data.splice(this.name, nameOrArgs);
+        }
+        
+        return this.instance.data.splice(this._resolveName(nameOrArgs), args);
     }
+
+    /**
+     * 将传入的数据项附加 this.name，转换成实际数据项
+     * 
+     * @private
+     * @param {string} name 
+     * @return {string}
+     */
+    _resolveName(name) {
+        return this.name + (/^[\[.]/.test(name) ? name : '.' + name);
+    } 
 }
 
 
