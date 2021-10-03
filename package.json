@@ -5,12 +5,12 @@
   "description": "San Composition API",
   "scripts": {
     "dev": "web-dev-server --open example/ --node-resolve --watch",
-    "build": "yarn run clear && yarn run rollup",
+    "build": "npm run clear && npm run rollup",
     "rollup": "rollup -c",
     "clear": "rimraf ./dist",
-    "test": "yarn run rollup && yarn run test:unit",
+    "test": "npm run rollup && npm run test:unit",
     "test:unit": "npx karma start ./test/karma.conf.js --single-run",
-    "test:cov": "yarn run test -- -- --coverage",
+    "test:cov": "npm run test -- -- --coverage",
     "lint": "eslint --ignore-path .eslintignore ./"
   },
   "keywords": [
