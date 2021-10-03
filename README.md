@@ -18,7 +18,7 @@ san-composition 提供一组与定义组件 options 的 key 对应的方法来�
 **NPM**
 
 ```
-npm install san-composition
+npm i --save san-composition
 ```
 
 ## 基础用法
