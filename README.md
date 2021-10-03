@@ -12,6 +12,7 @@ san-composition 提供一组与定义组件 options 的 key 对应的方法来�
 - [基础用法](#基础用法)
 - [进阶篇](#进阶篇) 
 - [API](https://github.com/baidu/san-composition/blob/master/docs/api.md)
+
 ## 安装
 
 **NPM**
@@ -502,3 +503,8 @@ defineComponent(() => {
 }, san);
 
 ```
+
+
+## License
+
+san-composition is [MIT licensed](./LICENSE).
