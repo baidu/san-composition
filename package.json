@@ -38,7 +38,6 @@
     "karma-jasmine": "^2.0.1",
     "karma-remap-istanbul": "^0.6.0",
     "karma-sourcemap-loader": "^0.3.7",
-    "lint-staged": "^9.2.5",
     "rimraf": "^3.0.2",
     "rollup": "^2.33.1",
     "san": "^3.10.0",
@@ -46,8 +45,5 @@
   },
   "peerDependencies": {
     "san": "^3.10.0"
-  },
-  "lint-staged": {
-    "!(example|dist|output|__mocks__|test)/**/*.js": "eslint"
   }
 }
