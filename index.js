@@ -3,7 +3,7 @@
  *
  * This source code is licensed under the MIT license.
  * See LICENSE file in the project root for license information.
- * 
+ *
  * @file San组合式API
  */
 
@@ -286,7 +286,7 @@ class DataProxy {
         if (typeof item === 'undefined') {
             return this.instance.data.push(this.name, nameOrItem);
         }
-        
+
         return this.instance.data.push(this._resolveName(nameOrItem), item);
     }
 
@@ -294,7 +294,7 @@ class DataProxy {
         if (typeof name === 'string') {
             return this.instance.data.pop(this._resolveName(name));
         }
-        
+
         return this.instance.data.pop(this.name);
     }
 
@@ -302,7 +302,7 @@ class DataProxy {
         if (typeof name === 'string') {
             return this.instance.data.shift(this._resolveName(name));
         }
-        
+
         return this.instance.data.shift(this.name);
     }
 
@@ -310,7 +310,7 @@ class DataProxy {
         if (typeof item === 'undefined') {
             return this.instance.data.unshift(this.name, nameOrItem);
         }
-        
+
         return this.instance.data.unshift(this._resolveName(nameOrItem), item);
     }
 
@@ -318,7 +318,7 @@ class DataProxy {
         if (typeof item === 'undefined') {
             return this.instance.data.remove(this.name, nameOrItem);
         }
-        
+
         return this.instance.data.remove(this._resolveName(nameOrItem), item);
     }
 
@@ -326,7 +326,7 @@ class DataProxy {
         if (typeof index === 'undefined') {
             return this.instance.data.removeAt(this.name, nameOrIndex);
         }
-        
+
         return this.instance.data.removeAt(this._resolveName(nameOrIndex), index);
     }
 
@@ -334,20 +334,20 @@ class DataProxy {
         if (typeof args === 'undefined') {
             return this.instance.data.splice(this.name, nameOrArgs);
         }
-        
+
         return this.instance.data.splice(this._resolveName(nameOrArgs), args);
     }
 
     /**
      * 将传入的数据项附加 this.name，转换成实际数据项
-     * 
+     *
      * @private
-     * @param {string} name 
+     * @param {string} name
      * @return {string}
      */
     _resolveName(name) {
         return this.name + (/^[\[.]/.test(name) ? name : '.' + name);
-    } 
+    }
 }
 
 
