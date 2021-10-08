@@ -7,16 +7,19 @@ export default {
     output: [
         {
             file: 'dist/index.common.js',
-            format: 'cjs'
+            format: 'cjs',
+            sourcemap: true
         },
         {
             file: 'dist/index.esm.js',
-            format: 'esm'
+            format: 'esm',
+            sourcemap: true
         },
         {
             file: 'dist/index.umd.js',
             name: 'sca',
-            format: 'umd'
+            format: 'umd',
+            sourcemap: true
         }
     ],
     plugins: [

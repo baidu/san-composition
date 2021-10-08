@@ -11,7 +11,8 @@
     "build": "npm run clear && npm run rollup",
     "rollup": "rollup -c",
     "clear": "rimraf ./dist",
-    "test": "npm run rollup && npm run test:unit",
+    "pretest": "npm run build",
+    "test": "npm run test:unit",
     "test:unit": "npx karma start ./test/karma.conf.js --single-run",
     "test:cov": "npm run test -- -- --coverage",
     "lint": "eslint --ignore-path .eslintignore ./"
