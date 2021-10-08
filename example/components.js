@@ -159,18 +159,14 @@ const App =  defineComponent(() => {
         console.log('count updated~', {oldVal, newVal});
     });
 
+    computed('double', function () {
+        const name = info.get('name');
+        return name + ' got ' + count.get() * 2;
+    });
 
-    computed({
-        double() {
-            // 不能在这里面使用 this
-            // const name = this.data.get('name');
-            const name = info.get('name');
-            return name + ' got ' + count.get() * 2;
-        },
-        usrInfo() {
-            const {name, company} = info.get();
-            return `name: ${name}   /   company: ${company}`;
-        }
+    computed('usrInfo', function () {
+        const {name, company} = info.get();
+        return `name: ${name}   /   company: ${company}`;
     });
 
     filters({
