@@ -278,7 +278,7 @@ class DataProxy {
             this.instance.data.apply(this._resolveName(nameOrFn), fn);
         }
         else {
-            this.instance.data.merge(this.name, nameOrFn);
+            this.instance.data.apply(this.name, nameOrFn);
         }
     }
 
