@@ -138,7 +138,7 @@ defineComponent(() => {
 
 **注意**
 
-1. data 方法返回的 DataProxy 实例对象提供的 12 个API，除了 assign 方法（该方法不需要 key ）与San 组件的 data 上提供的方法完全相同以外，其他的方法都省略了 key 参数，默认使用调用 data 方法时传的 key 参数，详见 <a href="#DataProxy">DataProxy</a> 部分。
+1. data 方法返回的 DataProxy 实例对象提供了操作数据的 API，这些 API 默认使用调用 data 方法时传入的 key 参数，与 San 组件的 data 上提供的方法一一对应（除了不提供 assign 方法），详见 <a href="#DataProxy">DataProxy</a> 部分。
 
 2. data 方法返回的对象，可以在 method、computed 等其他组合式 API 方法中使用，不能在 defineComponent 中直接调用。
 
@@ -241,42 +241,6 @@ onAttached(() => {
     
     info.get();
     // {name: 'jinz', company: 'baidu'}
-});
-
-```
-
-
-### assign
-
-将传入数据对象与 data 定义的数据合并，进行批量更新，与组件 data 对象提供的 [assign](https://baidu.github.io/san/tutorial/data-method/#assign) 类似。
-
-**描述**
-
-`assign(source)`
-
-**参数**
-
-- `{Object} source` 数据对象
-
-**返回**
-
-无
-
-**示例**
-
-```js
- 
-
-const name = data('name', 'san');
-
-onAttached(function () {
-    name.assign({
-        company: 'baidu',
-        type: 'mvvm'
-    });
-    
-    this.data.get();
-    // {name: 'san', company: 'baidu', type: 'mvvm'}
 });
 
 ```

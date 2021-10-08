@@ -82,7 +82,6 @@ const App =  defineComponent(() => {
              <div>{{info.usrInfo}}</div>
              <button on-click="baidu"> baidu </button>
              <button on-click="tencent"> tencent </button>
-             <button on-click="assign"> assign </button>
 
              <x-line />
 
@@ -129,16 +128,7 @@ const App =  defineComponent(() => {
                 name: 'liub',
                 company: 'tencent'
             });
-        },
-
-        // TODO: 方法待实现
-        // assign() {
-        //     info.assign({
-        //         name: 'yuxin',
-        //         company: 'tencent',
-        //         extra: 'boy'
-        //     });
-        // }
+        }
     });
 
     // Error: 不能在非组合 API 上下文中 set

@@ -255,15 +255,6 @@ class DataProxy {
      * @param {string|Object} nameOrSource
      * @param {Object?} source
      */
-    assign(nameOrSource, source) {
-        if (source) {
-            this.instance.data.merge(this._resolveName(nameOrSource), source);
-        }
-        else {
-            this.instance.data.merge(this.name, nameOrSource);
-        }
-    }
-
     merge(nameOrSource, source) {
         if (source) {
             this.instance.data.merge(this._resolveName(nameOrSource), source);
