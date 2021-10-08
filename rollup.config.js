@@ -1,11 +1,12 @@
 import resolve from '@rollup/plugin-node-resolve';
 import babel from '@rollup/plugin-babel';
+import {terser} from 'rollup-plugin-terser';
 
 export default {
     input: 'index.js',
     output: [
         {
-            file: 'dist/index.cjs.js',
+            file: 'dist/index.common.js',
             format: 'cjs'
         },
         {
@@ -15,9 +16,6 @@ export default {
         {
             file: 'dist/index.umd.js',
             name: 'sca',
-            // globals: {
-            //     'san': 'san'
-            // },
             format: 'umd'
         }
     ],
@@ -29,7 +27,8 @@ export default {
         }),
         babel({
             babelHelpers: 'bundled'
-        })
+        }),
+        terser()
     ],
     external: ['san']
 };
