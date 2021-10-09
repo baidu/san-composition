@@ -2,6 +2,8 @@
 
 [![NPM version](http://img.shields.io/npm/v/san-composition.svg?style=flat-square)](https://npmjs.org/package/san-composition)
 [![License](https://img.shields.io/github/license/baidu/san-composition.svg?style=flat-square)](https://npmjs.org/package/san-composition)
+[![Coverage Status](https://img.shields.io/coveralls/github/baidu/san-composition.svg?style=flat-square)](https://coveralls.io/github/baidu/san-composition?branch=master)
+[![Build Status](https://github.com/baidu/san-composition/workflows/CI/badge.svg)](https://github.com/baidu/san-composition/actions)
 
 
 随着业务的不断发展，前端项目往往变得越来越复杂，过去我们使用 options 定义组件的方式随着功能的迭代可读性可能会越来越差，当我们为组件添加额外功能时，通常需要修改（initData、attached、computed等）多个代码块；而在一些情况下，按功能来组织代码显然更有意义，也更方便细粒度的代码复用。
