@@ -25,6 +25,10 @@
     "index.js",
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/baidu/san-composition.git"
+  },
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.12.3",
