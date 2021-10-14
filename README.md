@@ -38,12 +38,12 @@ import san from 'san';
 import { defineComponent, template } from 'san-composition';
 
 export default defineComponent(() => {
-    template(`
+    template`
         <div>
             <span>count: {{ count }} </span>
             <button on-click="increment"> +1 </button>
         </div>
-    `);
+    `;
 }, san);
 
 ```

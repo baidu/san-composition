@@ -64,7 +64,7 @@ const HelloComponent = defineComponent(() => {
 
 **参数**
 
-- `{string} tpl` 模板字符串
+- `{string} tpl` 模板字符串，支持 Template Strings 语法糖。
 
 **返回**
 
@@ -75,6 +75,9 @@ const HelloComponent = defineComponent(() => {
 ```js
 defineComponent(() => {
    template('<div>Hello {{name}}.</div>');
+
+   // 或者
+   // template`<div>Hello {{name}}.</div>`;
 }, san);
 ```
 
