@@ -180,12 +180,18 @@ export function defineComponent(creator, san) {
  *
  * @param {string} tpl 组件的模板，支持tagged template string
  */
-export function template(tpl, ...vars) {
+export function template(tpl) {
     if (context.creator) {
-        // 支持tagged template string
-        context.template = Array.isArray(tpl)
-            ? tpl.slice(1).reduce((acc, cur, index) => acc + vars[index] + cur, tpl[0])
-            : tpl;
+        if (tpl instanceof Array) {
+            let realTpl = tpl[0];
+            for (let i = 1, l = tpl.length; i < l; i++) {
+                realTpl += arguments[i] + tpl[i];
+            }
+            context.template = realTpl;
+        }
+        else {
+            context.template = tpl;
+        }
     }
 };
 
