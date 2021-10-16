@@ -43,8 +43,26 @@ describe('[template]: ', () => {
         document.body.removeChild(wrap);
     });
 
+    it('using simple template string', function () {
+        let MyComponent = defineComponent(() => {
+            template`<span title="{{color}}">{{color}}</span>`;
+            data('color', 'red');
+        });
+        
+        let myComponent = new MyComponent();
+        let wrap = document.createElement('div');
+        document.body.appendChild(wrap);
+        myComponent.attach(wrap);
 
-    it('template as tagged template string', function () {
+        let span = wrap.getElementsByTagName('span')[0];
+        expect(span.title).toBe('red');
+
+        myComponent.dispose();
+        document.body.removeChild(wrap);
+    });
+
+
+    it('using template string with vars', function () {
         let MyComponent = defineComponent(() => {
             const color1 = 'blue';
             const color2 = 'grey';

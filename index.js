@@ -174,18 +174,20 @@ export function defineComponent(creator, san) {
     return ComponentClass;
 };
 
+
 /**
  * 处理template方法
  *
- * @param {string} tpl 组件的模板
+ * @param {string} tpl 组件的模板，支持tagged template string
  */
-export function template(tpl) {
+export function template(tpl, ...vars) {
     if (context.creator) {
-        context.template = tpl;
+        // 支持tagged template string
+        context.template = Array.isArray(tpl)
+            ? tpl.slice(1).reduce((acc, cur, index) => acc + vars[index] + cur, tpl[0])
+            : tpl;
     }
 };
-
-
 
 /**
  * 组件数据的代理类
