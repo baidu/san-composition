@@ -1,6 +1,10 @@
 import resolve from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
 import {terser} from 'rollup-plugin-terser';
+import pkg from "./package.json";
+
+
 
 export default {
     input: 'index.js',
@@ -23,6 +27,9 @@ export default {
         }
     ],
     plugins: [
+        replace({
+            __VERSION__: pkg.version
+        }),
         resolve({
             customResolveOptions: {
                 moduleDirectory: 'node_modules'

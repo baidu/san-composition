@@ -8,6 +8,8 @@
  */
 
 
+export const version = '__VERSION__';
+
 /**
  * 用于定义组件数据的临时对象
  * @type {Object?}
