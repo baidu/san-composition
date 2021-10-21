@@ -2,7 +2,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
 import {terser} from 'rollup-plugin-terser';
-import pkg from "./package.json";
+import pkg from './package.json';
 
 
 
