@@ -70,7 +70,7 @@ const App = defineComponent(() => {
 
 ```js
 const App =  defineComponent(() => {
-    template(/* ... */);
+    template`.....`;
 
     const name = data('name', {
         first: 'Donald',
@@ -90,7 +90,7 @@ const App =  defineComponent(() => {
  
 ```js
 const App =  defineComponent(() => {
-    template('<div> {{ count|triple }} </div>');
+    template`<div> {{ count|triple }} </div>`;
 
     const count = data('count', 1);
  
@@ -108,12 +108,12 @@ import san from 'san';
 import { defineComponent, template, data, method } from 'san-composition';
 
 const App = defineComponent(() => {
-    template(/* html */`
+    template`
         <div>
             <span>count: {{ count }} </span>
             <button on-click="increment"> +1 </button>
         </div>
-	`);
+	`;
     const count = data('count', 1);
     method('increment', () => count.set(count.get() + 1));
 }, san);
@@ -128,7 +128,7 @@ import san from 'san';
 import {defineComponent, template, onAttached} from 'san-composition';
 
 const App =  defineComponent(() => {
-    template(/* ... */);
+    template`...`;
     onAttached(() => {
         console.log('onAttached');
     });
@@ -170,7 +170,7 @@ import {
 
 export default defineComponent(() => {
     // 定义模板
-    template(/* html */`
+    template`
         <div>
             <span>count: {{ count }} </span>
             <input type="text" value="{= count =}" />
@@ -179,7 +179,7 @@ export default defineComponent(() => {
             <button on-click="increment"> +1 </button>
             <my-child></my-child>
         </div>
-    `);
+    `;
 
     // 初始化数据
     const count = data('count', 1);
@@ -328,7 +328,7 @@ class ContactList extends san.Component {
 
 ```js
 const ContactList = defineComponent(() => {
-    template('/* ... */');
+    template`...`;
     components({
         's-icon': Icon,
         's-input': Input,
@@ -438,7 +438,7 @@ export const useUIComponents = () => {
 ```js
 import { useContactList, useFavoriteList, useSearchBox, useUIComponents, useFilterList } from 'utils.js';
 const ContactList = defineComponent(() => {
-    template('/* ... */');
+    template`...`;
 
     useUIComponents();
 
@@ -470,7 +470,7 @@ const ContactList = defineComponent(() => {
 import { useContactList, useFavoriteList, useSearchBox, useUIComponents } from 'utils.js';
 const ContactList = defineComponent(() => {
     // 模板当然也要做一些调整，这里省略了
-    template('/* ... */');
+    template`...`;
 
     useUIComponents();
 
@@ -495,7 +495,7 @@ const ContactList = defineComponent(() => {
 
 ```js
 defineComponent(() => {
-    template(/* ... */);
+    template`...`;
     const count = data('count', 1);
 
     // 这里定义的方法不能使用剪头函数
