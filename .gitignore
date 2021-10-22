@@ -87,3 +87,5 @@ yarn.lock
 
 *.bak.js
 *.bak?.js
+
+index.js

@@ -155,7 +155,7 @@ export function defineComponent(creator: Function, san: {Component: Function, [k
 
         san.Component.call(this, options);
     };
- 
+
     function Empty() {}
     Empty.prototype = san.Component.prototype;
     ComponentClass.prototype = new (Empty as any)();
@@ -329,7 +329,7 @@ class DataProxy {
 
     removeAt(index: number) : void;
     removeAt(name: string, index: number) : void;
-    removeAt(nameOrIndex: string | number, index?: number ) {
+    removeAt(nameOrIndex: string | number, index?: number) {
         if (typeof index === 'undefined') {
             return this.instance.data.removeAt(this.name, nameOrIndex);
         }
@@ -425,7 +425,7 @@ function classMemberCreator(memberName: string): ClassMemberCreator {
      * 参数可以是key、val两个参数，也可以是对象的形式
      */
 
-    return function <T extends {[key: string]: Function}>(name: string | T, value?: Function) {
+    return function <T extends {[key: string]: Function}> (name: string | T, value?: Function) {
         if (context.creator) {
             context[memberName] = context[memberName] || {};
 
@@ -482,7 +482,7 @@ export const onError = hookMethodCreator('error');
  * @param {string} memberName
  * @returns {Function}
  */
-function instanceMemberCreator (memberName: string): Function {
+function instanceMemberCreator(memberName: string): Function {
     /**
      * 创建组件属性API方法
      * 参数可以是key、val两个参数，也可以是对象的形式

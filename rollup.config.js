@@ -2,12 +2,11 @@ import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
 import {terser} from 'rollup-plugin-terser';
+import typescript from 'rollup-plugin-typescript2';
 import pkg from './package.json';
 
-
-
 export default {
-    input: 'index.js',
+    input: 'index.ts',
     output: [
         {
             file: 'dist/index.common.js',
@@ -28,7 +27,17 @@ export default {
     ],
     plugins: [
         replace({
-            __VERSION__: pkg.version
+            values: {
+                __VERSION__: pkg.version
+            },
+            preventAssignment: true
+        }),
+        typescript({
+            tsconfigOverride: {
+                compilerOptions: {
+                    sourceMap: true
+                }
+            }
         }),
         resolve({
             customResolveOptions: {
