@@ -25,7 +25,7 @@ interface ClassMemberCreator {
 interface SpliceArgs {
     0: number;
     1?: number;
-    [index:number]: any;
+    [index: number]: any;
 }
 
 /**
