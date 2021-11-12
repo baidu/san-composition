@@ -2,7 +2,7 @@
 
 [![NPM version](http://img.shields.io/npm/v/san-composition.svg?style=flat-square)](https://npmjs.org/package/san-composition)
 [![License](https://img.shields.io/github/license/baidu/san-composition.svg?style=flat-square)](https://npmjs.org/package/san-composition)
-[![Coverage Status](https://img.shields.io/coveralls/github/baidu/san-composition.svg?style=flat-square)](https://coveralls.io/github/baidu/san-composition?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/baidu/san-composition/badge.svg?branch=master)](https://coveralls.io/github/baidu/san-composition?branch=master)
 [![Build Status](https://github.com/baidu/san-composition/workflows/CI/badge.svg)](https://github.com/baidu/san-composition/actions)
 
 
