@@ -7,25 +7,33 @@
  * @file San组合式API
  */
 
+interface DataObj {
+    [key: string]: any;
+}
+
+type Creator = (context?: DataObj) => void;
 interface Context {
-    creator?: Function;
+    creator?: Creator;
     template?: string;
-    initData?: Object;
-    computed?: Object;
-    computedDatas?: Object;
-    instance?: Object;
-    filters?: Object;
-    components?: Object;
+    initData?: DataObj;
+    computed?: DataObj;
+    computedDatas?: DataObj;
+    instance?: DataObj;
+    filters?: DataObj;
+    components?: DataObj;
 };
+
+
+type FunctionVar = (...args: any) => any;
 interface ClassMemberCreator {
-    (name: string, value: Function): void;
-    (value: {[key: string]: Function}): void;
+    (name: string, value: FunctionVar): void;
+    (value: {[key: string]: FunctionVar}): void;
 }
 
 interface SpliceArgs {
+    [index: number]: any;
     0: number;
     1?: number;
-    [index: number]: any;
 }
 
 /**
@@ -40,7 +48,7 @@ let contexts: Context[] = [];
 
 export const version = '__VERSION__';
 
-function componentInitData(this: any): Object {
+function componentInitData(this: any): DataObj {
     return this.__scContext.initData;
 }
 
@@ -72,6 +80,13 @@ function componentInitLifeCycle(this: any) {
             };
         }
     });
+}
+
+function getComputedWatcher(name: string, fn: FunctionVar) {
+    return function (this: any) {
+        let value = fn.call(this);
+        this.data.set(name, value);
+    };
 }
 
 function componentInitComputed(this: any) {
@@ -107,17 +122,10 @@ function componentInitWatch(this: any) {
     }
 }
 
-function getComputedWatcher(name: string, fn: Function) {
-    return function (this: any) {
-        let value = fn.call(this);
-        this.data.set(name, value);
-    };
-}
-
 /**
  * 通过组合式API定义San组件，返回组件类
  */
-export function defineComponent(creator: Function, san: {Component: Function, [key: string]: any}): Function {
+export function defineComponent(creator: Creator, san: {[key: string]: any, Component: FunctionVar}): FunctionVar {
     let defineContext: Context = {
         creator: creator
     };
@@ -145,7 +153,7 @@ export function defineComponent(creator: Function, san: {Component: Function, [k
         contexts.push(context);
 
         // 重新赋值，改变下 this
-        let creatorAsInstance = <Function>defineContext.creator;
+        let creatorAsInstance = defineContext.creator as Creator;
         creatorAsInstance();
 
         contexts.pop();
@@ -200,7 +208,7 @@ export function template(tpl: string | TemplateStringsArray) {
         if (tpl instanceof Array) {
             let realTpl: string = tpl[0];
             for (let i = 1, l = tpl.length; i < l; i++) {
-                realTpl += arguments[i] + tpl[i];
+                realTpl += arguments[i] as string + tpl[i];
             }
             context.template = realTpl;
         }
@@ -259,9 +267,9 @@ class DataProxy {
      * 将传入数据对象（source）与 data 合并，进行批量更新
      * 作用类似于 JavaScript 中的 Object.assign
      */
-    merge(source: Object) : void;
-    merge(name: string, source: Object) : void;
-    merge(nameOrSource: string | Object, source?: Object) {
+    merge(source: DataObj): void;
+    merge(name: string, source: DataObj): void;
+    merge(nameOrSource: string | DataObj, source?: DataObj) {
         if (source) {
             this.instance.data.merge(this._resolveName(nameOrSource as string), source);
         }
@@ -270,9 +278,9 @@ class DataProxy {
         }
     }
 
-    apply(name: string, fn: Function) : void;
-    apply(fn: Function) : void;
-    apply(nameOrFn: string | Function, fn?: Function) {
+    apply(name: string, fn: FunctionVar): void;
+    apply(fn: FunctionVar): void;
+    apply(nameOrFn: string | FunctionVar, fn?: FunctionVar) {
         if (fn) {
             this.instance.data.apply(this._resolveName(nameOrFn as string), fn);
         }
@@ -317,8 +325,8 @@ class DataProxy {
         return this.instance.data.unshift(this._resolveName(nameOrItem as string), item);
     }
 
-    remove(name: string, item: any) : void;
-    remove(item: any) : void;
+    remove(name: string, item: any): void;
+    remove(item: any): void;
     remove(nameOrItem: string | any, item?: any) {
         if (typeof item === 'undefined') {
             return this.instance.data.remove(this.name, nameOrItem);
@@ -327,8 +335,8 @@ class DataProxy {
         return this.instance.data.remove(this._resolveName(nameOrItem as string), item);
     }
 
-    removeAt(index: number) : void;
-    removeAt(name: string, index: number) : void;
+    removeAt(index: number): void;
+    removeAt(name: string, index: number): void;
     removeAt(nameOrIndex: string | number, index?: number) {
         if (typeof index === 'undefined') {
             return this.instance.data.removeAt(this.name, nameOrIndex);
@@ -337,8 +345,8 @@ class DataProxy {
         return this.instance.data.removeAt(this._resolveName(nameOrIndex as string), index);
     }
 
-    splice(name: string, args: SpliceArgs) : void;
-    splice(args: SpliceArgs) : void;
+    splice(name: string, args: SpliceArgs): void;
+    splice(args: SpliceArgs): void;
     splice(nameOrArgs: string | SpliceArgs, args?: SpliceArgs) {
         if (typeof args === 'undefined') {
             return this.instance.data.splice(this.name, nameOrArgs);
@@ -394,7 +402,7 @@ class ComputedProxy {
 /**
  * 定义组件计算数据，返回的 ComputedProxy 提供 get 方法
  */
-export function computed(name: string, fn: Function) {
+export function computed(name: string, fn: FunctionVar) {
     if (typeof name !== 'string') {
         return;
     }
@@ -425,7 +433,7 @@ function classMemberCreator(memberName: string): ClassMemberCreator {
      * 参数可以是key、val两个参数，也可以是对象的形式
      */
 
-    return function <T extends {[key: string]: Function}> (name: string | T, value?: Function) {
+    return function <T extends {[key: string]: FunctionVar}> (name: string | T, value?: FunctionVar) {
         if (context.creator) {
             context[memberName] = context[memberName] || {};
 
@@ -456,7 +464,7 @@ function hookMethodCreator(name: string) {
      *
      * @param {Function} handler 生命周期钩子，回调方法
      */
-    return function (handler: Function) {
+    return function (handler: FunctionVar) {
         if (context.creator) {
             return;
         }
@@ -482,7 +490,7 @@ export const onError = hookMethodCreator('error');
  * @param {string} memberName
  * @returns {Function}
  */
-function instanceMemberCreator(memberName: string): Function {
+function instanceMemberCreator(memberName: string): FunctionVar {
     /**
      * 创建组件属性API方法
      * 参数可以是key、val两个参数，也可以是对象的形式
@@ -490,7 +498,7 @@ function instanceMemberCreator(memberName: string): Function {
      * @param {string|Object} name 数据的key，或者键值对
      * @param {Function} handler 添加的函数
      */
-    return function (name: string | object, fn: Function) {
+    return function (name: string | object, fn: FunctionVar) {
         if (context.creator) {
             return;
         }
@@ -518,9 +526,9 @@ export const watch = instanceMemberCreator('watches');
 /**
  * 定义组件的方法
  */
-export function method(name: string, fn: Function) : void;
-export function method<T extends {[key: string]: Function}>(name: T): void;
-export function method<T extends {[key: string]: Function}>(name: string | T, fn?: Function) {
+export function method(name: string, fn: FunctionVar): void;
+export function method<T extends {[key: string]: FunctionVar}>(name: T): void;
+export function method<T extends {[key: string]: FunctionVar}>(name: string | T, fn?: FunctionVar) {
     if (context.creator) {
         return;
     }
