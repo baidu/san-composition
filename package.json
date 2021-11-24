@@ -14,7 +14,7 @@
     "clear": "rimraf ./dist",
     "pretest": "npm run build",
     "test": "npm run test:unit",
-    "test:unit": "npx karma start ./test/karma.conf.js --single-run",
+    "test:unit": "karma start ./test/karma.conf.js --single-run",
     "test:cov": "npm run test -- -- --coverage",
     "lint": "eslint index.ts"
   },
@@ -23,7 +23,7 @@
     "San Composition API"
   ],
   "files": [
-    "index.js",
+    "index.ts",
     "dist"
   ],
   "repository": {
