@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "lib": [
+            "dom",
+            "es2015"
+        ],
+        "module": "commonjs",
+        "baseUrl": ".",
+        "paths": {}
+    },
+    "files": [
+        "../index.d.ts",
+        "sc-test.ts"
+    ],
+    "compileOnSave": false
+}
