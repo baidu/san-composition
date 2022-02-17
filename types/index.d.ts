@@ -1,3 +1,4 @@
+import type san from 'san';
 interface DataObj {
     [key: string]: any;
 }
@@ -16,8 +17,15 @@ interface SpliceArgs {
     1?: number;
 }
 
+type SanLike = {
+    [key: string]: any;
+    Component: san.Component;
+};
+
+type LifeCycleHook = (handler: NFunction) => void;
+
 export declare const version: string;
-export declare function defineComponent(creator: Creator, san: any): NFunction;
+export declare function defineComponent(creator: Creator, san: SanLike): NFunction;
 
 
 export declare function template(tpl: string): void;
@@ -77,15 +85,15 @@ declare class ComputedProxy {
 export declare function computed(name: string, fn: TFunction): ComputedProxy | undefined;
 export declare const filters: ClassMemberCreator;
 export declare const components: ClassMemberCreator;
-export declare const onConstruct: (handler: NFunction) => void;
-export declare const onCompiled: (handler: NFunction) => void;
-export declare const onInited: (handler: NFunction) => void;
-export declare const onCreated: (handler: NFunction) => void;
-export declare const onAttached: (handler: NFunction) => void;
-export declare const onDetached: (handler: NFunction) => void;
-export declare const onDisposed: (handler: NFunction) => void;
-export declare const onUpdated: (handler: NFunction) => void;
-export declare const onError: (handler: NFunction) => void;
+export declare const onConstruct: LifeCycleHook;
+export declare const onCompiled: LifeCycleHook;
+export declare const onInited: LifeCycleHook;
+export declare const onCreated: LifeCycleHook;
+export declare const onAttached: LifeCycleHook;
+export declare const onDetached: LifeCycleHook;
+export declare const onDisposed: LifeCycleHook;
+export declare const onUpdated: LifeCycleHook;
+export declare const onError: LifeCycleHook;
 export declare const messages: NFunction;
 export declare const watch: NFunction;
 
