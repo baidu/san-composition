@@ -13,7 +13,7 @@ const wrapper = document.createElement('div');
 document.body.appendChild(wrapper);
 
 
-const App =  defineComponent(() => {
+const App =  defineComponent(context => {
     template(`
         <div>            
             <div><strong>Computed Function</strong></div>
@@ -34,9 +34,9 @@ const App =  defineComponent(() => {
         return info.get('first') + ' ' + info.get('last');
     });
 
-    // 虽然不推荐用this，但是内部的this还是支持的
-    const msg = computed('msg', function () {
-        return this.data.get('name') + '(' + info.get('email') + ')';
+    // 使用 context 替代内部的 this
+    const msg = computed('msg',  () => {
+        return context.data.get('name')  + '(' + info.get('email') + ')';
     });
 
     const more = computed('more', function () {

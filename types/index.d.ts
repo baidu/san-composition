@@ -1,8 +1,8 @@
-import type san from 'san';
+import type {Component} from 'san';
 interface DataObj {
     [key: string]: any;
 }
-declare type Creator = (context?: DataObj) => void;
+declare type Creator = (context?: Component) => void;
 declare type TFunction = (...args: any) => any;
 declare type NFunction = (...args: any) => void;
 interface ClassMemberCreator {
@@ -19,7 +19,7 @@ interface SpliceArgs {
 
 type SanLike = {
     [key: string]: any;
-    Component: san.Component;
+    Component: Component;
 };
 
 type LifeCycleHook = (handler: NFunction) => void;

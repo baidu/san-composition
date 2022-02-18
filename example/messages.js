@@ -17,7 +17,7 @@ const wrapper = document.createElement('div');
 document.body.appendChild(wrapper);
 
 
-const Select = defineComponent(() => {
+const Select = defineComponent(context => {
     template('<ul><slot></slot></ul>');
     const value = data('value', '');
     messages({
@@ -26,41 +26,41 @@ const Select = defineComponent(() => {
         },
 
         'UI:select-item-attached': function (arg) {
-            this.items.push(arg.target);
+            context.items.push(arg.target);
             arg.target.data.set('selectValue', value.get());
         },
 
         'UI:select-item-detached': function (arg) {
-            let len = this.items.length;
+            let len = context.items.length;
             while (len--) {
-                if (this.items[len] === arg.target) {
-                    this.items.splice(len, 1);
+                if (context.items[len] === arg.target) {
+                    context.items.splice(len, 1);
                 }
             }
         }
     });
 
     onInited(function () {
-        this.items = [];
+        context.items = [];
     });
 }, san);
 
 
-let SelectItem = defineComponent(() => {
+let SelectItem = defineComponent(context => {
     template('<li on-click="select"><slot></slot></li>');
     const value = data('value', '');
     method({
         select: function () {
-            this.dispatch('UI:select-item-selected', value.get());
+            context.dispatch('UI:select-item-selected', value.get());
         }
     });
 
     onAttached(function () {
-        this.dispatch('UI:select-item-attached');
+        context.dispatch('UI:select-item-attached');
     });
 
     onDetached(function () {
-        this.dispatch('UI:select-item-detached');
+        context.dispatch('UI:select-item-detached');
     });
 }, san);
 

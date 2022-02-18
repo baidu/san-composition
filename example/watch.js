@@ -12,7 +12,7 @@ import {
 const wrapper = document.createElement('div');
 document.body.appendChild(wrapper);
 
-const App =  defineComponent(() => {
+const App =  defineComponent(context => {
     template(`
         <div>
             <div><strong>Watch Function</strong></div>
@@ -39,7 +39,7 @@ const App =  defineComponent(() => {
     const nameData = data('name', 'myName');
 
     method('rename', function () {
-        this.data.set('name', 'jinz~' + Math.random());
+        context.data.set('name', 'jinz~' + Math.random());
         // info.set('name', 'jinz~' + Math.random());
     });
 

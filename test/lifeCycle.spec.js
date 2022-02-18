@@ -178,23 +178,23 @@ describe('[life cycle]: ', () => {
     it("life cycle and event", function () {
         let phases = {};
 
-        let Label = defineComponent(() => {
+        let Label = defineComponent(context => {
             template('<span>test</span>');
 
             onInited(function () {
-                this.fire('phase', 'inited');
+                context.fire('phase', 'inited');
             });
 
             onCreated(function () {
-                this.fire('phase', 'created');
+                context.fire('phase', 'created');
             });
 
             onAttached(function () {
-                this.fire('phase', 'attached');
+                context.fire('phase', 'attached');
             });
 
             onDetached(function () {
-                this.fire('phase', 'detached');
+                context.fire('phase', 'detached');
             });
         });
 
@@ -229,15 +229,15 @@ describe('[life cycle]: ', () => {
     });
 
     it("life cycle construct", function () {
-        let MyComponent = defineComponent(() => {
+        let MyComponent = defineComponent(context => {
             template('<a><span title="{{email}}">{{name}}</span></a>');
 
             onConstruct(function (options) {
                 expect(options.from).toBe('err');
-                expect(typeof this.template).toBe('string');
-                expect(this.data).toBeUndefined();
-                expect(this.scope).toBeUndefined();
-                expect(this.owner).toBeUndefined();
+                expect(typeof context.template).toBe('string');
+                expect(context.data).toBeUndefined();
+                expect(context.scope).toBeUndefined();
+                expect(context.owner).toBeUndefined();
             });
         });
 
@@ -330,7 +330,7 @@ describe('[life cycle]: ', () => {
 
     it("owner and child component life cycle, and el is ready when attached", function () {
         let uState = {};
-        let U = defineComponent(() => {
+        let U = defineComponent(context => {
             template('<u><slot></slot></u>'),
 
             onCompiled(function () {
@@ -342,12 +342,12 @@ describe('[life cycle]: ', () => {
             });
 
             onCreated(function () {
-                expect(this.el.tagName).toBe('U');
+                expect(context.el.tagName).toBe('U');
                 uState.created = 1;
             });
 
             onAttached(function () {
-                expect(this.el.tagName).toBe('U');
+                expect(context.el.tagName).toBe('U');
                 uState.attached = 1;
             });
 
@@ -361,7 +361,7 @@ describe('[life cycle]: ', () => {
         });
 
         let mainState = {};
-        let MyComponent = defineComponent(() => {
+        let MyComponent = defineComponent(context => {
             components({
                 'ui-u': U
             });
@@ -377,12 +377,12 @@ describe('[life cycle]: ', () => {
             })
 
             onCreated(function () {
-                expect(this.el.tagName).toBe('B');
+                expect(context.el.tagName).toBe('B');
                 mainState.created = 1;
             })
 
             onAttached(function () {
-                expect(this.el.tagName).toBe('B');
+                expect(context.el.tagName).toBe('B');
                 mainState.attached = 1;
             });
 

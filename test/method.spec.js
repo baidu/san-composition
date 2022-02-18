@@ -1,5 +1,5 @@
 describe('[method]: ', () => {
-    let ColorPicker = defineComponent(() => {
+    let ColorPicker = defineComponent(context => {
         template('<div><b title="{{value}}">{{value}}</b>'
             + '<ul class="ui-colorpicker">'
             +    '<li '
@@ -16,7 +16,7 @@ describe('[method]: ', () => {
 
         method({
             itemClick: function (item) {
-                this.data.set('value', item);
+                context.data.set('value', item);
             }
         });
     });
