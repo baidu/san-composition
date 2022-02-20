@@ -1,5 +1,5 @@
 describe('[Computed]: ', () => {
-    it("computed", function (done) {
+    it('computed', function (done) {
         let MyComponent = defineComponent(() => {
             template('<div><span title="{{name}}">{{name}}</span></div>');
 
@@ -21,11 +21,11 @@ describe('[Computed]: ', () => {
         let span = wrap.getElementsByTagName('span')[0];
         expect(span.title).toBe('first last');
 
-        myComponent.data.set('last', 'xxx')
+        myComponent.data.set('last', 'baidu')
 
         san.nextTick(function () {
             let span = wrap.getElementsByTagName('span')[0];
-            expect(span.title).toBe('first xxx');
+            expect(span.title).toBe('first baidu');
 
             myComponent.dispose();
             document.body.removeChild(wrap);
@@ -34,7 +34,7 @@ describe('[Computed]: ', () => {
 
     });
 
-    it("static computed property", function (done) {
+    it('static computed property', function (done) {
         let MyComponent = defineComponent(() => {
             template('<div><span title="{{name}}">{{name}}</span></div>');
             data('first', 'first');
@@ -56,11 +56,11 @@ describe('[Computed]: ', () => {
         let span = wrap.getElementsByTagName('span')[0];
         expect(span.title).toBe('first last');
 
-        myComponent.data.set('last', 'xxx')
+        myComponent.data.set('last', 'baidu');
 
         san.nextTick(function () {
             let span = wrap.getElementsByTagName('span')[0];
-            expect(span.title).toBe('first xxx');
+            expect(span.title).toBe('first baidu');
             myComponent.dispose();
             document.body.removeChild(wrap);
             done();
@@ -68,7 +68,7 @@ describe('[Computed]: ', () => {
 
     });
 
-    it("computed has computed dependency, computed item change", function (done) {
+    it('computed has computed dependency, computed item change', function (done) {
         let MyComponent = defineComponent(() => {
             template('<div><span title="{{msg}}">{{msg}}</span></div>');
 
@@ -82,7 +82,7 @@ describe('[Computed]: ', () => {
                 return info.get('first') + ' ' + info.get('last');
             });
 
-            const msg = computed('msg', function () {
+            computed('msg', function () {
                 return name.get() + '(' + info.get('email') + ')'
             });
         });
@@ -97,11 +97,11 @@ describe('[Computed]: ', () => {
         let span = wrap.getElementsByTagName('span')[0];
         expect(span.title).toBe('first last(name@name.com)');
 
-        myComponent.data.set('info.last', 'xxx')
+        myComponent.data.set('info.last', 'xiaodu')
 
         san.nextTick(function () {
             let span = wrap.getElementsByTagName('span')[0];
-            expect(span.title).toBe('first xxx(name@name.com)');
+            expect(span.title).toBe('first xiaodu(name@name.com)');
 
             myComponent.dispose();
             document.body.removeChild(wrap);
@@ -110,7 +110,7 @@ describe('[Computed]: ', () => {
 
     });
 
-    it("computed has computed dependency, normal data change", function (done) {
+    it('computed has computed dependency, normal data change', function (done) {
         let MyComponent = defineComponent(() => {
             template('<div><span title="{{msg}}">{{msg}}</span></div>');
 
@@ -124,7 +124,7 @@ describe('[Computed]: ', () => {
                 return info.get('first') + ' ' + info.get('last');
             });
 
-            const msg = computed('msg', function () {
+            computed('msg', function () {
                 return name.get() + '(' + info.get('email') + ')'
             });
         });
@@ -151,7 +151,7 @@ describe('[Computed]: ', () => {
 
     });
 
-    it("computed item compute once when init", function () {
+    it('computed item compute once when init', function () {
         let nameCount = 0;
         let welcomeCount = 0;
         let MyComponent = defineComponent(() => {

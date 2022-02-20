@@ -1,59 +1,59 @@
 describe('[messages]: ', () => {
     it("dispatch should pass message up, util the first component which recieve it", function (done) {
-        let Select = defineComponent(() => {
+        let Select = defineComponent(context => {
             template('<ul><slot></slot></ul>');
 
             messages({
                 'UI:select-item-selected': function (arg) {
                     let value = arg.value;
-                    this.data.set('value', value);
+                    context.data.set('value', value);
 
-                    let len = this.items.length;
+                    let len = context.items.length;
                     while (len--) {
-                        this.items[len].data.set('selectValue', value);
+                        context.items[len].data.set('selectValue', value);
                     }
                 },
 
                 'UI:select-item-attached': function (arg) {
-                    this.items.push(arg.target);
-                    arg.target.data.set('selectValue', this.data.get('value'));
+                    context.items.push(arg.target);
+                    arg.target.data.set('selectValue', context.data.get('value'));
                 },
 
                 'UI:select-item-detached': function (arg) {
-                    let len = this.items.length;
+                    let len = context.items.length;
                     while (len--) {
-                        if (this.items[len] === arg.target) {
-                            this.items.splice(len, 1);
+                        if (context.items[len] === arg.target) {
+                            context.items.splice(len, 1);
                         }
                     }
                 }
             });
 
             onInited(function () {
-                this.items = [];
+                context.items = [];
             });
         });
 
         let selectValue;
         let item;
-        let SelectItem = defineComponent(() => {
+        let SelectItem = defineComponent(context => {
             template('<li on-click="select" style="{{value === selectValue ? \'border: 1px solid red\' : \'\'}}"><slot></slot></li>');
 
             method({
                 select: function () {
-                    let value = this.data.get('value');
-                    this.dispatch('UI:select-item-selected', value);
+                    let value = context.data.get('value');
+                    context.dispatch('UI:select-item-selected', value);
                     selectValue = value;
                 }
             });
 
             onAttached(function () {
-                item = this.el;
-                this.dispatch('UI:select-item-attached');
+                item = context.el;
+                context.dispatch('UI:select-item-attached');
             });
 
             onDetached(function () {
-                this.dispatch('UI:select-item-detached');
+                context.dispatch('UI:select-item-detached');
             });
         });
 
@@ -109,58 +109,58 @@ describe('[messages]: ', () => {
     });
 
     it("messages static property", function (done) {
-        let Select = defineComponent(() => {
+        let Select = defineComponent(context => {
             template('<ul><slot></slot></ul>');
 
             onInited(function () {
-                this.items = [];
+                context.items = [];
+            });
+
+            messages({
+                'UI:select-item-selected': function (arg) {
+                    let value = arg.value;
+                    context.data.set('value', value);
+    
+                    let len = context.items.length;
+                    while (len--) {
+                        context.items[len].data.set('selectValue', value);
+                    }
+                },
+    
+                'UI:select-item-attached': function (arg) {
+                    context.items.push(arg.target);
+                    arg.target.data.set('selectValue', context.data.get('value'));
+                },
+    
+                'UI:select-item-detached': function (arg) {
+                    let len = context.items.length;
+                    while (len--) {
+                        if (context.items[len] === arg.target) {
+                            context.items.splice(len, 1);
+                        }
+                    }
+                }
             });
         });
 
-        Select.messages = {
-            'UI:select-item-selected': function (arg) {
-                let value = arg.value;
-                this.data.set('value', value);
-
-                let len = this.items.length;
-                while (len--) {
-                    this.items[len].data.set('selectValue', value);
-                }
-            },
-
-            'UI:select-item-attached': function (arg) {
-                this.items.push(arg.target);
-                arg.target.data.set('selectValue', this.data.get('value'));
-            },
-
-            'UI:select-item-detached': function (arg) {
-                let len = this.items.length;
-                while (len--) {
-                    if (this.items[len] === arg.target) {
-                        this.items.splice(len, 1);
-                    }
-                }
-            }
-        };
-
         let selectValue;
         let item;
-        let SelectItem = defineComponent(() => {
+        let SelectItem = defineComponent(context => {
             template('<li on-click="select" style="{{value === selectValue ? \'border: 1px solid red\' : \'\'}}"><slot></slot></li>');
 
             method('select', function () {
-                let value = this.data.get('value');
-                this.dispatch('UI:select-item-selected', value);
+                let value = context.data.get('value');
+                context.dispatch('UI:select-item-selected', value);
                 selectValue = value;
             });
 
             onAttached(function () {
-                item = this.el;
-                this.dispatch('UI:select-item-attached');
+                item = context.el;
+                context.dispatch('UI:select-item-attached');
             });
 
             onDetached(function () {
-                this.dispatch('UI:select-item-detached');
+                context.dispatch('UI:select-item-detached');
             });
         });
 
@@ -177,21 +177,21 @@ describe('[messages]: ', () => {
                 + '<ui-selectitem value="3">three</ui-selectitem>'
                 + '</ui-select>please click to select a item<b title="{{v}}">{{v}}</b></div>'
             );
+
+            messages({
+                'UI:select-item-selected': function () {
+                    expect(false).toBeTruthy();
+                },
+    
+                'UI:select-item-attached': function () {
+                    expect(false).toBeTruthy();
+                },
+    
+                'UI:select-item-detached': function () {
+                    expect(false).toBeTruthy();
+                }
+            });
         });
-
-        MyComponent.messages = {
-            'UI:select-item-selected': function () {
-                expect(false).toBeTruthy();
-            },
-
-            'UI:select-item-attached': function () {
-                expect(false).toBeTruthy();
-            },
-
-            'UI:select-item-detached': function () {
-                expect(false).toBeTruthy();
-            }
-        };
 
         let myComponent = new MyComponent();
         let wrap = document.createElement('div');
@@ -219,30 +219,30 @@ describe('[messages]: ', () => {
     it("message * would receive all message", function (done) {
         let selectMessageX;
         let justtestReceived;
-        let Select = defineComponent(() => {
+        let Select = defineComponent(context => {
             template('<ul><slot></slot></ul>');
 
             messages({
                 'UI:select-item-selected': function (arg) {
                     let value = arg.value;
-                    this.data.set('value', value);
+                    context.data.set('value', value);
 
-                    let len = this.items.length;
+                    let len = context.items.length;
                     while (len--) {
-                        this.items[len].data.set('selectValue', value);
+                        context.items[len].data.set('selectValue', value);
                     }
                 },
 
                 'UI:select-item-attached': function (arg) {
-                    this.items.push(arg.target);
-                    arg.target.data.set('selectValue', this.data.get('value'));
+                    context.items.push(arg.target);
+                    arg.target.data.set('selectValue', context.data.get('value'));
                 },
 
                 'UI:select-item-detached': function (arg) {
-                    let len = this.items.length;
+                    let len = context.items.length;
                     while (len--) {
-                        if (this.items[len] === arg.target) {
-                            this.items.splice(len, 1);
+                        if (context.items[len] === arg.target) {
+                            context.items.splice(len, 1);
                         }
                     }
                 },
@@ -251,97 +251,96 @@ describe('[messages]: ', () => {
                     selectMessageX = true;
                     expect(arg.name.indexOf('justtest')).toBe(0);
                     if (arg.name.indexOf('stop') === -1) {
-                        this.dispatch(arg.name);
+                        context.dispatch(arg.name);
                     }
                 }
             });
 
             onInited(function () {
-                this.items = [];
+                context.items = [];
             });
         });
 
         let selectValue;
         let item;
-        let SelectItem = defineComponent(() => {
+        let SelectItem = defineComponent(context => {
             template('<li on-click="select" style="{{value === selectValue ? \'border: 1px solid red\' : \'\'}}"><slot></slot></li>');
 
             method({
                 select: function () {
-                    let value = this.data.get('value');
-                    this.dispatch('UI:select-item-selected', value);
-                    this.dispatch('justtest', value);
+                    let value = context.data.get('value');
+                    context.dispatch('UI:select-item-selected', value);
+                    context.dispatch('justtest', value);
                     selectValue = value;
                 }
             });
 
             onAttached(function () {
-                item = this.el;
-                this.dispatch('UI:select-item-attached');
+                item = context.el;
+                context.dispatch('UI:select-item-attached');
             });
 
             onDetached(function () {
-                this.dispatch('UI:select-item-detached');
+                context.dispatch('UI:select-item-detached');
             });
         });
 
-            let MyComponent = defineComponent(() => {
-                components({
-                    'ui-select': Select,
-                    'ui-selectitem': SelectItem
-                });
-
-                template('<div><ui-select value="{=v=}">'
-                    + '<ui-selectitem value="1">one</ui-selectitem>'
-                    + '<ui-selectitem value="2">two</ui-selectitem>'
-                    + '<ui-selectitem value="3">three</ui-selectitem>'
-                    + '</ui-select>please click to select a item<b title="{{v}}">{{v}}</b></div>');
-
-                messages({
-                    'UI:select-item-selected': function () {
-                        expect(false).toBeTruthy();
-                    },
-
-                    'UI:select-item-attached': function () {
-                        expect(false).toBeTruthy();
-                    },
-
-                    'UI:select-item-detached': function () {
-                        expect(false).toBeTruthy();
-                    },
-
-                    'justtest': function () {
-                        justtestReceived = true;
-                    },
-
-                    'justteststop': function () {
-                        expect(false).toBeTruthy();
-                    }
-                });
+        let MyComponent = defineComponent(() => {
+            components({
+                'ui-select': Select,
+                'ui-selectitem': SelectItem
             });
 
-            let myComponent = new MyComponent();
-            let wrap = document.createElement('div');
-            document.body.appendChild(wrap);
-            myComponent.attach(wrap);
+            template('<div><ui-select value="{=v=}">'
+                + '<ui-selectitem value="1">one</ui-selectitem>'
+                + '<ui-selectitem value="2">two</ui-selectitem>'
+                + '<ui-selectitem value="3">three</ui-selectitem>'
+                + '</ui-select>please click to select a item<b title="{{v}}">{{v}}</b></div>');
 
-            function detectDone() {
-                if (selectValue) {
-                    expect(wrap.getElementsByTagName('b')[0].title).toBe(selectValue);
-                    expect(selectMessageX).toBeTruthy();
-                    expect(justtestReceived).toBeTruthy();
+            messages({
+                'UI:select-item-selected': function () {
+                    expect(false).toBeTruthy();
+                },
 
-                    myComponent.dispose();
-                    document.body.removeChild(wrap);
-                    done();
-                    return;
+                'UI:select-item-attached': function () {
+                    expect(false).toBeTruthy();
+                },
+
+                'UI:select-item-detached': function () {
+                    expect(false).toBeTruthy();
+                },
+
+                'justtest': function () {
+                    justtestReceived = true;
+                },
+
+                'justteststop': function () {
+                    expect(false).toBeTruthy();
                 }
+            });
+        });
 
-                setTimeout(detectDone, 500);
+        let myComponent = new MyComponent();
+        let wrap = document.createElement('div');
+        document.body.appendChild(wrap);
+        myComponent.attach(wrap);
+
+        function detectDone() {
+            if (selectValue) {
+                expect(wrap.getElementsByTagName('b')[0].title).toBe(selectValue);
+                expect(selectMessageX).toBeTruthy();
+                expect(justtestReceived).toBeTruthy();
+
+                myComponent.dispose();
+                document.body.removeChild(wrap);
+                done();
+                return;
             }
 
-            detectDone();
-            triggerEvent(item, 'click');
+            setTimeout(detectDone, 500);
+        }
 
+        detectDone();
+        triggerEvent(item, 'click');
         });
     });

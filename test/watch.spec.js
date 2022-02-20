@@ -1,13 +1,13 @@
 describe('[watch]: ', () => {
     it("watch simple data item", function (done) {
-        let MyComponent = defineComponent(() => {
+        let MyComponent = defineComponent(context => {
             template('<a><span title="{{email}}">{{name}}</span></a>');
 
             watch('email', function (value, e) {
                 expect(value).toBe(newValue);
                 expect(e.oldValue).toBe(oldValue);
                 expect(e.newValue).toBe(value);
-                expect(this.data.get('email')).toBe(value);
+                expect(context.data.get('email')).toBe(value);
                 watchTriggerTimes++;
             });
         });

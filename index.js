@@ -133,9 +133,8 @@ export function defineComponent(creator, san) {
         context = this.__scContext;
         contexts.push(context);
 
-        // 重新赋值，改变下 this
         let creatorAsInstance = defineContext.creator;
-        creatorAsInstance();
+        creatorAsInstance(this);
 
         contexts.pop();
         context = contexts[contexts.length - 1];
@@ -360,11 +359,11 @@ class DataProxy {
  * @returns {Object} 返回一个带有包装有 this.data 相关数据操作API的对象
  */
 export function data(key, value) {
-    if (typeof key !== 'string') {
+    if (context.creator) {
         return;
     }
 
-    if (context.creator) {
+    if (typeof key !== 'string') {
         return;
     }
 
@@ -392,11 +391,11 @@ class ComputedProxy {
 }
 
 export function computed(name, fn) {
-    if (typeof name !== 'string') {
+    if (context.creator) {
         return;
     }
 
-    if (context.creator) {
+    if (typeof name !== 'string') {
         return;
     }
 

@@ -1,11 +1,11 @@
 describe('[data]: ', () => {
     it("data set in inited should not update view", function (done) {
         let up = false;
-        let MyComponent = defineComponent(() => {
+        let MyComponent = defineComponent(context => {
             template('<a><span title="{{name}}-{{email}}">{{name}}</span></a>');
 
             onInited(function () {
-                this.data.set('name', 'errorrik');
+                context.data.set('name', 'errorrik');
             });
 
             data('name', 'erik',);
