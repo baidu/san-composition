@@ -2,7 +2,21 @@ import type {Component} from 'san';
 interface DataObj {
     [key: string]: any;
 }
-declare type Creator = (context?: Component) => void;
+interface ComponentContext {
+    el(): Component['el'];
+    owner(): Component | undefined;
+    parentComponent(): Component['parentComponent'];
+    dispatch: Component['dispatch'];
+    fire: Component['fire'];
+    ref: Component['ref'];
+    nextTick: Component['nextTick'];
+    data: {
+        get: Component['data']['get'],
+        set: Component['data']['set']
+    };
+}
+
+declare type Creator = (context?: ComponentContext) => void;
 declare type TFunction = (...args: any) => any;
 declare type NFunction = (...args: any) => void;
 interface ClassMemberCreator {
