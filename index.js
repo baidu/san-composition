@@ -99,15 +99,7 @@ function getComputedWatcher(name, fn) {
 
 function getComponentContext(instance) {
     return {
-        el() {
-            return instance.el;
-        },
-        owner() {
-            return instance.owner;
-        },
-        parentComponent() {
-            return instance.parentComponent;
-        },
+        instance,
         dispatch(...args) {
             instance.dispatch.apply(instance, args);
         },

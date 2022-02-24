@@ -1,7 +1,7 @@
 import {defineComponent, template, data, onAttached} from '../index';
 import san from 'san/dist';
 
-const MyComponent = defineComponent(() => {
+const MyComponent = defineComponent(context => {
     template`
     <div>
         <p>name: {{name}}</p>

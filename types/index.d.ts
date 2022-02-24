@@ -2,14 +2,8 @@ import type {Component} from 'san';
 interface DataObj {
     [key: string]: any;
 }
-interface ComponentContext {
-    el(): Component['el'];
-    owner(): Component | undefined;
-    parentComponent(): Component['parentComponent'];
-    dispatch: Component['dispatch'];
-    fire: Component['fire'];
-    ref: Component['ref'];
-    nextTick: Component['nextTick'];
+interface ComponentContext extends Pick<Component, 'dispatch' | 'fire' | 'ref' | 'nextTick'> {
+    instance: Component;
     data: {
         get: Component['data']['get'],
         set: Component['data']['set']
