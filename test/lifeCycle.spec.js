@@ -234,10 +234,10 @@ describe('[life cycle]: ', () => {
 
             onConstruct(function (options) {
                 expect(options.from).toBe('err');
-                expect(typeof context.template).toBe('string');
-                expect(context.data).toBeUndefined();
-                expect(context.scope).toBeUndefined();
-                expect(context.owner).toBeUndefined();
+                expect(typeof context.instance.template).toBe('string');
+                expect(context.instance.data).toBeUndefined();
+                expect(context.instance.scope).toBeUndefined();
+                expect(context.instance.owner).toBeUndefined();
             });
         });
 
@@ -342,12 +342,12 @@ describe('[life cycle]: ', () => {
             });
 
             onCreated(function () {
-                expect(context.el.tagName).toBe('U');
+                expect(context.instance.el.tagName).toBe('U');
                 uState.created = 1;
             });
 
             onAttached(function () {
-                expect(context.el.tagName).toBe('U');
+                expect(context.instance.el.tagName).toBe('U');
                 uState.attached = 1;
             });
 
@@ -377,12 +377,12 @@ describe('[life cycle]: ', () => {
             })
 
             onCreated(function () {
-                expect(context.el.tagName).toBe('B');
+                expect(context.instance.el.tagName).toBe('B');
                 mainState.created = 1;
             })
 
             onAttached(function () {
-                expect(context.el.tagName).toBe('B');
+                expect(context.instance.el.tagName).toBe('B');
                 mainState.attached = 1;
             });
 

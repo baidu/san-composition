@@ -97,6 +97,33 @@ function getComputedWatcher(name, fn) {
     };
 }
 
+function getComponentContext(instance) {
+    return {
+        instance,
+        dispatch(...args) {
+            instance.dispatch.apply(instance, args);
+        },
+        fire(...args) {
+            instance.fire.apply(instance, args);
+        },
+        ref(name) {
+            return instance.ref(name);
+        },
+        nextTick(...args) {
+            instance.nextTick(args);
+        },
+        data: {
+            get(key) {
+                return instance.data.get(key);
+            },
+            set(key, val) {
+                instance.data.set(key, val);
+            }
+            // TODO: 其他方法
+        }
+    };
+}
+
 
 /**
  * 通过组合式API定义San组件
@@ -134,7 +161,7 @@ export function defineComponent(creator, san) {
         contexts.push(context);
 
         let creatorAsInstance = defineContext.creator;
-        creatorAsInstance(this);
+        creatorAsInstance(getComponentContext(this));
 
         contexts.pop();
         context = contexts[contexts.length - 1];

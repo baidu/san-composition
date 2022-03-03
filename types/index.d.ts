@@ -2,7 +2,15 @@ import type {Component} from 'san';
 interface DataObj {
     [key: string]: any;
 }
-declare type Creator = (context?: Component) => void;
+interface ComponentContext extends Pick<Component, 'dispatch' | 'fire' | 'ref' | 'nextTick'> {
+    instance: Component;
+    data: {
+        get: Component['data']['get'],
+        set: Component['data']['set']
+    };
+}
+
+declare type Creator = (context?: ComponentContext) => void;
 declare type TFunction = (...args: any) => any;
 declare type NFunction = (...args: any) => void;
 interface ClassMemberCreator {

@@ -48,7 +48,7 @@ describe('[messages]: ', () => {
             });
 
             onAttached(function () {
-                item = context.el;
+                item = context.instance.el;
                 context.dispatch('UI:select-item-attached');
             });
 
@@ -155,7 +155,7 @@ describe('[messages]: ', () => {
             });
 
             onAttached(function () {
-                item = context.el;
+                item = context.instance.el;
                 context.dispatch('UI:select-item-attached');
             });
 
@@ -276,7 +276,7 @@ describe('[messages]: ', () => {
             });
 
             onAttached(function () {
-                item = context.el;
+                item = context.instance.el;
                 context.dispatch('UI:select-item-attached');
             });
 
