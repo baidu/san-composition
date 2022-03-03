@@ -28,6 +28,8 @@ describe('[components]: ', () => {
 
         let myComponent = new MyComponent();
 
+        expect(myComponent.__scContext).not.toBe(null);
+
         let wrap = document.createElement('div');
         document.body.appendChild(wrap);
         myComponent.attach(wrap);
@@ -36,6 +38,7 @@ describe('[components]: ', () => {
         expect(span.title).toBe('erik');
 
         myComponent.dispose();
+        expect(myComponent.__scContext).toBe(null);
         document.body.removeChild(wrap);
     });
 

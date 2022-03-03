@@ -90,6 +90,10 @@ function componentInitWatch() {
     }
 }
 
+function componentCleanOnDisposed() {
+    this.__scContext = null;
+}
+
 function getComputedWatcher(name, fn) {
     return function () {
         let value = fn.call(this);
@@ -166,6 +170,13 @@ export function defineComponent(creator, san) {
         contexts.pop();
         context = contexts[contexts.length - 1];
 
+        if (this.__scContext.disposed) {
+            this.__scContext.disposed.push(componentCleanOnDisposed);
+        }
+        else {
+            this.__scContext.disposed = [componentCleanOnDisposed];
+        }
+
         this.__scInitLifeCycle();
 
         san.Component.call(this, options);
@@ -179,12 +190,6 @@ export function defineComponent(creator, san) {
 
     ComponentClass.prototype.initData = componentInitData;
     ComponentClass.prototype.__scInitLifeCycle = componentInitLifeCycle;
-
-    const disposeMethod = san.Component.prototype.dispose;
-    ComponentClass.prototype.dispose = function (noDetach, noTransition) {
-        this.__scContext = null;
-        disposeMethod.call(this, noDetach, noTransition);
-    };
 
 
     if (defineContext.template) {
