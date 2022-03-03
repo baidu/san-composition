@@ -6,7 +6,7 @@ describe('[messages]: ', () => {
             messages({
                 'UI:select-item-selected': function (arg) {
                     let value = arg.value;
-                    context.data.set('value', value);
+                    context.component.data.set('value', value);
 
                     let len = context.items.length;
                     while (len--) {
@@ -16,7 +16,7 @@ describe('[messages]: ', () => {
 
                 'UI:select-item-attached': function (arg) {
                     context.items.push(arg.target);
-                    arg.target.data.set('selectValue', context.data.get('value'));
+                    arg.target.data.set('selectValue', context.component.data.get('value'));
                 },
 
                 'UI:select-item-detached': function (arg) {
@@ -41,14 +41,14 @@ describe('[messages]: ', () => {
 
             method({
                 select: function () {
-                    let value = context.data.get('value');
+                    let value = context.component.data.get('value');
                     context.dispatch('UI:select-item-selected', value);
                     selectValue = value;
                 }
             });
 
             onAttached(function () {
-                item = context.instance.el;
+                item = context.component.el;
                 context.dispatch('UI:select-item-attached');
             });
 
@@ -119,7 +119,7 @@ describe('[messages]: ', () => {
             messages({
                 'UI:select-item-selected': function (arg) {
                     let value = arg.value;
-                    context.data.set('value', value);
+                    context.component.data.set('value', value);
     
                     let len = context.items.length;
                     while (len--) {
@@ -129,7 +129,7 @@ describe('[messages]: ', () => {
     
                 'UI:select-item-attached': function (arg) {
                     context.items.push(arg.target);
-                    arg.target.data.set('selectValue', context.data.get('value'));
+                    arg.target.data.set('selectValue', context.component.data.get('value'));
                 },
     
                 'UI:select-item-detached': function (arg) {
@@ -149,13 +149,13 @@ describe('[messages]: ', () => {
             template('<li on-click="select" style="{{value === selectValue ? \'border: 1px solid red\' : \'\'}}"><slot></slot></li>');
 
             method('select', function () {
-                let value = context.data.get('value');
+                let value = context.component.data.get('value');
                 context.dispatch('UI:select-item-selected', value);
                 selectValue = value;
             });
 
             onAttached(function () {
-                item = context.instance.el;
+                item = context.component.el;
                 context.dispatch('UI:select-item-attached');
             });
 
@@ -225,7 +225,7 @@ describe('[messages]: ', () => {
             messages({
                 'UI:select-item-selected': function (arg) {
                     let value = arg.value;
-                    context.data.set('value', value);
+                    context.component.data.set('value', value);
 
                     let len = context.items.length;
                     while (len--) {
@@ -235,7 +235,7 @@ describe('[messages]: ', () => {
 
                 'UI:select-item-attached': function (arg) {
                     context.items.push(arg.target);
-                    arg.target.data.set('selectValue', context.data.get('value'));
+                    arg.target.data.set('selectValue', context.component.data.get('value'));
                 },
 
                 'UI:select-item-detached': function (arg) {
@@ -268,7 +268,7 @@ describe('[messages]: ', () => {
 
             method({
                 select: function () {
-                    let value = context.data.get('value');
+                    let value = context.component.data.get('value');
                     context.dispatch('UI:select-item-selected', value);
                     context.dispatch('justtest', value);
                     selectValue = value;
@@ -276,7 +276,7 @@ describe('[messages]: ', () => {
             });
 
             onAttached(function () {
-                item = context.instance.el;
+                item = context.component.el;
                 context.dispatch('UI:select-item-attached');
             });
 

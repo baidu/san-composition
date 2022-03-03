@@ -7,7 +7,7 @@ describe('[watch]: ', () => {
                 expect(value).toBe(newValue);
                 expect(e.oldValue).toBe(oldValue);
                 expect(e.newValue).toBe(value);
-                expect(context.data.get('email')).toBe(value);
+                expect(context.component.data.get('email')).toBe(value);
                 watchTriggerTimes++;
             });
         });

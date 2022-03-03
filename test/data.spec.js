@@ -4,11 +4,12 @@ describe('[data]: ', () => {
         let MyComponent = defineComponent(context => {
             template('<a><span title="{{name}}-{{email}}">{{name}}</span></a>');
 
+            let nameData = data('name', 'erik');
+
             onInited(function () {
-                context.data.set('name', 'errorrik');
+                nameData.set('errorrik');
             });
 
-            data('name', 'erik',);
 
             data('email', 'errorrik@gmail.com');
 

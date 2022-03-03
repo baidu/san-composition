@@ -101,31 +101,26 @@ function getComputedWatcher(name, fn) {
     };
 }
 
-function getComponentContext(instance) {
-    return {
-        instance,
-        dispatch(...args) {
-            instance.dispatch.apply(instance, args);
-        },
-        fire(...args) {
-            instance.fire.apply(instance, args);
-        },
-        ref(name) {
-            return instance.ref(name);
-        },
-        nextTick(...args) {
-            instance.nextTick(args);
-        },
-        data: {
-            get(key) {
-                return instance.data.get(key);
-            },
-            set(key, val) {
-                instance.data.set(key, val);
-            }
-            // TODO: 其他方法
-        }
-    };
+class ComponentContext4Method {
+    constructor(component) {
+        this.component = component;
+    }
+
+    dispatch(name, value) {
+        this.component.dispatch(name, value);
+    }
+
+    fire(name, event) {
+        this.component.fire(name, event);
+    }
+
+    ref(name) {
+        return this.component.ref(name);
+    }
+
+    nextTick(fn, thisArg) {
+        this.component.nextTick(fn, thisArg);
+    }
 }
 
 
@@ -165,7 +160,7 @@ export function defineComponent(creator, san) {
         contexts.push(context);
 
         let creatorAsInstance = defineContext.creator;
-        creatorAsInstance(getComponentContext(this));
+        creatorAsInstance(new ComponentContext4Method(this));
 
         contexts.pop();
         context = contexts[contexts.length - 1];
