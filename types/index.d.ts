@@ -3,11 +3,7 @@ interface DataObj {
     [key: string]: any;
 }
 interface ComponentContext extends Pick<Component, 'dispatch' | 'fire' | 'ref' | 'nextTick'> {
-    instance: Component;
-    data: {
-        get: Component['data']['get'],
-        set: Component['data']['set']
-    };
+    component: Component;
 }
 
 declare type Creator = (context?: ComponentContext) => void;
