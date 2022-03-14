@@ -491,7 +491,7 @@ const ContactList = defineComponent(() => {
 
 ### `context` 的使用
 
-在组合式 API 中我们不推荐使用 `this` ，它会造成一些混淆；但有些时候我们需要获取组件实例的一些属性和方法，这个时候就需要用到 `context` 参数了；`context` 对象暴露了组件实例的 `dispatch`、`fire`、`nextTick`、`ref` 等方法，还可以通过 `context.component` 还访问组件实例。
+在组合式 API 中我们不推荐使用 `this` ，它会造成一些混淆；但有些时候我们需要获取组件实例的一些属性和方法，这个时候就需要用到 `context` 参数了；`context` 对象暴露了组件实例的 `dispatch`、`fire`、`nextTick`、`ref` 等方法，还提供了 `context.component` 来访问组件实例。
 
 
 ```js

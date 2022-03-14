@@ -101,108 +101,6 @@ function getComputedWatcher(name, fn) {
     };
 }
 
-class ComponentContext4Method {
-    constructor(component) {
-        this.component = component;
-    }
-
-    dispatch(name, value) {
-        this.component.dispatch(name, value);
-    }
-
-    fire(name, event) {
-        this.component.fire(name, event);
-    }
-
-    ref(name) {
-        return this.component.ref(name);
-    }
-
-    nextTick(fn, thisArg) {
-        this.component.nextTick(fn, thisArg);
-    }
-}
-
-
-/**
- * 通过组合式API定义San组件
- *
- * @param {Function} creator 通过调用组合式API的方法
- * @param {Object} san
- * @return {Function} 返回 san.defineComponent 定义的类
- */
-export function defineComponent(creator, san) {
-    let defineContext = {
-        creator: creator
-    };
-    context = defineContext;
-    contexts.push(context);
-
-    // 执行san组合api
-    creator();
-
-    // 重置 context
-    contexts.pop();
-    context = contexts[contexts.length - 1];
-
-
-    const ComponentClass = function (options) {
-        this.__scContext = {
-            instance: this,
-            inited: [
-                componentInitComputed
-            ],
-            attached: [
-                componentInitWatch
-            ]
-        };
-        context = this.__scContext;
-        contexts.push(context);
-
-        let creatorAsInstance = defineContext.creator;
-        creatorAsInstance(new ComponentContext4Method(this));
-
-        contexts.pop();
-        context = contexts[contexts.length - 1];
-
-        if (this.__scContext.disposed) {
-            this.__scContext.disposed.push(componentCleanOnDisposed);
-        }
-        else {
-            this.__scContext.disposed = [componentCleanOnDisposed];
-        }
-
-        this.__scInitLifeCycle();
-
-        san.Component.call(this, options);
-    };
-
-
-    function Empty() { }
-    Empty.prototype = san.Component.prototype;
-    ComponentClass.prototype = new Empty();
-    ComponentClass.prototype.constructor = ComponentClass;
-
-    ComponentClass.prototype.initData = componentInitData;
-    ComponentClass.prototype.__scInitLifeCycle = componentInitLifeCycle;
-
-
-    if (defineContext.template) {
-        ComponentClass.prototype.template = defineContext.template;
-    }
-
-    if (defineContext.filters) {
-        ComponentClass.prototype.filters = defineContext.filters;
-    }
-
-    if (defineContext.components) {
-        ComponentClass.prototype.components = defineContext.components;
-    }
-
-    return ComponentClass;
-};
-
-
 /**
  * 处理template方法
  *
@@ -399,7 +297,12 @@ export function data(key, value) {
     }
 
     context.initData[key] = value;
-    return new DataProxy(key);
+
+    if (!context.__proxy) {
+        context.__proxy = {};
+    }
+
+    return context.__proxy[key] = new DataProxy(key);
 };
 
 class ComputedProxy {
@@ -431,6 +334,7 @@ export function computed(name, fn) {
     }
 
     context.computed[name] = fn;
+
     return new ComputedProxy(name);
 }
 
@@ -565,3 +469,117 @@ export function method(name, value) {
             Object.assign(context.instance, name);
     }
 }
+
+
+class ComponentContext4Method {
+    constructor(component) {
+        this.component = component;
+    }
+
+    get(name) {
+        this.component.__scContext.__proxy = this.component.__scContext.__proxy || {};
+
+        if (!this.component.__scContext.__proxy[name]) {
+            let originContext = context;
+            context = this.component.__scContext;
+            this.component.__scContext.__proxy[name] = new DataProxy(name);
+            context = originContext;
+        }
+
+        return this.component.__scContext.__proxy[name];
+    }
+
+    dispatch(name, value) {
+        this.component.dispatch(name, value);
+    }
+
+    fire(name, event) {
+        this.component.fire(name, event);
+    }
+
+    ref(name) {
+        return this.component.ref(name);
+    }
+
+    nextTick(fn, thisArg) {
+        this.component.nextTick(fn, thisArg);
+    }
+}
+
+
+/**
+ * 通过组合式API定义San组件
+ *
+ * @param {Function} creator 通过调用组合式API的方法
+ * @param {Object} san
+ * @return {Function} 返回 san.defineComponent 定义的类
+ */
+export function defineComponent(creator, san) {
+    let defineContext = {
+        creator: creator
+    };
+    context = defineContext;
+    contexts.push(context);
+
+    // 执行san组合api
+    creator();
+
+    // 重置 context
+    contexts.pop();
+    context = contexts[contexts.length - 1];
+
+    const ComponentClass = function (options) {
+        this.__scContext = {
+            instance: this,
+            inited: [
+                componentInitComputed
+            ],
+            attached: [
+                componentInitWatch
+            ]
+        };
+        context = this.__scContext;
+        contexts.push(context);
+
+        let creatorAsInstance = defineContext.creator;
+        creatorAsInstance(new ComponentContext4Method(this));
+
+        contexts.pop();
+        context = contexts[contexts.length - 1];
+
+        if (this.__scContext.disposed) {
+            this.__scContext.disposed.push(componentCleanOnDisposed);
+        }
+        else {
+            this.__scContext.disposed = [componentCleanOnDisposed];
+        }
+
+        this.__scInitLifeCycle();
+
+        san.Component.call(this, options);
+    };
+
+
+    function Empty() {}
+    Empty.prototype = san.Component.prototype;
+    ComponentClass.prototype = new Empty();
+    ComponentClass.prototype.constructor = ComponentClass;
+
+    ComponentClass.prototype.initData = componentInitData;
+    ComponentClass.prototype.__scInitLifeCycle = componentInitLifeCycle;
+
+
+    if (defineContext.template) {
+        ComponentClass.prototype.template = defineContext.template;
+    }
+
+    if (defineContext.filters) {
+        ComponentClass.prototype.filters = defineContext.filters;
+    }
+
+    if (defineContext.components) {
+        ComponentClass.prototype.components = defineContext.components;
+    }
+
+    return ComponentClass;
+};

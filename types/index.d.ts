@@ -4,6 +4,7 @@ interface DataObj {
 }
 interface ComponentContext extends Pick<Component, 'dispatch' | 'fire' | 'ref' | 'nextTick'> {
     component: Component;
+    get(name: string): DataProxy;
 }
 
 declare type Creator = (context?: ComponentContext) => void;

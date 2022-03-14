@@ -2,12 +2,14 @@ describe('[data]: ', () => {
     it("data set in inited should not update view", function (done) {
         let up = false;
         let MyComponent = defineComponent(context => {
-            template('<a><span title="{{name}}-{{email}}">{{name}}</span></a>');
+            template('<a><span title="{{name}}{{num}}-{{email}}">{{name}}</span></a>');
 
             let nameData = data('name', 'erik');
 
             onInited(function () {
                 nameData.set('errorrik');
+                let num = context.get('num');
+                num.set(666);
             });
 
 
@@ -24,12 +26,12 @@ describe('[data]: ', () => {
         myComponent.attach(wrap);
 
         let span = wrap.getElementsByTagName('span')[0];
-        expect(span.title).toBe('errorrik-errorrik@gmail.com');
+        expect(span.title).toBe('errorrik666-errorrik@gmail.com');
         expect(up).toBeFalsy();
 
         san.nextTick(function () {
             expect(up).toBeFalsy();
-            expect(span.title).toBe('errorrik-errorrik@gmail.com');
+            expect(span.title).toBe('errorrik666-errorrik@gmail.com');
 
             myComponent.dispose();
             document.body.removeChild(wrap);
