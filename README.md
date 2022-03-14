@@ -491,7 +491,7 @@ const ContactList = defineComponent(() => {
 
 ### `context` 的使用
 
-在组合式 API 中我们不推荐使用 `this` ，它会造成一些混淆；但有些时候我们需要获取组件实例的一些属性和方法，这个时候就需要用到 `context` 参数了；`context` 对象暴露了组件实例的 `dispatch`、`fire`、`nextTick`、`ref` 等方法，还可以通过 `context.component` 还访问组件实例。
+在组合式 API 中我们不推荐使用 `this` ，它会造成一些混淆；但有些时候我们需要获取组件实例的一些属性和方法，这个时候就需要用到 `context` 参数了；`context` 对象暴露了组件实例的 `dispatch`、`fire`、`nextTick`、`ref` 等方法，提供了 `context.component` 来访问组件实例，提供了 `context.data` 方法来访问或创建一个 DataProxy。
 
 
 ```js
@@ -499,8 +499,20 @@ defineComponent(context => {
     template`...`;
     const count = data('count', 1);
 
-    // 这里定义的方法不能使用剪头函数
+    // 在 method 中，我们不能使用 data 方法，但可以通过 context.data 来操作数据
     method('increment', function () {
+        // 访问已经定义了的 DataProxy 实例
+        const count2 = context.data('count');
+
+        // 如果未被定义，则创建一个新的 DataProxy 实例
+        const kiev = context.data('kiev');
+        // 定义 'kiev' 的值 为 'need peace'
+        kiev.set('need peace');
+
+        // 等价于
+        context.component.data.set('kiev', 'need peace');
+
+        // 这里 count.get() 和 count2.get() 是等价的
         context.dispatch('increment:count', count.get());
     });
 }, san);

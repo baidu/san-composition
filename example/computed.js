@@ -36,7 +36,7 @@ const App =  defineComponent(context => {
 
     // 使用 context 替代内部的 this
     const msg = computed('msg',  () => {
-        return context.data.get('name')  + '(' + info.get('email') + ')';
+        return context.component.data.get('name')  + '(' + info.get('email') + ')';
     });
 
     const more = computed('more', function () {
