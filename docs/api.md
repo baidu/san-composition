@@ -30,8 +30,14 @@
 
 **参数**
 
-- `{Function} creator` 该函数内部通过组合式API来定义组件
-- `{Object} san` 将san通过参数传入
+- `{Function} creator` 该函数内部通过组合式 API 来定义组件，它接收一个 `context` 参数，该参数提供 `component`、`get`、`dispatch`、`fire`、`nextTick`、`ref` 等属性和方法
+    - `context.component` 返回组件的实例
+    - `context.data(name)` 返回组件中 name 对应的 DataProxy，如果不存在，则创建一个新的
+    - `context.dispatch(name, ...args)` 同组件的 [dispatch](https://baidu.github.io/san/doc/api/#dispatch) 方法
+    - `context.fire(eventName)` 同组件的 [fire](https://baidu.github.io/san/doc/api/#fire) 方法
+    - `context.nextTick(() => {/* ... */})` 同组件的 [nextTick](https://baidu.github.io/san/doc/api/#nextTick) 方法
+    - `context.ref(name)` 同组件的 [ref](https://baidu.github.io/san/doc/api/#ref) 方法
+- `{Object} san` 将 san 通过参数传入
 
 **返回**
 
@@ -45,9 +51,13 @@
 import san from 'san';
 import {defineComponent, template, data} from 'san-composition';
 
-const HelloComponent = defineComponent(() => {
+const HelloComponent = defineComponent(context => {
    template('<div>Hello {{name}}.</div>');
    data('name', 'san');
+   method('demo', function () {
+        // 获取组件对应的 HTML 元素
+       console.log(context.component.el);
+    });
 }, san);
 ```
 
@@ -704,7 +714,7 @@ const App =  defineComponent(() => {
 **示例**
 
 ```js
-const App =  defineComponent(() => {
+const App =  defineComponent(context => {
     template(`
         <div>            
             <div><span>name: {{name}}</span></div>
@@ -723,9 +733,8 @@ const App =  defineComponent(() => {
         return info.get('first') + ' ' + info.get('last');
     });
 
-    // 虽然不推荐用this，但是内部的this还是支持的
     const msg = computed('msg', function () {
-        return this.data.get('name') + '(' + info.get('email') + ')';
+        return context.component.data.get('name') + '(' + info.get('email') + ')';
     });
 
     // 通过get方法获取另一个计算属性的值
@@ -823,7 +832,7 @@ const MyComponent = defineComponent(() => {
 **示例**
 
 ```js
-const Select = defineComponent(() => {
+const Select = defineComponent(context => {
     template('<ul><slot></slot></ul>');
     const value = data('value', '');
     messages({
@@ -832,41 +841,41 @@ const Select = defineComponent(() => {
         },
 
         'UI:select-item-attached': function (arg) {
-            this.items.push(arg.target);
+            context.component.items.push(arg.target);
             arg.target.data.set('selectValue', value.get());
         },
 
         'UI:select-item-detached': function (arg) {
-            let len = this.items.length;
+            let len = context.component.items.length;
             while (len--) {
-                if (this.items[len] === arg.target) {
-                    this.items.splice(len, 1);
+                if (context.component.items[len] === arg.target) {
+                    context.component.items.splice(len, 1);
                 }
             }
         }
     });
 
     onInited(function () {
-        this.items = [];
+        context.component.items = [];
     });
 }, san);
 
 
-let SelectItem = defineComponent(() => {
+let SelectItem = defineComponent(context => {
     template('<li on-click="select"><slot></slot></li>');
     const value = data('value', '');
     method({
         select: function () {
-            this.dispatch('UI:select-item-selected', value.get());
+            context.dispatch('UI:select-item-selected', value.get());
         }
     });
 
     onAttached(function () {
-        this.dispatch('UI:select-item-attached');
+        context.dispatch('UI:select-item-attached');
     });
 
     onDetached(function () {
-        this.dispatch('UI:select-item-detached');
+        context.dispatch('UI:select-item-detached');
     });
 }, san);
 
