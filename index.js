@@ -80,18 +80,21 @@ function componentInitComputed() {
 }
 
 function componentInitWatch() {
-    let watches = this.__scContext.instance.watches;
+    let watches = this.__scContext.component.watches;
     if (watches) {
         let names = Object.keys(watches);
         for (let i = 0; i < names.length; i++) {
             let name = names[i];
-            this.watch(name, watches[name].bind(this.__scContext.instance));
+            this.watch(name, watches[name].bind(this.__scContext.component));
         }
     }
 }
 
 function componentCleanOnDisposed() {
-    this.__scContext = null;
+    if (this.__scContext) {
+        this.__scContext.publicContext.dispose();
+        this.__scContext = null;
+    }
 }
 
 function getComputedWatcher(name, fn) {
@@ -131,9 +134,9 @@ class DataProxy {
      *
      * @param {string|Array} name 数据的key，如果是通过键值对声明的数据，则name是一个数组
      */
-    constructor(name, context) {
+    constructor(name, component) {
         this.name = name;
-        this.instance = context.instance;
+        this.component = component;
     }
 
     /**
@@ -152,12 +155,12 @@ class DataProxy {
     get(name) {
         let fullName = name ? this._resolveName(name) : this.name;
 
-        let computedDatas = this.instance.__scContext.computedDatas;
+        let computedDatas = this.component.__scContext.computedDatas;
         if (computedDatas) {
             computedDatas.push(fullName);
         }
 
-        return this.instance.data.get(fullName);
+        return this.component.data.get(fullName);
     }
 
     /**
@@ -175,10 +178,10 @@ class DataProxy {
      */
     set(nameOrValue, value) {
         if (typeof value === 'undefined') {
-            this.instance.data.set(this.name, nameOrValue);
+            this.component.data.set(this.name, nameOrValue);
         }
         else {
-            this.instance.data.set(this._resolveName(nameOrValue), value);
+            this.component.data.set(this._resolveName(nameOrValue), value);
         }
     }
 
@@ -191,76 +194,76 @@ class DataProxy {
      */
     merge(nameOrSource, source) {
         if (source) {
-            this.instance.data.merge(this._resolveName(nameOrSource), source);
+            this.component.data.merge(this._resolveName(nameOrSource), source);
         }
         else {
-            this.instance.data.merge(this.name, nameOrSource);
+            this.component.data.merge(this.name, nameOrSource);
         }
     }
 
     apply(nameOrFn, fn) {
         if (fn) {
-            this.instance.data.apply(this._resolveName(nameOrFn), fn);
+            this.component.data.apply(this._resolveName(nameOrFn), fn);
         }
         else {
-            this.instance.data.apply(this.name, nameOrFn);
+            this.component.data.apply(this.name, nameOrFn);
         }
     }
 
     push(nameOrItem, item) {
         if (typeof item === 'undefined') {
-            return this.instance.data.push(this.name, nameOrItem);
+            return this.component.data.push(this.name, nameOrItem);
         }
 
-        return this.instance.data.push(this._resolveName(nameOrItem), item);
+        return this.component.data.push(this._resolveName(nameOrItem), item);
     }
 
     pop(name) {
         if (typeof name === 'string') {
-            return this.instance.data.pop(this._resolveName(name));
+            return this.component.data.pop(this._resolveName(name));
         }
 
-        return this.instance.data.pop(this.name);
+        return this.component.data.pop(this.name);
     }
 
     shift(name) {
         if (typeof name === 'string') {
-            return this.instance.data.shift(this._resolveName(name));
+            return this.component.data.shift(this._resolveName(name));
         }
 
-        return this.instance.data.shift(this.name);
+        return this.component.data.shift(this.name);
     }
 
     unshift(nameOrItem, item) {
         if (typeof item === 'undefined') {
-            return this.instance.data.unshift(this.name, nameOrItem);
+            return this.component.data.unshift(this.name, nameOrItem);
         }
 
-        return this.instance.data.unshift(this._resolveName(nameOrItem), item);
+        return this.component.data.unshift(this._resolveName(nameOrItem), item);
     }
 
     remove(nameOrItem, item) {
         if (typeof item === 'undefined') {
-            return this.instance.data.remove(this.name, nameOrItem);
+            return this.component.data.remove(this.name, nameOrItem);
         }
 
-        return this.instance.data.remove(this._resolveName(nameOrItem), item);
+        return this.component.data.remove(this._resolveName(nameOrItem), item);
     }
 
     removeAt(nameOrIndex, index) {
         if (typeof index === 'undefined') {
-            return this.instance.data.removeAt(this.name, nameOrIndex);
+            return this.component.data.removeAt(this.name, nameOrIndex);
         }
 
-        return this.instance.data.removeAt(this._resolveName(nameOrIndex), index);
+        return this.component.data.removeAt(this._resolveName(nameOrIndex), index);
     }
 
     splice(nameOrArgs, args) {
         if (typeof args === 'undefined') {
-            return this.instance.data.splice(this.name, nameOrArgs);
+            return this.component.data.splice(this.name, nameOrArgs);
         }
 
-        return this.instance.data.splice(this._resolveName(nameOrArgs), args);
+        return this.component.data.splice(this._resolveName(nameOrArgs), args);
     }
 
     /**
@@ -298,26 +301,26 @@ export function data(name, value) {
 
     context.initData[name] = value;
 
-    let dataDefs = context.instanceContext._dataDefs;
+    let dataDefs = context.publicContext._dataDefs;
     if (dataDefs[name]) {
         return dataDefs[name];
     }
 
-    return (dataDefs[name] = new DataProxy(name, context));
+    return (dataDefs[name] = new DataProxy(name, context.component));
 };
 
 class ComputedProxy {
-    constructor(name) {
+    constructor(name, component) {
         this.name = name;
-        this.instance = context.instance;
+        this.component = component;
     }
 
     get() {
-        let computedDatas = this.instance.__scContext.computedDatas;
+        let computedDatas = this.component.__scContext.computedDatas;
         if (computedDatas) {
             computedDatas.push(this.name);
         }
-        return this.instance.data.get(this.name);
+        return this.component.data.get(this.name);
     }
 }
 
@@ -336,7 +339,7 @@ export function computed(name, fn) {
 
     context.computed[name] = fn;
 
-    return new ComputedProxy(name);
+    return new ComputedProxy(name, context.component);
 }
 
 
@@ -429,10 +432,10 @@ function instanceMemberCreator(memberName) {
             return;
         }
 
-        let instance = context.instance;
-        let target = instance[memberName];
-        if (!instance.hasOwnProperty(memberName)) {
-            target = instance[memberName] = {};
+        let component = context.component;
+        let target = component[memberName];
+        if (!component.hasOwnProperty(memberName)) {
+            target = component[memberName] = {};
         }
 
         switch (typeof name) {
@@ -463,16 +466,16 @@ export function method(name, value) {
 
     switch (typeof name) {
         case 'string':
-            context.instance[name] = value;
+            context.component[name] = value;
             break;
 
         case 'object':
-            Object.assign(context.instance, name);
+            Object.assign(context.component, name);
     }
 }
 
 
-class ComponentContext4Method {
+class PublicComponentContext {
     constructor(component) {
         this.component = component;
         this._dataDefs = {};
@@ -481,7 +484,7 @@ class ComponentContext4Method {
     data(name) {
         let dataProxy = this._dataDefs[name];
         if (!dataProxy) {
-            dataProxy = this._dataDefs[name] = new DataProxy(name, this.component.__scContext);
+            dataProxy = this._dataDefs[name] = new DataProxy(name, this.component);
         }
 
         return dataProxy;
@@ -501,6 +504,11 @@ class ComponentContext4Method {
 
     nextTick(fn, thisArg) {
         this.component.nextTick(fn, thisArg);
+    }
+
+    dispose() {
+        this.component = null;
+        this._dataDefs = null;
     }
 }
 
@@ -528,20 +536,17 @@ export function defineComponent(creator, san) {
 
     const ComponentClass = function (options) {
         this.__scContext = {
-            instance: this,
-            instanceContext: new ComponentContext4Method(this),
-            inited: [
-                componentInitComputed
-            ],
-            attached: [
-                componentInitWatch
-            ]
+            component: this,
+            publicContext: new PublicComponentContext(this),
+            inited: [componentInitComputed],
+            attached: [componentInitWatch]
         };
+        
         context = this.__scContext;
         contexts.push(context);
 
         let creatorAsInstance = defineContext.creator;
-        creatorAsInstance(context.instanceContext);
+        creatorAsInstance(context.publicContext);
 
         contexts.pop();
         context = contexts[contexts.length - 1];
