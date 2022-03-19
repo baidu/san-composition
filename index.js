@@ -80,12 +80,14 @@ function componentInitComputed() {
 }
 
 function componentInitWatch() {
-    let watches = this.__scContext.component.watches;
+    let watches = this.__scContext.watches;
     if (watches) {
+        let component = this.__scContext.component;
+
         let names = Object.keys(watches);
         for (let i = 0; i < names.length; i++) {
             let name = names[i];
-            this.watch(name, watches[name].bind(this.__scContext.component));
+            this.watch(name, watches[name].bind(component));
         }
     }
 }
@@ -345,7 +347,7 @@ export function computed(name, fn) {
 
 /**
  * 创建组件类成员API的高阶函数，
- * 负责：filters、computed、messages、components、watch等API创建
+ * 负责：filters/components API创建
  *
  * @param {string} memberName 类成员名称
  * @returns {Function}
@@ -412,45 +414,49 @@ export const onUpdated = hookMethodCreator('updated');
 export const onError = hookMethodCreator('error');
 
 
-/**
- * 创建组件实例成员API的高阶函数，
- * 负责：computed、messages、watch等API创建
- *
- * @param {string} memberName
- * @returns {Function}
- */
-function instanceMemberCreator(memberName) {
-    /**
-     * 创建组件属性API方法
-     * 参数可以是key、val两个参数，也可以是对象的形式
-     *
-     * @param {string|Object} name 数据的key，或者键值对
-     * @param {Function} handler 添加的函数
-     */
-    return function (name, value) {
-        if (context.creator) {
-            return;
-        }
+export function messages(name, value) {
+    if (context.creator) {
+        return;
+    }
 
-        let component = context.component;
-        let target = component[memberName];
-        if (!component.hasOwnProperty(memberName)) {
-            target = component[memberName] = {};
-        }
+    let component = context.component;
+    switch (typeof name) {
+        case 'string':
+            if (!component.messages) {
+                component.messages = {};
+            }
+            component.messages[name] = value;
+            break;
 
-        switch (typeof name) {
-            case 'string':
-                target[name] = value;
-                break;
-
-            case 'object':
-                Object.assign(target, name);
-        }
-    };
+        case 'object':
+            if (!component.messages) {
+                component.messages = name;
+            }
+            else {
+                Object.assign(component.messages, name);
+            }
+    }
 }
 
-export const messages = instanceMemberCreator('messages');
-export const watch = instanceMemberCreator('watches');
+export function watch(name, value) {
+    if (context.creator) {
+        return;
+    }
+
+    if (!context.watches) {
+        context.watches = {};
+    }
+
+    switch (typeof name) {
+        case 'string':
+            context.watches[name] = value;
+            break;
+
+        case 'object':
+            Object.assign(context.watches, name);
+    }
+}
+
 
 /**
  * 为组件添加方法
