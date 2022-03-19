@@ -103,11 +103,11 @@ defineComponent(() => {
 
 **描述**
 
-`data(key, value)`
+`data(name, value)`
 
 **参数**
 
-- `{string} key`
+- `{string} name`
 - `{*} value`
 
 **返回**
