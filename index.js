@@ -131,7 +131,7 @@ class DataProxy {
      *
      * @param {string|Array} name 数据的key，如果是通过键值对声明的数据，则name是一个数组
      */
-    constructor(name) {
+    constructor(name, context) {
         this.name = name;
         this.instance = context.instance;
     }
@@ -279,16 +279,16 @@ class DataProxy {
 /**
  * 操作数据的API，提供 get 和 set 方法
  *
- * @param {string} key 数据的key
- * @param {*} value 设置的数据
+ * @param {string} name 数据的名称
+ * @param {*} value 初始值
  * @returns {Object} 返回一个带有包装有 this.data 相关数据操作API的对象
  */
-export function data(key, value) {
+export function data(name, value) {
     if (context.creator) {
         return;
     }
 
-    if (typeof key !== 'string') {
+    if (typeof name !== 'string') {
         return;
     }
 
@@ -296,13 +296,14 @@ export function data(key, value) {
         context.initData = {};
     }
 
-    context.initData[key] = value;
+    context.initData[name] = value;
 
-    if (!context.__proxy) {
-        context.__proxy = {};
+    let dataDefs = context.instanceContext._dataDefs;
+    if (dataDefs[name]) {
+        return dataDefs[name];
     }
 
-    return context.__proxy[key] = new DataProxy(key);
+    return (dataDefs[name] = new DataProxy(name, context));
 };
 
 class ComputedProxy {
@@ -474,19 +475,16 @@ export function method(name, value) {
 class ComponentContext4Method {
     constructor(component) {
         this.component = component;
+        this._dataDefs = {};
     }
 
     data(name) {
-        this.component.__scContext.__proxy = this.component.__scContext.__proxy || {};
-
-        if (!this.component.__scContext.__proxy[name]) {
-            let originContext = context;
-            context = this.component.__scContext;
-            this.component.__scContext.__proxy[name] = new DataProxy(name);
-            context = originContext;
+        let dataProxy = this._dataDefs[name];
+        if (!dataProxy) {
+            dataProxy = this._dataDefs[name] = new DataProxy(name, this.component.__scContext);
         }
 
-        return this.component.__scContext.__proxy[name];
+        return dataProxy;
     }
 
     dispatch(name, value) {
@@ -531,6 +529,7 @@ export function defineComponent(creator, san) {
     const ComponentClass = function (options) {
         this.__scContext = {
             instance: this,
+            instanceContext: new ComponentContext4Method(this),
             inited: [
                 componentInitComputed
             ],
@@ -542,7 +541,7 @@ export function defineComponent(creator, san) {
         contexts.push(context);
 
         let creatorAsInstance = defineContext.creator;
-        creatorAsInstance(new ComponentContext4Method(this));
+        creatorAsInstance(context.instanceContext);
 
         contexts.pop();
         context = contexts[contexts.length - 1];
