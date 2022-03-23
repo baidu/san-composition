@@ -547,7 +547,7 @@ export function defineComponent(creator, san) {
             inited: [componentInitComputed],
             attached: [componentInitWatch]
         };
-        
+
         context = this.__scContext;
         contexts.push(context);
 
