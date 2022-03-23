@@ -1,6 +1,6 @@
 {
   "name": "san-composition",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "main": "dist/index.common.js",
   "browser": "dist/index.common.js",
   "module": "dist/index.esm.js",
