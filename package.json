@@ -25,7 +25,9 @@
   ],
   "files": [
     "index.js",
-    "dist"
+    "dist",
+    "types/*.d.ts",
+    "types/*.json"
   ],
   "repository": {
     "type": "git",
