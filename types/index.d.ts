@@ -1,4 +1,4 @@
-import type {Component} from 'san';
+import type {Component, DefinedComponentClass} from 'san';
 interface DataObj {
     [key: string]: any;
 }
@@ -11,9 +11,9 @@ declare type Creator = (context?: ComponentContext) => void;
 declare type TFunction = (...args: any) => any;
 declare type NFunction = (...args: any) => void;
 interface ClassMemberCreator {
-    (name: string, value: NFunction): void;
+    (name: string, value: DefinedComponentClass<{}, {}>): void;
     (value: {
-        [key: string]: NFunction;
+        [key: string]: DefinedComponentClass<{}, {}>;
     }): void;
 }
 interface SpliceArgs {
@@ -30,7 +30,7 @@ type SanLike = {
 type LifeCycleHook = (handler: NFunction) => void;
 
 export declare const version: string;
-export declare function defineComponent(creator: Creator, san: SanLike): NFunction;
+export declare function defineComponent<DataT extends {} = {}, OptionsT extends {} = {}>(creator: Creator, san: SanLike): DefinedComponentClass<DataT, OptionsT>;
 
 
 export declare function template(tpl: string): void;
