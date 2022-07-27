@@ -25,7 +25,7 @@ type SanLike = {
     Component: Component;
 };
 
-type LifeCycleHook = (handler: NFunction) => void;
+
 
 export declare const version: string;
 export declare function defineComponent<DataT extends {} = {}, OptionsT extends {} = {}>(creator: Creator, san: SanLike): DefinedComponentClass<DataT, OptionsT>;
@@ -89,20 +89,20 @@ export declare function data(name: string, value: any): DataProxy;
 export declare function data<T>(name: string, value: T): DataProxy<T>;
 
 
-declare class ComputedProxy {
+declare class ComputedProxy<T> {
     name: string;
-    instance: {
-        [key: string]: any;
-    };
     constructor(name: string);
-    get(): any;
+    get(): T;
 }
 
-export declare function computed(name: string, fn: TFunction): ComputedProxy | undefined;
+export declare function computed(name: string, fn: () => any): ComputedProxy<any>;
+export declare function computed<T>(name: string, fn: () => T): ComputedProxy<T>;
 
 
 export declare const filters: ClassMemberCreator;
 export declare const components: ClassMemberCreator;
+
+type LifeCycleHook = (handler: () => void) => void;
 export declare const onConstruct: LifeCycleHook;
 export declare const onCompiled: LifeCycleHook;
 export declare const onInited: LifeCycleHook;
@@ -112,6 +112,7 @@ export declare const onDetached: LifeCycleHook;
 export declare const onDisposed: LifeCycleHook;
 export declare const onUpdated: LifeCycleHook;
 export declare const onError: LifeCycleHook;
+
 export declare const messages: NFunction;
 export declare const watch: NFunction;
 
