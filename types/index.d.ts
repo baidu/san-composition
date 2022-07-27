@@ -4,7 +4,7 @@ interface DataObj {
 }
 interface ComponentContext extends Pick<Component, 'dispatch' | 'fire' | 'ref' | 'nextTick'> {
     component: Component;
-    data(name: string): DataProxy;
+    data<T extends {} = {}>(name: string): DataProxy<T>;
 }
 
 declare type Creator = (context?: ComponentContext) => void;
@@ -36,7 +36,9 @@ export declare function defineComponent<DataT extends {} = {}, OptionsT extends 
 export declare function template(tpl: string): void;
 export declare function template(tpl: TemplateStringsArray, ...args: string[]): void;
 
-declare class DataProxy {
+type DataKey<T> = keyof T extends never ? string : keyof T;
+type DataVal<T, M> = keyof T extends never ? any : T[M extends keyof T ? M : never];
+declare class DataProxy<T extends {} = {}> {
     name: string;
     instance: {
         [key: string]: any;
@@ -44,10 +46,9 @@ declare class DataProxy {
 
     constructor(name: string);
 
-    get(name?: string): any;
-
+    get<M extends DataKey<T>>(name?: M):  DataVal<T, M>;
+    set<M extends DataKey<T>>(name: M, value?: DataVal<T, M>): void;
     set(value: any): void;
-    set(name: string, value?: any): void;
 
     merge(source: DataObj): void;
     merge(name: string, source: DataObj): void;
@@ -77,7 +78,7 @@ declare class DataProxy {
     _resolveName(name: string): string;
 }
 
-export declare function data(key: string, value: any): DataProxy | undefined;
+export declare function data<T extends {} = {}>(key: string, value: any): DataProxy<T> | undefined;
 declare class ComputedProxy {
     name: string;
     instance: {
