@@ -6,6 +6,7 @@ const MyComponent = defineComponent<{
     email: string;
     age: number;
 }>(context => {
+
     template`
     <div>
         <p>name: {{name}}</p>
@@ -18,10 +19,25 @@ const MyComponent = defineComponent<{
             <p>email: {{email}}</p>
         </div>`);
 
-    const name = data('name', 'baidu');
+
+    // data
+    const name = data<string>('name', 'baidu');
+    let nameVal = name.get();
+
+    const person = data<{name:string;age:number;}>('person', {name: 'baidu', age: 23});
+    let pNameVal = person.get('name');
+
+    person.set('age', 10);
+
+    person.merge({age: 23});
+
+    // person.merge('name', {age: 23}); error
+    // name.merge({}); // error
+
     name.apply(val => {
         return val + ' 2021';
     });
+
     data('email', 'xxx@baidu.com');
 
     onAttached(() => {
@@ -35,5 +51,6 @@ const myComponent = new MyComponent({
     }
 });
 
+let email = myComponent.data.get('email');
 myComponent.attach(document.body);
 myComponent.dispose();
