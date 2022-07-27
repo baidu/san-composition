@@ -6,14 +6,7 @@ interface ComponentContext extends Pick<Component, 'dispatch' | 'fire' | 'ref' |
 }
 
 declare type Creator = (context?: ComponentContext) => void;
-declare type TFunction = (...args: any) => any;
-declare type NFunction = (...args: any) => void;
-interface ClassMemberCreator {
-    (name: string, value: DefinedComponentClass<{}, {}>): void;
-    (value: {
-        [key: string]: DefinedComponentClass<{}, {}>;
-    }): void;
-}
+
 interface SpliceArgs {
     [index: number]: any;
     0: number;
@@ -24,7 +17,6 @@ type SanLike = {
     [key: string]: any;
     Component: Component;
 };
-
 
 
 export declare const version: string;
@@ -98,9 +90,19 @@ declare class ComputedProxy<T> {
 export declare function computed(name: string, fn: () => any): ComputedProxy<any>;
 export declare function computed<T>(name: string, fn: () => T): ComputedProxy<T>;
 
+export declare function filters(
+    name: string, 
+    component: (value: any, ...filterOption: any[]) => any
+): void;
+export declare function filters(filters: {
+    [k: string]: (value: any, ...filterOption: any[]) => any;
+}): void;
 
-export declare const filters: ClassMemberCreator;
-export declare const components: ClassMemberCreator;
+
+export declare function components(name: string, component: DefinedComponentClass<{}, {}>): void;
+export declare function components(components: {
+    [key: string]: DefinedComponentClass<{}, {}>;
+}): void;
 
 type LifeCycleHook = (handler: () => void) => void;
 export declare const onConstruct: LifeCycleHook;
@@ -113,10 +115,25 @@ export declare const onDisposed: LifeCycleHook;
 export declare const onUpdated: LifeCycleHook;
 export declare const onError: LifeCycleHook;
 
-export declare const messages: NFunction;
-export declare const watch: NFunction;
 
-export declare function method(name: string, fn: NFunction): void;
-export declare function method<T extends {
-    [key: string]: NFunction;
-}>(name: T): void;
+
+export declare function messages(
+    name: string, 
+    msgFn: (arg?: {name?: string, target?: Component<{}>, value?: unknown}) => void
+): void;
+export declare function messages(msgs: {
+    [k: string]: (arg?: {name?: string, target?: Component<{}>, value?: unknown}) => void;
+}): void;
+
+export declare function watch(
+    name: string, 
+    watcher: (value: any, arg: {oldValue?: any, newValue?: any}) => void
+): void;
+export declare function watch(watchers: {
+    [k: string]: (value: any, arg: {oldValue?: any, newValue?: any}) => void
+}): void;
+
+export declare function method(name: string, fn: (...args: any) => void): void;
+export declare function method(methods: {
+    [key: string]: (...args: any) => void;
+}): void;
