@@ -1,7 +1,5 @@
 import type {Component, DefinedComponentClass} from 'san';
-interface DataObj {
-    [key: string]: any;
-}
+
 interface ComponentContext extends Pick<Component, 'dispatch' | 'fire' | 'ref' | 'nextTick'> {
     component: Component;
     data<T extends {} = {}>(name: string): DataProxy<T>;
@@ -36,22 +34,36 @@ export declare function defineComponent<DataT extends {} = {}, OptionsT extends 
 export declare function template(tpl: string): void;
 export declare function template(tpl: TemplateStringsArray, ...args: string[]): void;
 
+type Get<T, K> = K extends `${infer L}.${infer R}`
+    ? L extends keyof T
+        ? Get<T[L], R>
+        : any
+    : K extends `${infer First}[${infer Tail}]`
+        ? First extends keyof T
+            ? T[First] extends Array<infer AT> ? AT : any
+            : any
+        : K extends keyof T
+            ? T[K]
+            : any
 type DataKey<T> = keyof T extends never ? string : keyof T;
 type DataVal<T, M> = keyof T extends never ? any : T[M extends keyof T ? M : never];
+
+interface MergeSource {
+    [key: string]: any;
+}
+
 declare class DataProxy<T = any> {
     name: string;
-    instance: {
-        [key: string]: any;
-    };
-
     constructor(name: string);
 
-    get<M extends DataKey<T>>(name?: M):  DataVal<T, M>;
-    set<M extends DataKey<T>>(name: M, value?: DataVal<T, M>): void;
-    set(value: any): void;
+    get(): T;
+    get<TPath extends string>(name: TPath):  Get<T, TPath>;
 
-    merge(source: DataObj): void;
-    merge(name: string, source: DataObj): void;
+    set(value: T): void;
+    set<TPath extends string>(name: TPath, value: Get<T, TPath>):  void;
+
+    merge(source: MergeSource): void;
+    merge(name: string, source: MergeSource): void;
 
     apply(name: string, fn: TFunction): void;
     apply(fn: TFunction): void;
@@ -78,8 +90,8 @@ declare class DataProxy<T = any> {
     _resolveName(name: string): string;
 }
 
-export declare function data(key: string, value: any): DataProxy;
-export declare function data<T>(key: string, value: T): DataProxy<T>;
+export declare function data(name: string, value: any): DataProxy;
+export declare function data<T>(name: string, value: T): DataProxy<T>;
 
 
 declare class ComputedProxy {
