@@ -48,9 +48,6 @@ type Get<T, K> = K extends `${infer L}.${infer R}`
 type DataKey<T> = keyof T extends never ? string : keyof T;
 type DataVal<T, M> = keyof T extends never ? any : T[M extends keyof T ? M : never];
 
-interface MergeSource {
-    [key: string]: any;
-}
 
 declare class DataProxy<T = any> {
     name: string;
@@ -62,11 +59,11 @@ declare class DataProxy<T = any> {
     set(value: T): void;
     set<TPath extends string>(name: TPath, value: Get<T, TPath>):  void;
 
-    merge(source: MergeSource): void;
-    merge(name: string, source: MergeSource): void;
+    merge(source: Partial<T>): void;
+    merge<TPath extends string>(name: TPath, source: Partial<Get<T, TPath>>): void;
 
-    apply(name: string, fn: TFunction): void;
-    apply(fn: TFunction): void;
+    apply(changer: (oldValue: T) => T): void;
+    apply<TPath extends string>(name: TPath, changer: (oldValue: Get<T, TPath>) => Get<T, TPath>): void;
 
     push(name: string, item: any): number;
     push(item: any): number;
@@ -86,8 +83,6 @@ declare class DataProxy<T = any> {
 
     splice(name: string, args: SpliceArgs): void;
     splice(args: SpliceArgs): void;
-
-    _resolveName(name: string): string;
 }
 
 export declare function data(name: string, value: any): DataProxy;
