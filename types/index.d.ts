@@ -38,7 +38,7 @@ export declare function template(tpl: TemplateStringsArray, ...args: string[]): 
 
 type DataKey<T> = keyof T extends never ? string : keyof T;
 type DataVal<T, M> = keyof T extends never ? any : T[M extends keyof T ? M : never];
-declare class DataProxy<T extends {} = {}> {
+declare class DataProxy<T = any> {
     name: string;
     instance: {
         [key: string]: any;
@@ -78,7 +78,10 @@ declare class DataProxy<T extends {} = {}> {
     _resolveName(name: string): string;
 }
 
-export declare function data<T extends {} = {}>(key: string, value: any): DataProxy<T> | undefined;
+export declare function data(key: string, value: any): DataProxy;
+export declare function data<T>(key: string, value: T): DataProxy<T>;
+
+
 declare class ComputedProxy {
     name: string;
     instance: {
@@ -89,6 +92,8 @@ declare class ComputedProxy {
 }
 
 export declare function computed(name: string, fn: TFunction): ComputedProxy | undefined;
+
+
 export declare const filters: ClassMemberCreator;
 export declare const components: ClassMemberCreator;
 export declare const onConstruct: LifeCycleHook;
