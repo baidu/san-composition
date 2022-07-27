@@ -1,26 +1,27 @@
 import type {Component, DefinedComponentClass} from 'san';
 
-interface ComponentContext extends Pick<Component, 'dispatch' | 'fire' | 'ref' | 'nextTick'> {
+interface ComponentContext {
     component: Component;
-    data<T extends {} = {}>(name: string): DataProxy<T>;
+    data<T = any>(name: string): DataProxy<T>;
+    dispatch<TMsg>(messageName: string, message: TMsg): void;
+    fire(eventName: string):void;
+    fire<TEventArg>(eventName: string, eventArg: TEventArg): void;
+    ref<TCmpt extends Component<{}>>(refName: string): TCmpt;
+    ref(refName: string): Component<{}> | Element;
+    (handler: () => void): void;
 }
 
 declare type Creator = (context?: ComponentContext) => void;
-
-interface SpliceArgs {
-    [index: number]: any;
-    0: number;
-    1?: number;
-}
-
 type SanLike = {
     [key: string]: any;
     Component: Component;
 };
 
 
-export declare const version: string;
-export declare function defineComponent<DataT extends {} = {}, OptionsT extends {} = {}>(creator: Creator, san: SanLike): DefinedComponentClass<DataT, OptionsT>;
+export declare function defineComponent<
+    ExportDataT extends {} = {}, 
+    ExportInterface extends {} = {}
+>(creator: Creator, san: SanLike): DefinedComponentClass<ExportDataT, ExportInterface>;
 
 
 export declare function template(tpl: string): void;
@@ -37,9 +38,13 @@ type Get<T, K> = K extends `${infer L}.${infer R}`
         : K extends keyof T
             ? T[K]
             : any
-type DataKey<T> = keyof T extends never ? string : keyof T;
-type DataVal<T, M> = keyof T extends never ? any : T[M extends keyof T ? M : never];
+;
 
+interface SpliceArgs {
+    [index: number]: any;
+    0: number;
+    1?: number;
+}
 
 declare class DataProxy<T = any> {
     name: string;
@@ -137,3 +142,5 @@ export declare function method(name: string, fn: (...args: any) => void): void;
 export declare function method(methods: {
     [key: string]: (...args: any) => void;
 }): void;
+
+export declare const version: string;
