@@ -49,8 +49,10 @@ function componentInitLifeCycle() {
         if (hooks) {
             let len = hooks.length;
             this[lifeCycle] = function (...args) {
-                for (let i = 0; i < len; i++) {
-                    hooks[i].apply(this, args);
+                if (this.__scContext) {
+                    for (let i = 0; i < len; i++) {
+                        hooks[i].apply(this, args);
+                    }
                 }
             };
         }
@@ -58,7 +60,7 @@ function componentInitLifeCycle() {
 }
 
 function componentInitComputed() {
-    let computed = this.__scContext.computed;
+    let computed = this.__scContext && this.__scContext.computed;
     if (computed) {
         let names = Object.keys(computed);
         for (let i = 0; i < names.length; i++) {
@@ -80,7 +82,7 @@ function componentInitComputed() {
 }
 
 function componentInitWatch() {
-    let watches = this.__scContext.watches;
+    let watches = this.__scContext && this.__scContext.watches;
     if (watches) {
         let component = this.__scContext.component;
 
