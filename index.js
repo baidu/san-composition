@@ -156,7 +156,7 @@ class DataProxy {
      */
     get(name) {
         let fullName = name ? this._resolveName(name) : this.name;
-        
+
         let scContext = this.component.__scContext;
         let computedDatas = scContext && scContext.computedDatas;
         if (computedDatas) {
@@ -498,19 +498,27 @@ class PublicComponentContext {
     }
 
     dispatch(name, value) {
-        this.component.dispatch(name, value);
+        if (this.component) {
+            this.component.dispatch(name, value);
+        }
     }
 
     fire(name, event) {
-        this.component.fire(name, event);
+        if (this.component) {
+            this.component.fire(name, event);
+        }
     }
 
     ref(name) {
-        return this.component.ref(name);
+        if (this.component) {
+            return this.component.ref(name);
+        }
     }
 
     nextTick(fn, thisArg) {
-        this.component.nextTick(fn, thisArg);
+        if (this.component) {
+            this.component.nextTick(fn, thisArg);
+        }
     }
 
     dispose() {
