@@ -81,7 +81,7 @@ function componentInitComputed() {
 
 function componentInitWatch() {
     let watches = this.__scContext && this.__scContext.watches;
-    
+
     if (watches) {
         let component = this.__scContext.component;
 
