@@ -7,6 +7,7 @@ import {
     data,
     computed,
     method,
+    onAttached,
 }  from '../index';
 
 const wrapper = document.createElement('div');
@@ -77,3 +78,22 @@ const App =  defineComponent(() => {
 }, san);
 
 (new App()).attach(wrapper);
+
+let DataSetAfterDisposed = defineComponent(context => {
+    template('<u>num is {{num}}</u>');
+
+    let d = data('num', 10);
+
+    onAttached(() => {
+        setTimeout(() => {
+            context.data('num').set(50);
+            console.log(d.get());
+        }, 1000);
+    });
+}, san);
+
+(function () {
+    let myComponent = new DataSetAfterDisposed();
+    myComponent.attach(wrapper);
+    myComponent.dispose();
+})();

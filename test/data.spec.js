@@ -1,3 +1,4 @@
+
 describe('[data]: ', () => {
     it("data set in inited should not update view", function (done) {
         let up = false;
@@ -76,5 +77,33 @@ describe('[data]: ', () => {
             document.body.removeChild(wrap);
             done();
         })
+    });
+
+    it("set data and get data, when component disposed", function (done) {
+
+        let MyComponent = defineComponent(context => {
+            template('<u>{{num}}</u>');
+
+            let d = data('num', 10);
+
+            onAttached(() => {
+                setTimeout(() => {
+                    context.data('num').set(50);
+                    expect(d.get()).toBe(50);
+                    done();
+                }, 1000);
+            })
+        });
+
+        let myComponent = new MyComponent();
+        let wrap = document.createElement('div');
+        document.body.appendChild(wrap);
+        myComponent.attach(wrap);
+
+        expect(wrap.getElementsByTagName('u')[0].innerHTML).toBe('10');
+
+        myComponent.dispose();
+        document.body.removeChild(wrap);
+
     });
 });

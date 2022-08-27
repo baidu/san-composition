@@ -156,8 +156,9 @@ class DataProxy {
      */
     get(name) {
         let fullName = name ? this._resolveName(name) : this.name;
-
-        let computedDatas = this.component.__scContext.computedDatas;
+        
+        let scContext = this.component.__scContext;
+        let computedDatas = scContext && scContext.computedDatas;
         if (computedDatas) {
             computedDatas.push(fullName);
         }
@@ -514,7 +515,6 @@ class PublicComponentContext {
 
     dispose() {
         this.component = null;
-        this._dataDefs = null;
     }
 }
 
