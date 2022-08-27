@@ -319,10 +319,12 @@ class ComputedProxy {
     }
 
     get() {
-        let computedDatas = this.component.__scContext.computedDatas;
+        let scContext = this.component.__scContext;
+        let computedDatas = scContext && scContext.computedDatas;
         if (computedDatas) {
             computedDatas.push(this.name);
         }
+
         return this.component.data.get(this.name);
     }
 }
