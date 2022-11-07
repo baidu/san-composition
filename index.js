@@ -127,21 +127,19 @@ export function template(tpl) {
     }
 };
 
-export function trimWhitespace(val) {
+/**
+ * template配置项
+ *
+ * @param {Object} 组件的模板配置项，包括：trimWhitespace、delimiters、autoFillStyleAndId
+ */
+export function templateOptions({trimWhitespace, delimiters, autoFillStyleAndId}) {
     if (context.creator) {
-        context.trimWhitespace = val;
+        context.trimWhitespace = trimWhitespace;
+        context.delimiters = delimiters;
+        context.autoFillStyleAndId = autoFillStyleAndId;
     }
-}
-export function delimiters(val) {
-    if (context.creator) {
-        context.delimiters = val;
-    }
-}
-export function autoFillStyleAndId(val) {
-    if (context.creator) {
-        context.autoFillStyleAndId = val;
-    }
-}
+};
+
 /**
  * 组件数据的代理类
  * @class DataProxy
@@ -617,15 +615,9 @@ export function defineComponent(creator, san) {
         ComponentClass.prototype.components = defineContext.components;
     }
 
-    if (defineContext.trimWhitespace) {
-        ComponentClass.prototype.trimWhitespace = defineContext.trimWhitespace;
-    }
-    if (defineContext.delimiters) {
-        ComponentClass.prototype.delimiters = defineContext.delimiters;
-    }
-    if (defineContext.autoFillStyleAndId) {
-        ComponentClass.prototype.autoFillStyleAndId = defineContext.autoFillStyleAndId;
-    }
+    ComponentClass.prototype.trimWhitespace = defineContext.trimWhitespace;
+    ComponentClass.prototype.delimiters = defineContext.delimiters;
+    ComponentClass.prototype.autoFillStyleAndId = defineContext.autoFillStyleAndId;
 
     return ComponentClass;
 };

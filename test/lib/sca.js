@@ -1,5 +1,6 @@
 const {
     template,
+    templateOptions,
     data,
     computed,
     messages,
