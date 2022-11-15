@@ -128,6 +128,19 @@ export function template(tpl) {
 };
 
 /**
+ * template配置项
+ *
+ * @param {Object} 组件的模板配置项，包括：trimWhitespace、delimiters、autoFillStyleAndId
+ */
+export function templateOptions({trimWhitespace, delimiters, autoFillStyleAndId}) {
+    if (context.creator) {
+        context.trimWhitespace = trimWhitespace;
+        context.delimiters = delimiters;
+        context.autoFillStyleAndId = autoFillStyleAndId;
+    }
+};
+
+/**
  * 组件数据的代理类
  * @class DataProxy
  */
@@ -601,6 +614,10 @@ export function defineComponent(creator, san) {
     if (defineContext.components) {
         ComponentClass.prototype.components = defineContext.components;
     }
+
+    ComponentClass.prototype.trimWhitespace = defineContext.trimWhitespace;
+    ComponentClass.prototype.delimiters = defineContext.delimiters;
+    ComponentClass.prototype.autoFillStyleAndId = defineContext.autoFillStyleAndId;
 
     return ComponentClass;
 };
