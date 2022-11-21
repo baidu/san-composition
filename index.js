@@ -481,20 +481,21 @@ export function watch(name, value) {
  *
  * @param {string|Object} name 数据的key，或者键值对
  * @param {Function} handler 添加的函数
+ * @return {Function|Object} 返回添加的方法或方法集
  */
 export function method(name, value) {
-    if (context.creator) {
-        return;
+    if (!context.creator) {
+        switch (typeof name) {
+            case 'string':
+                context.component[name] = value;
+                break;
+    
+            case 'object':
+                Object.assign(context.component, name);
+        }
     }
 
-    switch (typeof name) {
-        case 'string':
-            context.component[name] = value;
-            break;
-
-        case 'object':
-            Object.assign(context.component, name);
-    }
+    return value || name;
 }
 
 
