@@ -615,9 +615,17 @@ export function defineComponent(creator, san) {
         ComponentClass.prototype.components = defineContext.components;
     }
 
-    ComponentClass.prototype.trimWhitespace = defineContext.trimWhitespace;
-    ComponentClass.prototype.delimiters = defineContext.delimiters;
-    ComponentClass.prototype.autoFillStyleAndId = defineContext.autoFillStyleAndId;
+    if (defineContext.trimWhitespace != null) {
+        ComponentClass.prototype.trimWhitespace = defineContext.trimWhitespace;
+    }
 
+    if (defineContext.delimiters != null) {
+        ComponentClass.prototype.delimiters = defineContext.delimiters;
+    }
+
+    if (defineContext.autoFillStyleAndId != null) {
+        ComponentClass.prototype.autoFillStyleAndId = defineContext.autoFillStyleAndId;
+    }
+    
     return ComponentClass;
 };
