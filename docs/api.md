@@ -2,6 +2,7 @@
 
 - [defineComponent](#defineComponent)
 - [template](#template)
+- [templateOptions](#templateOptions)
 - [data](#data)
 - [DataProxy](#DataProxy)
 - [method](#method)
@@ -92,6 +93,42 @@ defineComponent(() => {
 
    // 或者
    // template`<div>Hello {{name}}.</div>`;
+}, san);
+```
+
+
+## templateOptions
+
+设置组件模板解析或运行的行为参数。
+
+**描述**
+
+`templateOptions(options)`
+
+**参数**
+
+- `{string?} options.trimWhitespace` 空白字符的 trim 模式。none | blank | all。
+- `{Array?} options.delimiters` 模板解析时插值的分隔符。值为2个项的数组，分别为起始分隔符和结束分隔符。默认为 `['{{', '}}']`
+- `{boolean?} options.autoFillStyleAndId` 组件根节点是否应用外部通过绑定传入的 id / class / style。默认为 true。
+
+**返回**
+
+无
+
+**示例**
+
+```js
+defineComponent(() => {
+    template`
+    <div>
+        Hello 
+        <b>{{name}}</b>.
+    </div>
+    `;
+
+    templateOptions({
+        trimWhitespace: 'all'
+    });
 }, san);
 ```
 
