@@ -28,7 +28,8 @@ describe('[templateOptions]: ', () => {
         myComponent.dispose();
         document.body.removeChild(wrap);
     });
-    it('setting templateOptions.trimWhitespace to all', function () {
+
+    it('setting templateOptions trimWhitespace to all', function () {
         let MyComponent = defineComponent(() => {
             template`
                 <div id="listWrap">
@@ -50,11 +51,12 @@ describe('[templateOptions]: ', () => {
         document.body.removeChild(wrap);
     });
 
-    it('setting templateOptions.trimWhitespace to all', function () {
+    it('setting templateOptions delimiters', function () {
         let MyComponent = defineComponent(() => {
             template`<span title="{%color%}">{%color%}</span>`;
             templateOptions({delimiters: ['{%', '%}']});
         });
+
         const myComponent = new MyComponent({data: {color}});
 
         const wrap = document.createElement('div');
@@ -62,26 +64,27 @@ describe('[templateOptions]: ', () => {
         myComponent.attach(wrap);
 
         let span = wrap.getElementsByTagName('span')[0];
-        expect(span.title).toBe('red');
+        expect(span.title).toBe(color);
 
         myComponent.dispose();
         document.body.removeChild(wrap);
     });
 
-    it('setting templateOptions.autoFillStyleAndId to false', function () {
+    it('setting templateOptions autoFillStyleAndId to false', function () {
+        let Label = defineComponent(context => {
+            template`<span>label</span>`;
+            templateOptions({autoFillStyleAndId: false});
+        });
+
         let MyComponent = defineComponent(context => {
             template`
                 <div>
-                    <span title="{{color}}">{{color}}</span>
-                    <div id="listWrap">
-                        <div s-for="item in list">{{item}}</div>
-                    </div>
+                    <ui-label id="nothing" />
                 </div>
             `;
-            templateOptions({autoFillStyleAndId: false});
-            onAttached(() => {
-                console.log(context.component.aNode.props)
-                expect(context.component.aNode.props.length).toBe(0);
+
+            components({
+                'ui-label': Label
             });
         });
         
@@ -89,6 +92,37 @@ describe('[templateOptions]: ', () => {
         const wrap = document.createElement('div');
         document.body.appendChild(wrap);
         myComponent.attach(wrap);
+
+        expect(document.getElementById('nothing') == null).toBeTruthy();
+
+        myComponent.dispose();
+        document.body.removeChild(wrap);
+    });
+
+    it('setting templateOptions autoFillStyleAndId to true', function () {
+        let Label = defineComponent(context => {
+            template`<span>label</span>`;
+            templateOptions({autoFillStyleAndId: true});
+        });
+
+        let MyComponent = defineComponent(context => {
+            template`
+                <div>
+                    <ui-label id="nothing" />
+                </div>
+            `;
+
+            components({
+                'ui-label': Label
+            });
+        });
+        
+        const myComponent = new MyComponent({data: {list, color}});
+        const wrap = document.createElement('div');
+        document.body.appendChild(wrap);
+        myComponent.attach(wrap);
+
+        expect(document.getElementById('nothing').tagName.toLowerCase()).toBe('span');
 
         myComponent.dispose();
         document.body.removeChild(wrap);
