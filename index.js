@@ -489,7 +489,7 @@ export function method(name, value) {
             case 'string':
                 context.component[name] = value;
                 break;
-    
+
             case 'object':
                 Object.assign(context.component, name);
         }
