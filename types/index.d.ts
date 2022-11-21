@@ -27,9 +27,9 @@ export declare function defineComponent<
 export declare function template(tpl: string): void;
 export declare function template(tpl: TemplateStringsArray, ...args: string[]): void;
 export declare function templateOptions(options: {
-    trimWhitespace?: string,
-    delimiters?: string,
-    autoFillStyleAndId?: string
+    trimWhitespace?: 'none' | 'blank' | 'all',
+    delimiters?: [string, string],
+    autoFillStyleAndId?: boolean
 }): void;
 
 type Get<T, K> = K extends `${infer L}.${infer R}`
