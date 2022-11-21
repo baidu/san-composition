@@ -626,6 +626,6 @@ export function defineComponent(creator, san) {
     if (defineContext.autoFillStyleAndId != null) {
         ComponentClass.prototype.autoFillStyleAndId = defineContext.autoFillStyleAndId;
     }
-    
+
     return ComponentClass;
 };
