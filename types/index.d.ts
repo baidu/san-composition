@@ -14,7 +14,8 @@ interface ComponentContext {
 declare type Creator = (context?: ComponentContext) => void;
 type SanLike = {
     [key: string]: any;
-    Component: Component;
+    version: string;
+    Component: typeof Component;
 };
 
 
@@ -143,9 +144,9 @@ export declare function watch(watchers: {
     [k: string]: (value: any, arg: {oldValue?: any, newValue?: any}) => void
 }): void;
 
-export declare function method(name: string, fn: (...args: any) => void): void;
+export declare function method(name: string, fn: (...args: any) => void): typeof fn;
 export declare function method(methods: {
     [key: string]: (...args: any) => void;
-}): void;
+}): typeof methods;
 
 export declare const version: string;
